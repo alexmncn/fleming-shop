@@ -2,7 +2,7 @@
 from flask import Flask
 from flask_cors import CORS
 
-from app.extensions import db
+from app.extensions import db, migrate
 from app.routes import home
 
 def create_app(config_object="app.config"):
@@ -17,6 +17,7 @@ def create_app(config_object="app.config"):
 def register_extensions(app):
     # Initialize the extensions.
     db.init_app(app)
+    migrate.init_app(app, db)
     return None
 
 def register_blueprints(app):
