@@ -28,4 +28,4 @@ def featured_a():
     
     articulos = featured_articles(page, per_page)
     
-    return jsonify(articulos) 
+    return jsonify(articulos)
