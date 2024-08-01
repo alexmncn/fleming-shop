@@ -1,15 +1,31 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, request, jsonify
 
-from app.services.data import data
+from app.services.home_data import all_articles, featured_articles
 
 
 home_bp = Blueprint('home', __name__)
+
 
 @home_bp.route('/')
 def home():
     return '<h1>Hello world</h1>'
 
-@home_bp.route('/data')
+
+@home_bp.route('/articles/all')
 def data_():
-    articulo = data()
-    return jsonify(ref=articulo.ref, detalle=articulo.detalle, codfam=articulo.codfam, detallefam=articulo.detallefam, pcosto=articulo.pcosto, pvp=articulo.pvp, codebar=articulo.codebar, stock=articulo.stock, factualizacion=articulo.factualizacion)
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 20, type=int)
+    
+    articulos = all_articles(page, per_page)
+            
+    return jsonify(articulos)
+
+
+@home_bp.route('/articles/featured')
+def featured_a():
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 20, type=int)
+    
+    articulos = featured_articles(page, per_page)
+    
+    return jsonify(articulos) 
