@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 
-from app.services.home_data import all_articles, featured_articles, all_families, family_articles
+from app.services.home_data import all_articles, featured_articles, all_families, family_articles, new_articles
 
 
 home_bp = Blueprint('home', __name__)
@@ -26,10 +26,19 @@ def featured_articles_():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 20, type=int)
     
-    articulos = featured_articles(page, per_page)
+    articles = featured_articles(page, per_page)
     
-    return jsonify(articulos)
+    return jsonify(articles)
 
+
+@home_bp.route('/articles/new')
+def new_articles_():
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 20, type=int)
+    
+    articles = new_articles(page, per_page)
+
+    return jsonify(articles)
 
 @home_bp.route('/articles/families')
 @home_bp.route('/articles/families/<int:family_id>')
