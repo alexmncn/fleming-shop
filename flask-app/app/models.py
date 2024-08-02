@@ -28,6 +28,14 @@ class article(db.Model):
             'factualizacion': self.factualizacion,
             'destacado': bool(self.destacado)
         }
+        
+    def to_dict_reduced(self):
+        return {
+            'ref': self.ref, 
+            'detalle': self.detalle, 
+            'codfam': self.codfam,  
+            'pvp': self.pvp
+        }
     
 
 class family(db.Model):
