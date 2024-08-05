@@ -1,0 +1,26 @@
+section {
+    margin-bottom: 3rem;
+}
+
+.families {
+    display: flex;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    gap: 1rem;
+    padding: 0.75rem;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.family {
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0px 2px 5px 2px rgba(0, 0, 0, 0.2);
+    background-color: white;
+    white-space: nowrap;
+}
+
+h4 {
+    margin: 0; 
+}
