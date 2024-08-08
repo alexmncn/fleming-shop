@@ -24,6 +24,10 @@ def new_articles(page, per_page):
     time_threshold = datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=range)
     
     articles = article.query.filter(article.factualizacion>=time_threshold).order_by(desc(article.factualizacion)).limit(per_page).offset(offset)
+    
+    if articles is None:
+        articles = article.query.all().order_by(desc(article.factualizacion)).limit(per_page)
+    
     return [article.to_dict_reduced() for article in articles]
     
 

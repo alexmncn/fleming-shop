@@ -1,13 +1,20 @@
-<h2>Familias</h2>
-<section class="families" (wheel)="onFamilyScroll($event)">
+<div class="header families">
+    <h2>Familias</h2>
+    <mat-icon *ngIf="!this.familiesUnfold" class="material-symbols-outlined" (click)="toggleFamiliesDisplay()">keyboard_arrow_down</mat-icon>
+    <mat-icon *ngIf="this.familiesUnfold" class="material-symbols-outlined" (click)="toggleFamiliesDisplay()">keyboard_arrow_up</mat-icon>
+</div>
+<section class="families" [class.unfold]="this.familiesUnfold" (wheel)="onFamilyScroll($event)">
     <div class="family" *ngFor="let family of families">
-        <h4>{{ family.nomfam }}</h4>
+        <p>{{ family.nomfam }}</p>
     </div>
 </section>
 
 <h2>Destacado</h2>
 <section class="articles featured">
-    <div class="article" *ngFor="let article of featuredArticles">
-        <h4>{{ article.detalle }}</h4>
-    </div>
+    <app-articles [articles]="featuredArticles"></app-articles>
+</section>
+
+<h2>Novedades</h2>
+<section class="articles new">
+    <app-articles [articles]="newArticles"></app-articles>
 </section>

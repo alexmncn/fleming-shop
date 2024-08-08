@@ -30,6 +30,11 @@ def featured_articles_():
     
     return jsonify(articles)
 
+@home_bp.route('/gay/porn')
+def eres_gay_jejeje():
+    return '<h1>Eres muy maricon jeje</h1>'
+
+
 
 @home_bp.route('/articles/new')
 def new_articles_():
