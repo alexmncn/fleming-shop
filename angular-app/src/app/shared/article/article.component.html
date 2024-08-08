@@ -1,0 +1,15 @@
+<section class="article-card">
+    <ng-container *ngIf="!loading; else loadingTemplate">
+        <img *ngIf="!imgError" [src]="imgURL" (error)="showPlaceholder()">
+        <div *ngIf="imgError" class="placeholder-img"></div>
+
+        <p>{{ article.detalle }}</p>
+        <p class="pvp">{{ article.pvp }} €</p>
+    </ng-container>
+
+    <ng-template #loadingTemplate>
+        <div class="placeholder-img"></div>
+        <p class="placeholder-text"></p>
+        <p class="placeholder-text"></p>
+      </ng-template>
+</section>

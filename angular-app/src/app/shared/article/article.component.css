@@ -1,0 +1,38 @@
+.article-card {
+    border: 1px solid #ccc;
+    padding: 16px;
+    text-align: center;
+    margin: 8px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: white;
+}
+
+.article-card img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 8px;
+}
+
+.article-card p {
+    font-size: 1rem;
+}
+
+p.pvp {
+    color: green;
+    font-weight: 600;
+}
+
+.placeholder-img {
+    width: 100%;
+    height: 150px;
+    background-color: #e0e0e0;
+    margin-bottom: 8px;
+}
+
+.placeholder-text {
+    width: 100%;
+    height: 1.5em;
+    background-color: #e0e0e0;
+    margin: 8px 0;
+}
