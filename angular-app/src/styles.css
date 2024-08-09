@@ -2,14 +2,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
 
 @font-face {
-    font-family: 'Lemon Milk';
-    src: url('/assets/fonts/LEMONMILK-Light.otf') format('opentype');
-    font-weight: normal;
-    font-style: normal;
-  }
+  font-family: 'Lemon Milk';
+  src: url('/assets/fonts/LEMONMILK-Light.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  /* Grey Scale */
+  --white: #ffffff;
+  --gray-50: #e0e0e0;
+  --gray-100: #c0c0c0;
+  --gray-500: #6c757d;
+  --gray-700: #303030;
+  --gray-800: #1C1C1C;
+  --gray-900: #111111;
+  --black: #000000;
+  
+}
 
 html, body { height: 100%;}
 body { 
-    margin: 0;
-    font-family: 'Montserrat','Segoe UI', Roboto, "Helvetica Neue", sans-serif;
+  margin: 0;
+  font-family: 'Montserrat','Segoe UI', Roboto, "Helvetica Neue", sans-serif;
 }

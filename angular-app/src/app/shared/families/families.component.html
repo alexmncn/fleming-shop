@@ -1,0 +1,19 @@
+<header>
+    <h2>Familias</h2>
+    <mat-icon *ngIf="!this.familiesUnfold" class="material-symbols-outlined" (click)="toggleFamiliesDisplay()">keyboard_arrow_down</mat-icon>
+    <mat-icon *ngIf="this.familiesUnfold" class="material-symbols-outlined" (click)="toggleFamiliesDisplay()">keyboard_arrow_up</mat-icon>
+</header>
+<section [class.unfold]="this.familiesUnfold" (wheel)="onFamilyScroll($event)">
+    <ng-container *ngIf="!loading; else loadingTemplate">
+        <div class="family" *ngFor="let family of families">
+            <p>{{ family.nomfam }}</p>
+        </div>
+    </ng-container>
+
+    <ng-template pTemplate="loader" #loadingTemplate>
+        <div class="family" *ngFor="let placeholder of placeholders">
+            <p-skeleton width="5rem" styleClass="mb-2" borderRadius="8px"/>
+        </div>
+    </ng-template>
+
+</section>

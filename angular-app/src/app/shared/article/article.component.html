@@ -1,15 +1,24 @@
 <section class="article-card">
     <ng-container *ngIf="!loading; else loadingTemplate">
-        <img *ngIf="!imgError" [src]="imgURL" (error)="showPlaceholder()">
-        <div *ngIf="imgError" class="placeholder-img"></div>
-
-        <p>{{ article.detalle }}</p>
-        <p class="pvp">{{ article.pvp }} €</p>
+        <img *ngIf="!imgError" [src]="imgURL" (error)="showPlaceholder()" loading="lazy">
+        <div *ngIf="imgError" class="placeholder-img">
+            <p-skeleton class="placeholder-img" height="100%" styleClass="mb-2" />
+        </div>
+        <section class="info">
+            <p class="detalle">{{ article.detalle }}</p>
+            <p class="pvp">{{ article.pvp }} €</p>
+        </section>
     </ng-container>
 
-    <ng-template #loadingTemplate>
-        <div class="placeholder-img"></div>
-        <p class="placeholder-text"></p>
-        <p class="placeholder-text"></p>
+    <ng-template pTemplate="loader" #loadingTemplate>
+        <div class="placeholder-img">
+            <p-skeleton height="100%" styleClass="mb-2" borderRadius="8px"/>
+        </div>
+        <p class="placeholder-text">
+            <p-skeleton height="100%" styleClass="mb-2" borderRadius="8px"/>
+        </p>
+        <p class="placeholder-text">
+            <p-skeleton height="100%" styleClass="mb-2" borderRadius="8px"/>
+        </p>
       </ng-template>
 </section>

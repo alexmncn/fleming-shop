@@ -1,11 +1,13 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { SkeletonModule } from 'primeng/skeleton';
+
 import { Article } from '../../models/article.model';
 
 @Component({
   selector: 'app-article',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SkeletonModule],
   templateUrl: './article.component.html',
   styleUrl: './article.component.css'
 })

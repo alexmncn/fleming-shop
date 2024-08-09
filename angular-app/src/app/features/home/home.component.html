@@ -1,20 +1,21 @@
-<div class="header families">
-    <h2>Familias</h2>
-    <mat-icon *ngIf="!this.familiesUnfold" class="material-symbols-outlined" (click)="toggleFamiliesDisplay()">keyboard_arrow_down</mat-icon>
-    <mat-icon *ngIf="this.familiesUnfold" class="material-symbols-outlined" (click)="toggleFamiliesDisplay()">keyboard_arrow_up</mat-icon>
-</div>
-<section class="families" [class.unfold]="this.familiesUnfold" (wheel)="onFamilyScroll($event)">
-    <div class="family" *ngFor="let family of families">
-        <p>{{ family.nomfam }}</p>
-    </div>
+<section class="families">
+    <app-families></app-families>
 </section>
 
 <h2>Destacado</h2>
 <section class="articles featured">
-    <app-articles [articles]="featuredArticles"></app-articles>
+    <h4>{{ featuredArticles.length }} artículos</h4>
+    <app-articles [articles]="featuredArticles" [per_page]="per_page"></app-articles>
+    <div class="articles-footer">
+        <button (click)="loadFeaturedArticles()">Mostrar más</button>
+    </div>
 </section>
 
 <h2>Novedades</h2>
 <section class="articles new">
-    <app-articles [articles]="newArticles"></app-articles>
+    <h4>{{ newArticles.length }} artículos</h4>
+    <app-articles [articles]="newArticles" [per_page]="per_page"></app-articles>
+    <div class="articles-footer">
+        <button (click)="loadNewArticles()">Mostrar más</button>
+    </div>
 </section>

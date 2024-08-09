@@ -1,51 +1,29 @@
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-}
-
-.header mat-icon {
-    margin-right: 1rem;
-    cursor: pointer;
-}
-
 section {
-    margin-bottom: 3rem;
-}
-
-section.families {
-    display: flex;
-    overflow-x: scroll;
-    overflow-y: hidden;
-    gap: 1rem;
-    padding: 1rem;
-    scroll-behavior: smooth;
-}
-
-section.families.unfold {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    overflow-x: none;
-    overflow-y: none;
-}
-
-.family {
-    padding: 1rem;
-    background-color: white;
-    white-space: nowrap;
-    border: 1px solid #ccc;
-    text-align: center;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    font-weight: 500;
-    cursor: pointer;
-}
-
-p {
-    margin: 0;
+    margin-bottom: 5rem;
 }
 
 section.articles {
     width: 100%;
+    padding: 1rem;
+}
+
+section h4 {
+    margin-top: 0;
+    color: var(--gray-700);
+}
+
+.articles-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 2rem;
+}
+
+.articles-footer button {
+    width: 100%;
+    padding: 0.75rem 3rem;
+    color: white;
+    background-color: #0151bd;
+    border-radius: 8px;
+    border-style: solid;
 }

@@ -3,5 +3,4 @@ export interface Article {
     codfam: number;
     detalle: string;
     pvp: number;
-
-  }
+}

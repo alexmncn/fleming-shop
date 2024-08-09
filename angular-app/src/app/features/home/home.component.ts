@@ -1,75 +1,63 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { MatIcon } from '@angular/material/icon';
+
+import { environment } from '../../../environments/environment';
 
 import { ArticlesComponent } from '../../shared/articles/articles.component';
+import { FamiliesComponent } from "../../shared/families/families.component";
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, ArticlesComponent, MatIcon],
+  imports: [CommonModule, ArticlesComponent, FamiliesComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit {
-  families: any[] = [];
-  featuredArticles: any[] = [];
-  newArticles: any[] = [];
+  per_page: number = 20;
 
-  familiesUnfold: boolean = false;
+  featuredArticlesURL: string = environment.apiUrl + '/articles/featured';
+  featuredArticles: any[] = [];
+  featuredArticlesPage: number = 1;
+  totalFeaturedArticles: number = 0;
+
+  newArticlesURL: string = environment.apiUrl + '/articles/new';
+  newArticles: any[] = [];
+  newArticlesPage: number = 1;
+  totalNewArticles: number = 0;
 
   constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
-    this.loadFamilies();
     this.loadFeaturedArticles()
     this.loadNewArticles()
   }
-  
-  loadFamilies(): void {
-    this.http.get('http://127.0.0.1:5000/articles/families')
+
+  getTotalFeaturedArticles(): void {
+    this.http.get<any>(this.featuredArticlesURL + '/total')
       .subscribe((data) => {
-        this.families = this.families.concat(data);
+        this.totalFeaturedArticles = data.totalfeaturedarticles
       });
   }
 
   loadFeaturedArticles(): void {
     setTimeout(() => {
-      this.http.get('http://127.0.0.1:5000/articles/featured')
+      this.http.get(this.featuredArticlesURL, {params: {'page': this.featuredArticlesPage, 'per_page': this.per_page}})
       .subscribe((data) => {
         this.featuredArticles = this.featuredArticles.concat(data);
+        this.featuredArticlesPage++;
       });
     }, 2000);
   }
 
   loadNewArticles(): void {
     setTimeout(() => {
-      this.http.get('http://127.0.0.1:5000/articles/new')
+      this.http.get(this.newArticlesURL, {params: {'page': this.newArticlesPage, 'per_page': this.per_page}})
       .subscribe((data) => {
         this.newArticles = this.newArticles.concat(data);
+        this.newArticlesPage++;
       });
     }, 1000);
   }
-
-  onFamilyScroll(event: WheelEvent): void {
-    if (!this.familiesUnfold) {
-      const scrollContainer = event.currentTarget as HTMLElement;
-      if (event.deltaY !== 0) {
-        event.preventDefault();
-        const scrollAmount = event.deltaY * 2;
-        scrollContainer.scrollLeft += scrollAmount;
-        
-      }
-    }
-  }
-
-  toggleFamiliesDisplay() {
-    if (this.familiesUnfold) {
-      this.familiesUnfold = false;
-    } else {
-      this.familiesUnfold = true;
-    }
-  }
-
 }

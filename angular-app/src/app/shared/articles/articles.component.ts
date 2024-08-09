@@ -1,4 +1,4 @@
-import { Component, Input  } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { ArticleComponent } from '../article/article.component';
@@ -13,8 +13,7 @@ import { Article } from '../../models/article.model';
 })
 export class ArticlesComponent {
   @Input() articles: any[]= [];
-
-  per_page: number = 20;
-  page: number = 1;
+  @Input() per_page: number = 20;
+  
   placeholders: Article[] = new Array(this.per_page).fill('');
 }
