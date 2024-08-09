@@ -30,6 +30,9 @@ export class HomeComponent implements OnInit {
   constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
+    this.getTotalFeaturedArticles()
+    this.getTotalNewArticles()
+
     this.loadFeaturedArticles()
     this.loadNewArticles()
   }
@@ -37,7 +40,7 @@ export class HomeComponent implements OnInit {
   getTotalFeaturedArticles(): void {
     this.http.get<any>(this.featuredArticlesURL + '/total')
       .subscribe((data) => {
-        this.totalFeaturedArticles = data.totalfeaturedarticles
+        this.totalFeaturedArticles = data.total;
       });
   }
 
@@ -51,13 +54,22 @@ export class HomeComponent implements OnInit {
     }, 2000);
   }
 
+  getTotalNewArticles(): void {
+    this.http.get<any>(this.newArticlesURL + '/total')
+      .subscribe((data) => {
+        this.totalNewArticles = data.total;
+      });
+  }
+
   loadNewArticles(): void {
     setTimeout(() => {
-      this.http.get(this.newArticlesURL, {params: {'page': this.newArticlesPage, 'per_page': this.per_page}})
-      .subscribe((data) => {
-        this.newArticles = this.newArticles.concat(data);
-        this.newArticlesPage++;
-      });
+      if (this.totalNewArticles != 0) {
+        this.http.get(this.newArticlesURL, {params: {'page': this.newArticlesPage, 'per_page': this.per_page}})
+        .subscribe((data) => {
+          this.newArticles = this.newArticles.concat(data);
+          this.newArticlesPage++;
+        });
+      }
     }, 1000);
   }
 }

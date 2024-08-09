@@ -1,15 +1,22 @@
+h4 {
+    margin-top: 0;
+    color: var(--gray-700);
+}
+
 section {
     margin-bottom: 5rem;
 }
 
 section.articles {
-    width: 100%;
-    padding: 1rem;
+    border-style: solid;
+    border-width: 2px;
+    border-color: var(--gray-300);
+    border-radius: 8px;
 }
 
-section h4 {
-    margin-top: 0;
-    color: var(--gray-700);
+section.articles {
+    width: 100%;
+    padding: 2rem;
 }
 
 .articles-footer {
@@ -23,7 +30,9 @@ section h4 {
     width: 100%;
     padding: 0.75rem 3rem;
     color: white;
-    background-color: #0151bd;
+    background-color: var(--primary-accent-500);
     border-radius: 8px;
     border-style: solid;
+    font-weight: 600;
+    font-size: 1rem;
 }

@@ -9,20 +9,24 @@
 }
 
 :root {
-  /* Grey Scale */
-  --white: #ffffff;
-  --gray-50: #e0e0e0;
-  --gray-100: #c0c0c0;
-  --gray-500: #6c757d;
-  --gray-700: #303030;
-  --gray-800: #1C1C1C;
-  --gray-900: #111111;
-  --black: #000000;
-  
+  /* Accents */
+  --primary-accent-500: #0151bd;
+
+  --green-accent-500: #009600 ;
+
 }
 
 html, body { height: 100%;}
 body { 
   margin: 0;
+  font-family: 'Montserrat','Segoe UI', Roboto, "Helvetica Neue", sans-serif;
+}
+
+h2 {
+  font-size: 1.75rem;
+}
+
+button {
+  border: none;
   font-family: 'Montserrat','Segoe UI', Roboto, "Helvetica Neue", sans-serif;
 }

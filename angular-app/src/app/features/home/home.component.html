@@ -4,7 +4,7 @@
 
 <h2>Destacado</h2>
 <section class="articles featured">
-    <h4>{{ featuredArticles.length }} artículos</h4>
+    <h4>{{ featuredArticles.length }} de {{ totalFeaturedArticles }} artículos</h4>    
     <app-articles [articles]="featuredArticles" [per_page]="per_page"></app-articles>
     <div class="articles-footer">
         <button (click)="loadFeaturedArticles()">Mostrar más</button>
@@ -13,7 +13,7 @@
 
 <h2>Novedades</h2>
 <section class="articles new">
-    <h4>{{ newArticles.length }} artículos</h4>
+    <h4>{{ newArticles.length }} de {{ totalNewArticles }} artículos</h4>
     <app-articles [articles]="newArticles" [per_page]="per_page"></app-articles>
     <div class="articles-footer">
         <button (click)="loadNewArticles()">Mostrar más</button>
