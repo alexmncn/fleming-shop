@@ -21,6 +21,12 @@ section.articles {
     padding: 2rem;
 }
 
+@media (max-width: 600px) {
+    section.articles {
+        padding: 0.5rem
+    }
+}
+
 .articles-footer {
     display: flex;
     flex-direction: column;

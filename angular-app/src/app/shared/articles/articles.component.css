@@ -3,3 +3,10 @@ section {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 3rem 2rem;
 }
+
+@media (max-width: 600px) {
+    section {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem 0.5rem;
+    }
+}

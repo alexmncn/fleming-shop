@@ -17,13 +17,13 @@ export class ArticleComponent {
   imgURL: string = '';
   imgError: boolean = false;
 
-  ngOnChanges() {
+  ngOnChanges(): void {
     this.loading = !this.article.detalle;
     this.imgError = false;
     this.imgURL = '/assets/images/articles/' + this.article.ref + '.jpg';
   }
 
-  showPlaceholder() {
+  showPlaceholder(): void {
     this.imgError = true;
   }
 
