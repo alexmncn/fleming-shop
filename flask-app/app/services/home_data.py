@@ -6,11 +6,24 @@ from app.models import article, family
 new_articles_range = 14 # in days
 
 
+def all_articles_total():
+    return article.query.count()
+
+
 def all_articles(page, per_page):
     offset = (page - 1) * per_page
     
     articles = article.query.limit(per_page).offset(offset).all()
     return [article.to_dict_reduced() for article in articles]
+
+
+def search_articles(search):
+    articles = article.query.filter(
+        (article.detalle.ilike(f'%{search}%')) | 
+        (article.ref.ilike(f'%{search}%'))
+    ).all()
+    return [article.to_dict_reduced() for article in articles]
+    
 
 
 def featured_articles_total():

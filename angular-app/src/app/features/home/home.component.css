@@ -1,3 +1,7 @@
+app-search-bar {
+    margin: 0 1rem;
+}
+
 h4 {
     margin-top: 0;
     color: var(--gray-700);
@@ -8,10 +12,8 @@ section {
 }
 
 section.articles {
-    border-style: solid;
-    border-width: 2px;
-    border-color: var(--gray-300);
-    border-radius: 8px;
+    border: 2px solid var(--gray-300);
+    border-radius: 12px;
 }
 
 section.articles {
@@ -35,4 +37,5 @@ section.articles {
     border-style: solid;
     font-weight: 600;
     font-size: 1rem;
+    cursor: pointer;
 }

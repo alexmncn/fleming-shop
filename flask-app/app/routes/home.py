@@ -11,6 +11,12 @@ def home():
     return '<h1>Hello world</h1>'
 
 
+@home_bp.route('/articles/total')
+def all_articles_total():
+    total = home_data.all_articles_total()
+    return jsonify(total=total)
+
+
 @home_bp.route('/articles/all')
 def all_articles():
     page = request.args.get('page', 1, type=int)
@@ -19,6 +25,15 @@ def all_articles():
     articulos = home_data.all_articles(page, per_page)
             
     return jsonify(articulos)
+
+
+@home_bp.route('/articles')
+def search_articles():
+    search = request.args.get('search', None)
+    
+    articles = home_data.search_articles(search)
+    
+    return jsonify(articles)
 
 
 @home_bp.route('/articles/featured/total')

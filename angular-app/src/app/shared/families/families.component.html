@@ -1,7 +1,7 @@
-<header>
+<header (click)="toggleFamiliesDisplay()">
     <h2>Familias</h2>
-    <mat-icon *ngIf="!this.familiesUnfold" class="material-symbols-outlined" (click)="toggleFamiliesDisplay()">keyboard_arrow_down</mat-icon>
-    <mat-icon *ngIf="this.familiesUnfold" class="material-symbols-outlined" (click)="toggleFamiliesDisplay()">keyboard_arrow_up</mat-icon>
+    <span *ngIf="!this.familiesUnfold" class="pi pi-angle-down"></span>
+    <span *ngIf="this.familiesUnfold" class="pi pi-angle-up"></span>
 </header>
 <section [class.unfold]="this.familiesUnfold" (wheel)="onFamilyScroll($event)">
     <ng-container *ngIf="!loading; else loadingTemplate">

@@ -6,11 +6,12 @@ import { environment } from '../../../environments/environment';
 
 import { ArticlesComponent } from '../../shared/articles/articles.component';
 import { FamiliesComponent } from "../../shared/families/families.component";
+import { SearchBarComponent } from "../../shared/search-bar/search-bar.component";
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, ArticlesComponent, FamiliesComponent],
+  imports: [CommonModule, ArticlesComponent, FamiliesComponent, SearchBarComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -21,11 +22,13 @@ export class HomeComponent implements OnInit {
   featuredArticles: any[] = [];
   featuredArticlesPage: number = 1;
   totalFeaturedArticles: number = 0;
+  loadingFeaturedArticles: boolean = false;
 
   newArticlesURL: string = environment.apiUrl + '/articles/new';
   newArticles: any[] = [];
   newArticlesPage: number = 1;
   totalNewArticles: number = 0;
+  loadingNewArticles: boolean = false;
 
   constructor(private http: HttpClient) { }
 
@@ -45,11 +48,14 @@ export class HomeComponent implements OnInit {
   }
 
   loadFeaturedArticles(): void {
+    this.loadingFeaturedArticles = true;
     setTimeout(() => {
       this.http.get(this.featuredArticlesURL, {params: {'page': this.featuredArticlesPage, 'per_page': this.per_page}})
       .subscribe((data) => {
         this.featuredArticles = this.featuredArticles.concat(data);
         this.featuredArticlesPage++;
+
+        this.loadingFeaturedArticles = false;
       });
     }, 2000);
   }
@@ -62,12 +68,15 @@ export class HomeComponent implements OnInit {
   }
 
   loadNewArticles(): void {
+    this.loadingNewArticles = true;
     setTimeout(() => {
       if (this.totalNewArticles != 0) {
         this.http.get(this.newArticlesURL, {params: {'page': this.newArticlesPage, 'per_page': this.per_page}})
         .subscribe((data) => {
           this.newArticles = this.newArticles.concat(data);
           this.newArticlesPage++;
+
+          this.loadingNewArticles = false;
         });
       }
     }, 1000);

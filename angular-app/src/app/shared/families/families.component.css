@@ -1,13 +1,22 @@
 header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    position: sticky;
+    margin: 1.5rem 0;
+    cursor: pointer;
 }
 
-mat-icon {
-    margin-right: 1rem;
+h2 {
+    margin: 0;
+}
+
+span {
+    margin: 0 1rem;
     cursor: pointer;
+    font-size: 1.5rem;
+}
+
+header:hover {
+    background-color: var(--gray-300);
 }
 
 section {
@@ -18,7 +27,7 @@ section {
     padding: 1rem;
     scroll-behavior: smooth;
     border: 2px solid var(--gray-300);
-    border-radius: 8px;
+    border-radius: 12px;
     scrollbar-width: thin;
     scrollbar-color: var(--primary-accent-500) white;
 }
