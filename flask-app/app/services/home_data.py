@@ -3,7 +3,7 @@ from sqlalchemy import desc
 
 from app.models import article, family
 
-new_articles_range = 14 # in days
+new_articles_range = 30 # in days
 
 
 def all_articles_total():
@@ -65,3 +65,6 @@ def family_articles(family_id, page, per_page):
     
     articles = article.query.filter_by(codfam=family_id).limit(per_page).offset(offset)
     return [article.to_dict_reduced() for article in articles]
+
+def family_articles_total(family_id):
+    return article.query.filter_by(codfam=family_id).count()

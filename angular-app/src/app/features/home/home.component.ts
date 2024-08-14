@@ -49,15 +49,17 @@ export class HomeComponent implements OnInit {
 
   loadFeaturedArticles(): void {
     this.loadingFeaturedArticles = true;
-    setTimeout(() => {
-      this.http.get(this.featuredArticlesURL, {params: {'page': this.featuredArticlesPage, 'per_page': this.per_page}})
-      .subscribe((data) => {
-        this.featuredArticles = this.featuredArticles.concat(data);
-        this.featuredArticlesPage++;
+    this.http.get(this.featuredArticlesURL, {params: {'page': this.featuredArticlesPage, 'per_page': this.per_page}})
+    .subscribe((data) => {
+      this.featuredArticles = this.featuredArticles.concat(data);
+      this.featuredArticlesPage++;
 
-        this.loadingFeaturedArticles = false;
-      });
-    }, 2000);
+      this.loadingFeaturedArticles = false;
+    });
+  }
+
+  get allFeaturedArticlesLoaded(): boolean {
+    return this.featuredArticles.length === this.totalFeaturedArticles;
   }
 
   getTotalNewArticles(): void {
@@ -68,17 +70,17 @@ export class HomeComponent implements OnInit {
   }
 
   loadNewArticles(): void {
-    this.loadingNewArticles = true;
-    setTimeout(() => {
-      if (this.totalNewArticles != 0) {
-        this.http.get(this.newArticlesURL, {params: {'page': this.newArticlesPage, 'per_page': this.per_page}})
-        .subscribe((data) => {
-          this.newArticles = this.newArticles.concat(data);
-          this.newArticlesPage++;
+  this.loadingNewArticles = true;
+    this.http.get(this.newArticlesURL, {params: {'page': this.newArticlesPage, 'per_page': this.per_page}})
+    .subscribe((data) => {
+      this.newArticles = this.newArticles.concat(data);
+      this.newArticlesPage++;
 
-          this.loadingNewArticles = false;
-        });
-      }
-    }, 1000);
+      this.loadingNewArticles = false;
+    });
+  }
+
+  get allNewArticlesLoaded(): boolean {
+    return this.newArticles.length === this.totalNewArticles;
   }
 }

@@ -69,7 +69,7 @@ def new_articles():
 
 @home_bp.route('/articles/families')
 @home_bp.route('/articles/families/<int:family_id>')
-def articles_families(family_id=None):
+def families_articles(family_id=None):
     if family_id:
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 20, type=int)
@@ -77,3 +77,9 @@ def articles_families(family_id=None):
         return jsonify(home_data.family_articles(family_id, page, per_page))
     
     return jsonify(home_data.all_families())
+
+
+@home_bp.route('/articles/families/<int:family_id>/total')
+def family_articles_total(family_id=None):
+    total = home_data.family_articles_total(family_id)
+    return jsonify(total=total)

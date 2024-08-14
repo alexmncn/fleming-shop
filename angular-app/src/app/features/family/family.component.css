@@ -1,18 +1,8 @@
-section {
-    margin-bottom: 5rem;
-}
-
 section.articles {
     width: 100%;
     padding: 2rem;
     border: 2px solid var(--gray-300);
     border-radius: 12px;
-}
-
-@media (max-width: 600px) {
-    section.articles {
-        padding: 0.5rem
-    }
 }
 
 .articles-footer {

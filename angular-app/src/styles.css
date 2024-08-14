@@ -26,6 +26,11 @@ h2 {
   font-size: 1.75rem;
 }
 
+h4 {
+  margin-top: 0;
+  color: var(--gray-700);
+}
+
 button {
   border: none;
   font-family: 'Montserrat','Segoe UI', Roboto, "Helvetica Neue", sans-serif;
@@ -33,4 +38,8 @@ button {
 
 input {
   font-family: 'Montserrat','Segoe UI', Roboto, "Helvetica Neue", sans-serif;
+}
+
+app-search-bar {
+  margin: 0 1rem;
 }

@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { Router, NavigationExtras  } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
 import { SkeletonModule } from 'primeng/skeleton';
+
 
 import { environment } from '../../../environments/environment';
 
@@ -19,22 +21,19 @@ export class FamiliesComponent implements OnInit {
   loading: boolean = true;
   familiesUnfold: boolean = false;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private router: Router) { }
 
   ngOnInit(): void {
     this.loadFamilies();
   }
 
   loadFamilies(): void {
-    setTimeout(() => {
-      this.http.get(environment.apiUrl + '/articles/families')
-        .subscribe((data) => {
-          this.families = this.families.concat(data);
-          this.loading = false;
-        });
-    }, 2000);
+    this.http.get(environment.apiUrl + '/articles/families')
+      .subscribe((data) => {
+        this.families = this.families.concat(data);
+        this.loading = false;
+      });
   }
-
   
   onFamilyScroll(event: WheelEvent): void {
     if (!this.familiesUnfold) {
@@ -55,4 +54,15 @@ export class FamiliesComponent implements OnInit {
       this.familiesUnfold = true;
     }
   }
+
+  showFamily(nomfam: string, codfam: number): void {
+    if (this.router.url !== '/family') {
+      const navigationExtras: NavigationExtras = {
+        queryParams: {'nomfam': nomfam, 'codfam': codfam }
+      };
+
+      this.router.navigate(['/family'], navigationExtras);;
+    }
+  }
+
 }

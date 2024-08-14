@@ -5,7 +5,7 @@
 </header>
 <section [class.unfold]="this.familiesUnfold" (wheel)="onFamilyScroll($event)">
     <ng-container *ngIf="!loading; else loadingTemplate">
-        <div class="family" *ngFor="let family of families">
+        <div class="family" *ngFor="let family of families" (click)="showFamily(family.nomfam, family.codfam)">
             <p>{{ family.nomfam }}</p>
         </div>
     </ng-container>

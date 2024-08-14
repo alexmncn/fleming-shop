@@ -1,0 +1,15 @@
+<h3>{{ nomfam }}</h3>
+<section class="articles">
+    <h4>{{ articles.length }} de {{ totalArticles }} artículos</h4>
+    <app-articles [articles]="articles"/>
+    <div class="articles-footer">
+        <button *ngIf="!allArticlesLoaded" (click)="loadFamilyArticles()" [disabled]="loadingArticles ">
+            <ng-container *ngIf="!loadingArticles; else loadingTemplate">
+              Show More
+            </ng-container>
+            <ng-template #loadingTemplate>
+              <i class="pi pi-spin pi-spinner"></i>
+            </ng-template>
+        </button>
+    </div>
+</section>

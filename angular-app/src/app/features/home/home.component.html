@@ -9,14 +9,15 @@
     <h4>{{ featuredArticles.length }} de {{ totalFeaturedArticles }} artículos</h4>    
     <app-articles [articles]="featuredArticles" [per_page]="per_page"/>
     <div class="articles-footer">
-        <button class="show-more" (click)="loadFeaturedArticles()" [disabled]="loadingFeaturedArticles">
-            <ng-container *ngIf="!loadingFeaturedArticles; else loadingTemplate">
-              Show More
-            </ng-container>
-            <ng-template #loadingTemplate>
-              <i class="pi pi-spin pi-spinner"></i>
-            </ng-template>
-        </button>
+      <p>{{ featuredArticles.length }} de {{ totalFeaturedArticles }} artículos</p>
+      <button *ngIf="!allFeaturedArticlesLoaded" (click)="loadFeaturedArticles()" [disabled]="loadingFeaturedArticles">
+          <ng-container *ngIf="!loadingFeaturedArticles; else loadingTemplate">
+            Show More
+          </ng-container>
+          <ng-template #loadingTemplate>
+            <i class="pi pi-spin pi-spinner"></i>
+          </ng-template>
+      </button>
     </div>
 </section>
 
@@ -25,7 +26,8 @@
     <h4>{{ newArticles.length }} de {{ totalNewArticles }} artículos</h4>
     <app-articles [articles]="newArticles" [per_page]="per_page"/>
     <div class="articles-footer">
-        <button (click)="loadNewArticles()" [disabled]="loadingNewArticles ">
+        <p>{{ newArticles.length }} de {{ totalNewArticles }} artículos</p>
+        <button *ngIf="!allNewArticlesLoaded" (click)="loadNewArticles()" [disabled]="loadingNewArticles ">
             <ng-container *ngIf="!loadingNewArticles; else loadingTemplate">
               Show More
             </ng-container>

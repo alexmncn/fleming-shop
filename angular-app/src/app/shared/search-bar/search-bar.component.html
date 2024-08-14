@@ -1,6 +1,6 @@
 <section>
-    <input type="text" id="search" name="search" [placeholder]="placeholder">
+    <input type="text" id="search" name="search" (submit)="onSearch()" [(ngModel)]="searchParam" [placeholder]="placeholder">
     <div>
-        <span class="pi pi-search"></span>
+        <span class="pi pi-search" (click)="onSearch()"></span>
     </div>
 </section>
