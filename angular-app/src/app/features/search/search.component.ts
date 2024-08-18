@@ -16,10 +16,14 @@ import { ArticlesComponent } from "../../shared/articles/articles.component";
   styleUrl: './search.component.css'
 })
 export class SearchComponent {
-  per_page: number = 0;
-  searchURL: string = environment.apiUrl + '/articles';
+  searchURL: string = environment.apiUrl + '/articles/search';
   articles: any[] = [];
+  totalArticles: number = 0;
+  per_page: number = 30;
   searchParam: string = '';
+  lastSearchParam: string = 'none';
+  articlesPage: number = 1;
+  loadingArticles: boolean = false;
 
 
   constructor(private http: HttpClient, private route: ActivatedRoute) { }
@@ -28,18 +32,43 @@ export class SearchComponent {
     this.route.queryParams.subscribe(params => {
       this.searchParam = params['q'] || '';
       if (this.searchParam) {
-        this.onSearch(this.searchParam)
+        this.onSearch(this.searchParam);
       }
     });
   }
 
-  onSearch(param: string): void {
+  getTotalSearchArticles(): void {
+    this.http.get<any>(this.searchURL + '/total', {params: {'search': this.searchParam}})
+      .subscribe((data) => {
+        this.totalArticles = data.total;
+      });
+  }
+
+  onSearch(param: string = ''): void {
+    this.loadingArticles = true;
     this.searchParam = param;
-    this.articles = [];
-    this.http.get(this.searchURL, {params: {'search': this.searchParam}})
+    if (this.searchParam === this.lastSearchParam) {
+      this.http.get(this.searchURL, {params: {'search': this.searchParam, 'page': this.articlesPage, 'per_page': this.per_page}})
       .subscribe((data) => {
         this.articles = this.articles.concat(data);
+        this.articlesPage++;
+        this.lastSearchParam = this.searchParam;
+
+        this.loadingArticles = false;
       });
+    } else {
+      this.articlesPage = 1;
+      this.articles = [];
+      this.getTotalSearchArticles();
+      this.http.get(this.searchURL, {params: {'search': this.searchParam, 'page': this.articlesPage, 'per_page': this.per_page}})
+        .subscribe((data) => {
+          this.articles = this.articles.concat(data);
+          this.articlesPage++;
+          this.lastSearchParam = this.searchParam;
+          
+          this.loadingArticles = false;
+        });
+    }
   }
 
 }

@@ -5,13 +5,14 @@ import { Router, NavigationExtras  } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
 import { SkeletonModule } from 'primeng/skeleton';
 
+import { CapitalizePipe } from '../../pipes/capitalize/capitalize.pipe';
 
 import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-families',
   standalone: true,
-  imports: [CommonModule, MatIcon, SkeletonModule],
+  imports: [CommonModule, MatIcon, SkeletonModule, CapitalizePipe],
   templateUrl: './families.component.html',
   styleUrl: './families.component.css'
 })

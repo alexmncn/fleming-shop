@@ -9,6 +9,8 @@
 }
 
 :root {
+  --background-white: #f8fafc;
+
   /* Accents */
   --primary-accent-500: #0151bd;
 
@@ -20,15 +22,12 @@ html, body { height: 100%;}
 body { 
   margin: 0;
   font-family: 'Montserrat','Segoe UI', Roboto, "Helvetica Neue", sans-serif;
+  background-color: var(--background-white);
 }
 
 h2 {
+  color: var(--primary-accent-500);
   font-size: 1.75rem;
-}
-
-h4 {
-  margin-top: 0;
-  color: var(--gray-700);
 }
 
 button {
@@ -38,8 +37,4 @@ button {
 
 input {
   font-family: 'Montserrat','Segoe UI', Roboto, "Helvetica Neue", sans-serif;
-}
-
-app-search-bar {
-  margin: 0 1rem;
 }

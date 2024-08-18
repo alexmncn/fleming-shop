@@ -54,8 +54,4 @@ export class FamilyComponent {
         this.loadingArticles = false;
       });
   }
-
-  get allArticlesLoaded(): boolean {
-    return this.articles.length === this.totalArticles;
-  }
 }

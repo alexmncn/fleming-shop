@@ -9,11 +9,8 @@
         </section>
         <section class="info">
             <div class="left">
-                <p class="detalle">{{ article.detalle }}</p>
-                <p class="ref">Ref: {{article.ref}}</p>
-            </div>
-
-            <div class="right">
+                <p class="detalle">{{ article.detalle | capitalize }}</p>
+                <p class="ref">Ref: {{ article.ref }}</p>
                 <p class="pvp">{{ article.pvp }} €</p>
             </div>
         </section>

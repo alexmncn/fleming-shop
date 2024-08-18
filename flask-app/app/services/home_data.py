@@ -17,14 +17,22 @@ def all_articles(page, per_page):
     return [article.to_dict_reduced() for article in articles]
 
 
-def search_articles(search):
+def search_articles(search, page, per_page):
+    offset = (page - 1) * per_page
+    
     articles = article.query.filter(
         (article.detalle.ilike(f'%{search}%')) | 
         (article.ref.ilike(f'%{search}%'))
-    ).all()
+    ).limit(per_page).offset(offset).all()
     return [article.to_dict_reduced() for article in articles]
     
 
+def search_articles_total(search):
+    total_articles = article.query.filter(
+        (article.detalle.ilike(f'%{search}%')) | 
+        (article.ref.ilike(f'%{search}%'))
+    ).count()
+    return total_articles
 
 def featured_articles_total():
     return article.query.filter_by(destacado=1).count()

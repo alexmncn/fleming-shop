@@ -1,12 +1,11 @@
 <header (click)="toggleFamiliesDisplay()">
-    <h2>Familias</h2>
     <span *ngIf="!this.familiesUnfold" class="pi pi-angle-down"></span>
     <span *ngIf="this.familiesUnfold" class="pi pi-angle-up"></span>
 </header>
 <section [class.unfold]="this.familiesUnfold" (wheel)="onFamilyScroll($event)">
     <ng-container *ngIf="!loading; else loadingTemplate">
         <div class="family" *ngFor="let family of families" (click)="showFamily(family.nomfam, family.codfam)">
-            <p>{{ family.nomfam }}</p>
+            <p>{{ family.nomfam | capitalize }}</p>
         </div>
     </ng-container>
 

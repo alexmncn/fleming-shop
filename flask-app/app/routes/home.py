@@ -27,14 +27,24 @@ def all_articles():
     return jsonify(articulos)
 
 
-@home_bp.route('/articles')
+@home_bp.route('/articles/search')
 def search_articles():
     search = request.args.get('search', None)
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 20, type=int)
     
-    articles = home_data.search_articles(search)
+    articles = home_data.search_articles(search, page, per_page)
     
     return jsonify(articles)
 
+
+@home_bp.route('/articles/search/total')
+def search_articles_total():
+    search = request.args.get('search', None)
+    
+    total = home_data.search_articles_total(search)
+    
+    return jsonify(total=total)
 
 @home_bp.route('/articles/featured/total')
 def featured_articles_total():

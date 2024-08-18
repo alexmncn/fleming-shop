@@ -1,39 +1,17 @@
-<app-search-bar/>
+<section class="search-bar">
+  <app-search-bar/>
+</section>  
 
 <section class="families">
     <app-families/>
 </section>
 
 <h2>Destacado</h2>
-<section class="articles featured">
-    <h4>{{ featuredArticles.length }} de {{ totalFeaturedArticles }} artículos</h4>    
-    <app-articles [articles]="featuredArticles" [per_page]="per_page"/>
-    <div class="articles-footer">
-      <p>{{ featuredArticles.length }} de {{ totalFeaturedArticles }} artículos</p>
-      <button *ngIf="!allFeaturedArticlesLoaded" (click)="loadFeaturedArticles()" [disabled]="loadingFeaturedArticles">
-          <ng-container *ngIf="!loadingFeaturedArticles; else loadingTemplate">
-            Show More
-          </ng-container>
-          <ng-template #loadingTemplate>
-            <i class="pi pi-spin pi-spinner"></i>
-          </ng-template>
-      </button>
-    </div>
+<section class="articles featured">   
+    <app-articles (loadArticles)="loadFeaturedArticles()" [articles]="featuredArticles" [totalArticles]="totalFeaturedArticles" [per_page]="per_page" [loadingArticles]="loadingFeaturedArticles"/>
 </section>
 
 <h2>Novedades</h2>
 <section class="articles new">
-    <h4>{{ newArticles.length }} de {{ totalNewArticles }} artículos</h4>
-    <app-articles [articles]="newArticles" [per_page]="per_page"/>
-    <div class="articles-footer">
-        <p>{{ newArticles.length }} de {{ totalNewArticles }} artículos</p>
-        <button *ngIf="!allNewArticlesLoaded" (click)="loadNewArticles()" [disabled]="loadingNewArticles ">
-            <ng-container *ngIf="!loadingNewArticles; else loadingTemplate">
-              Show More
-            </ng-container>
-            <ng-template #loadingTemplate>
-              <i class="pi pi-spin pi-spinner"></i>
-            </ng-template>
-        </button>
-    </div>
+    <app-articles (loadArticles)="loadNewArticles()" [articles]="newArticles" [totalArticles]="totalNewArticles" [per_page]="per_page" [loadingArticles]="loadingNewArticles"/>
 </section>

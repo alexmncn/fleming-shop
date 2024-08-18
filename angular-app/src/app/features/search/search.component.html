@@ -2,6 +2,5 @@
 
 <h3>Resultados de '{{ searchParam }}'</h3>
 <section class="articles">
-    <h4>{{ articles.length }} artículos</h4>
-    <app-articles [articles]="articles"/>
+    <app-articles (loadArticles)="onSearch(searchParam)" [articles]="articles" [totalArticles]="totalArticles" [per_page]="per_page" [loadingArticles]="loadingArticles"/>
 </section>

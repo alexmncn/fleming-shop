@@ -4,10 +4,12 @@ import { SkeletonModule } from 'primeng/skeleton';
 
 import { Article } from '../../models/article.model';
 
+import { CapitalizePipe } from '../../pipes/capitalize/capitalize.pipe';
+
 @Component({
   selector: 'app-article',
   standalone: true,
-  imports: [CommonModule, SkeletonModule],
+  imports: [CommonModule, SkeletonModule, CapitalizePipe],
   templateUrl: './article.component.html',
   styleUrl: './article.component.css'
 })

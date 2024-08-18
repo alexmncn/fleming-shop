@@ -57,11 +57,7 @@ export class HomeComponent implements OnInit {
       this.loadingFeaturedArticles = false;
     });
   }
-
-  get allFeaturedArticlesLoaded(): boolean {
-    return this.featuredArticles.length === this.totalFeaturedArticles;
-  }
-
+  
   getTotalNewArticles(): void {
     this.http.get<any>(this.newArticlesURL + '/total')
       .subscribe((data) => {
@@ -78,9 +74,5 @@ export class HomeComponent implements OnInit {
 
       this.loadingNewArticles = false;
     });
-  }
-
-  get allNewArticlesLoaded(): boolean {
-    return this.newArticles.length === this.totalNewArticles;
   }
 }

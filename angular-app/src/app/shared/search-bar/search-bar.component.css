@@ -3,8 +3,10 @@ section {
     align-items: center;
     justify-content: space-between;
     padding: 0.75rem;
-    border: 2px solid var(--gray-300);
+    border: 1px solid var(--gray-300);
+    box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.1);
     border-radius: 12px;
+    background-color: white;
 }
 
 input {

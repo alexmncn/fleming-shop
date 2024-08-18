@@ -1,3 +1,26 @@
-<section>
-    <app-article *ngFor="let article of (articles.length ? articles : placeholders)" [article]="article"></app-article>
-</section>
+<main>
+    <div class="header">
+        <div class="info">
+            <h4>{{ totalArticles }} artículos</h4>
+        </div> 
+        <div class="display-buttons">
+            <i title="grid" class="pi pi-th-large" [class.selected]="gridDisplay" (click)="setGridDisplay()"></i>
+            <i title="list" class="pi pi-list" [class.selected]="listDisplay" (click)="setListDisplay()"></i>
+        </div>
+    </div>
+    <section class="articles" [class.grid]="gridDisplay" [class.list]="listDisplay">
+        <app-article *ngFor="let article of (articles.length ? articles : placeholders)" [article]="article"></app-article>
+    </section>
+    <div class="footer">
+        <p>{{ articles.length }} de {{ totalArticles }} artículos</p>
+        <progress [max]="totalArticles" [value]="articles.length"></progress>
+        <button *ngIf="!allArticlesLoaded || totalArticles == 0" (click)="load()" [disabled]="loadingArticles">
+            <ng-container *ngIf="!loadingArticles; else loadingTemplate">
+              Show More
+            </ng-container>
+            <ng-template #loadingTemplate>
+              <i class="pi pi-spin pi-spinner"></i>
+            </ng-template>
+        </button>
+    </div>
+</main>
