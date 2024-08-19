@@ -4,6 +4,7 @@ main {
     border-radius: 12px;
     box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.1);
 }
+
 @media (max-width: 600px) {  
     main {
         padding: 0.5rem;
@@ -18,29 +19,43 @@ main {
     margin-bottom: 1rem;
 }
 
+@media (max-width: 600px) {
+    .header {
+        margin-top: 1rem;
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
 h4 {
     margin: 0;
     color: var(--gray-700);
 }
 
-.display-buttons {
+.display {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}  
+
+.display .pattern-buttons {
     padding: 0.2rem;
     border: 1px solid var(--gray-300);
     border-radius: 8px;
     background-color: white;
 }
 
-.display-buttons i {
+.display .pattern-buttons i {
     padding: 0.5rem;
     cursor: pointer;
     border-radius: 6px;
 }
 
-.display-buttons i:active {
+.display .pattern-buttons i:active {
     background-color: var(--gray-300);
 }
 
-.display-buttons i.selected {
+.display .pattern-buttons i.selected {
     background-color: var(--primary-accent-500);
     color: white;
 }
