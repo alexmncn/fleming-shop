@@ -6,4 +6,12 @@ section {
 img {
     height: 2.5rem;
     margin: 1.5rem;
+    cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    img {
+        height: 1.5rem;
+        margin: 1rem;
+    }  
 }

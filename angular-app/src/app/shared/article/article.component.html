@@ -1,4 +1,4 @@
-<section class="article-card" [class.grid]="gridDisplay" [class.list]="listDisplay">
+<section class="article-card" [class.grid]="gridDisplay" [class.list]="listDisplay" (click)="toggleSelection()">
     <ng-container *ngIf="!loading; else loadingTemplate">
         <section class="img">
             <img *ngIf="!imgError" [src]="imgURL" (error)="showPlaceholder()" loading="lazy">
@@ -30,4 +30,24 @@
             <p-skeleton height="100%" styleClass="mb-2" borderRadius="8px"/>
         </p>
       </ng-template>
+</section>
+
+<section *ngIf="selected" class="overlay" (click)="toggleSelection()">
+    <section @slideInDown class="article-overlay" (click)="$event.stopPropagation()">
+        <i title="cerrar" class="pi pi-times" (click)="toggleSelection()"></i>
+        <section class="img">
+            <img *ngIf="!imgError" [src]="imgURL" (error)="showPlaceholder()">
+            
+            <div *ngIf="imgError" class="placeholder-img">
+                <p-skeleton class="placeholder-img" height="100%" styleClass="mb-2" />
+            </div>
+        </section>
+        <section class="info">
+            <div class="left">
+                <p class="detalle">{{ article.detalle | capitalize }}</p>
+                <p class="ref">Ref: {{ article.ref }}</p>
+                <p class="pvp">{{ article.pvp }} €</p>
+            </div>
+        </section>
+    </section>
 </section>

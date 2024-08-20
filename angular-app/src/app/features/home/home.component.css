@@ -2,16 +2,22 @@ section {
     margin-bottom: 5rem;
 }
 
+@media (max-width: 600px) {
+    section {
+        margin-bottom: 2rem;
+    }
+}
+
+@media (max-width: 600px) {
+    h2 {
+        margin-bottom: 0.5rem;
+    }
+}
+
 section.search-bar {
     margin-bottom: 1.5rem;
 }
 
 section.articles {
     width: 100%;
-}
-
-@media (max-width: 600px) {
-    section.articles {
-        padding: 0.5rem
-    }
 }

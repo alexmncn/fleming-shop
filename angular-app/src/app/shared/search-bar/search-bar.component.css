@@ -14,8 +14,19 @@ input {
     padding: 0.75rem;
     border-radius: 8px;
     border: none;
-    font-size: 1rem;
+    font-size: clamp(0.85rem, 2.5vw, 1rem);
     font-weight: 600;
+}
+
+@media (max-width: 600px) {
+    input {
+        padding: 0.5rem;
+    }
+
+    section { 
+        padding: 0.5rem;
+    }
+
 }
 
 input:focus {
@@ -31,7 +42,7 @@ div {
 
 span {
     border-radius: 8px;
-    font-size: 1.7rem;
+    font-size: clamp(1.25rem, 2.5vw, 1.7rem);
     padding: 0.5rem;
     cursor: pointer;
 }

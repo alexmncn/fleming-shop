@@ -60,10 +60,8 @@ section.list .info {
     justify-content: center;
 }
 
-
 p {
     margin: 0;
-    font-size: 1rem;
 }
 
 section.grid .info .left {
@@ -77,16 +75,16 @@ section.list .info .left {
 }
 
 p.detalle {
-    font-size: 1rem;
+    font-size: clamp(0.85rem, 2.5vw, 1rem);
 }
 
 p.ref {
     color: var(--gray-600);
-    font-size: 0.9rem;
+    font-size: clamp(0.65rem, 2.5vw, 0.9rem);
 }
 
 p.pvp {
-    font-size: 1.25rem;
+    font-size: clamp(0.95rem, 2.5vw, 1.25rem);
     margin-top: 0.5rem;
     font-weight: 600;
     white-space: nowrap;
@@ -98,6 +96,14 @@ p.pvp {
     margin-bottom: 1rem;
 }
 
+@media (max-width: 600px) {
+    .grid .placeholder-img {
+        width: 100%;
+        height: 100px;
+        margin-bottom: 1rem;
+    }
+}
+
 .list .placeholder-img {
     width: 150px;
     height: 100%;
@@ -106,4 +112,70 @@ p.pvp {
 .placeholder-text {
     height: 1rem;
     margin: 0.25rem 0;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 900;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.article-overlay {
+    width: 50%;
+    height: min-content;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    border: 1px solid var(--gray-300);
+    border-radius: 12px;
+    background-color: white;
+    box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 600px) {
+    .article-overlay {
+        width: 75%;
+        padding: 1rem;
+    }
+}
+
+.article-overlay i {
+    width: 100%;
+    text-align: end;
+    cursor: pointer;
+}
+
+.article-overlay img {
+    max-height: 400px;
+}
+
+.article-overlay .info {
+    width: 100%;
+}
+
+.article-overlay p.detalle {
+    font-size: clamp(1rem, 2.5vw, 1.15rem);
+}
+
+.article-overlay p.ref {
+    font-size: clamp(0.8rem, 2.5vw, 1rem);
+}
+
+.article-overlay p.pvp {
+    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+}
+
+.article-overlay .placeholder-img {
+    width: 100%;
+    height: 15rem;
+    margin-bottom: 1rem;
 }
