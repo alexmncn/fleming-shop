@@ -15,6 +15,8 @@ import { CapitalizePipe } from '../../pipes/capitalize/capitalize.pipe';
 })
 export class ArticleComponent {
   @Input() article!: Article;
+  @Input() gridDisplay: boolean = false;
+  @Input() listDisplay: boolean = false;
   loading: boolean = true;
   imgURL: string = '';
   imgError: boolean = false;

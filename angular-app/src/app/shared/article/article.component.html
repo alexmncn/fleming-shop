@@ -1,4 +1,4 @@
-<section class="article-card">
+<section class="article-card" [class.grid]="gridDisplay" [class.list]="listDisplay">
     <ng-container *ngIf="!loading; else loadingTemplate">
         <section class="img">
             <img *ngIf="!imgError" [src]="imgURL" (error)="showPlaceholder()" loading="lazy">

@@ -19,7 +19,7 @@
         </div>
     </div>
     <section class="articles" [class.grid]="gridDisplay" [class.list]="listDisplay">
-        <app-article *ngFor="let article of (articles.length ? articles : placeholders)" [article]="article"></app-article>
+        <app-article *ngFor="let article of (articles.length ? articles : placeholders)" [article]="article" [gridDisplay]="gridDisplay" [listDisplay]="listDisplay"></app-article>
     </section>
     <div class="footer">
         <p>{{ articles.length }} de {{ totalArticles }} artículos</p>
