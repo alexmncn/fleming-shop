@@ -1,5 +1,5 @@
-# data .csv
-*.csv
+# data
+./data
 
 # flask_migrate
 */migrations
