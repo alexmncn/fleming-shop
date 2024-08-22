@@ -6,12 +6,10 @@
     <app-families/>
 </section>
 
-<h2>Destacado</h2>
 <section class="articles featured">   
-    <app-articles (loadArticles)="loadFeaturedArticles()" [articles]="featuredArticles" [totalArticles]="totalFeaturedArticles" [per_page]="per_page" [loadingArticles]="loadingFeaturedArticles"/>
+    <app-articles (loadArticles)="loadFeaturedArticles()" [articles]="featuredArticles" [headerTitle]="featuredHeaderTitle" [totalArticles]="totalFeaturedArticles" [per_page]="per_page" [loadingArticles]="loadingFeaturedArticles"/>
 </section>
 
-<h2>Novedades</h2>
 <section class="articles new">
-    <app-articles (loadArticles)="loadNewArticles()" [articles]="newArticles" [totalArticles]="totalNewArticles" [per_page]="per_page" [loadingArticles]="loadingNewArticles"/>
+    <app-articles (loadArticles)="loadNewArticles()" [articles]="newArticles" [headerTitle]="newHeaderTitle" [totalArticles]="totalNewArticles" [per_page]="per_page" [loadingArticles]="loadingNewArticles"/>
 </section>

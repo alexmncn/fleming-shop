@@ -8,12 +8,6 @@ section {
     }
 }
 
-@media (max-width: 600px) {
-    h2 {
-        margin-bottom: 0.5rem;
-    }
-}
-
 section.search-bar {
     margin-bottom: 1.5rem;
 }

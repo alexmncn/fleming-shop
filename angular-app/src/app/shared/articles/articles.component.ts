@@ -21,6 +21,7 @@ interface SortByOption {
 export class ArticlesComponent {
   @Output() loadArticles = new EventEmitter();
   @Input() articles: any[]= [];
+  @Input() headerTitle: string = '';
   @Input() totalArticles: number = 0;
   @Input() per_page: number = 20;
   @Input() loadingArticles: boolean = false;

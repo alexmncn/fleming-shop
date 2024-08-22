@@ -20,11 +20,13 @@ export class HomeComponent implements OnInit {
 
   featuredArticlesURL: string = environment.apiUrl + '/articles/featured';
   featuredArticles: any[] = [];
+  featuredHeaderTitle: string = 'Destacado';
   featuredArticlesPage: number = 1;
   totalFeaturedArticles: number = 0;
   loadingFeaturedArticles: boolean = false;
 
   newArticlesURL: string = environment.apiUrl + '/articles/new';
+  newHeaderTitle: string = 'Novedades';
   newArticles: any[] = [];
   newArticlesPage: number = 1;
   totalNewArticles: number = 0;
