@@ -4,7 +4,7 @@ from sqlalchemy.dialects.mysql import TINYINT, BIGINT
 from .extensions import db
 
 # article
-class article(db.Model):
+class Article(db.Model):
     __tablename__ = "article"
     ref = db.Column(BIGINT, nullable=False)
     detalle = db.Column(db.String(50), nullable=True)
@@ -29,6 +29,19 @@ class article(db.Model):
             'destacado': bool(self.destacado)
         }
         
+    def to_dict_og_keys(self):
+        return {
+            'CREF': self.ref, 
+            'CDETALLE': self.detalle, 
+            'CCODFAM': self.codfam, 
+            'NCOSTEDIV': self.pcosto, 
+            'NPVP': self.pvp, 
+            'CCODEBAR': self.codebar, 
+            'NSTOCKMIN': self.stock, 
+            'DACTUALIZA': self.factualizacion,
+            'destacado': bool(self.destacado)
+        }
+        
     def to_dict_reduced(self):
         return {
             'ref': self.ref, 
@@ -38,7 +51,7 @@ class article(db.Model):
         }
     
 
-class family(db.Model):
+class Family(db.Model):
     __tablename__= "family"
     codfam = db.Column(db.Integer, primary_key=True, nullable=False)
     nomfam = db.Column(db.String(50), nullable=False)
