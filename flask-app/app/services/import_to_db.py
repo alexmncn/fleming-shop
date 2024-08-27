@@ -232,7 +232,7 @@ def update_articles(articles_dbf):
     change_log = []
     conflict_log = []
 
-# Manejo de nuevas entradas
+    # Manejo de nuevas entradas
     for _, row in new_entries.iterrows():
         if 'CCODEBAR' in row:
             if pd.isna(row['CCODEBAR']):
@@ -318,9 +318,9 @@ def update_articles(articles_dbf):
                     if new_value != last_value:
                         attribute_name = column_to_attribute_map.get(col)
                         if attribute_name:    
-                            print(f"Antes de asignar: {attribute_name} = {getattr(article, attribute_name)}")
+                            #print(f"Antes de asignar: {attribute_name} = {getattr(article, attribute_name)}")
                             setattr(article, attribute_name, new_value)
-                            print(f"Después de asignar: {attribute_name} = {getattr(article, attribute_name)}")
+                            #print(f"Después de asignar: {attribute_name} = {getattr(article, attribute_name)}")
                             updated = True
                             change_log.append({
                                 'CREF': row.get('CREF_new', None),
@@ -343,8 +343,6 @@ def update_articles(articles_dbf):
                     try:
                         session.add(article)  # Agregar el artículo a la sesión para actualizarlo
                         session.flush()  # Asegurarse de que los cambios se envíen a la base de datos
-                        #print(article.to_dict())
-                        print('\n')
                     except Exception as e:
                         session.rollback()  # Deshacer cambios si ocurre un error
                         conflict_log.append({

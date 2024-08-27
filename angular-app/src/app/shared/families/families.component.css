@@ -63,6 +63,10 @@ section.unfold {
     }
 }
 
+.family:hover {
+    background-color: var(--gray-100);
+}
+
 .family:active {
     background-color: var(--primary-accent-500);
     color: white;

@@ -1,5 +1,13 @@
 main {
-    margin: 2rem 4rem;
+    max-width: 100rem;
+    margin: 2rem 1rem;
+}
+
+@media (min-width: 100rem) {
+    main {
+        max-width: 100rem;
+        margin: 2rem auto;
+    }
 }
 
 @media (max-width: 600px) {
