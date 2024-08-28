@@ -1,14 +1,15 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { Router, RouterLink,  NavigationEnd } from '@angular/router';
-import { SearchBarComponent } from "../search-bar/search-bar.component";
 import { trigger, style, transition, animate, state } from '@angular/animations';
+import { MatIcon } from '@angular/material/icon';
 
+import { SearchBarComponent } from "../search-bar/search-bar.component";
 
 @Component({
   selector: 'app-nav-bar',
   standalone: true,
-  imports: [ CommonModule, RouterLink, SearchBarComponent],
+  imports: [ CommonModule, RouterLink, MatIcon, SearchBarComponent],
   templateUrl: './nav-bar.component.html',
   styleUrl: './nav-bar.component.css',
   animations:[

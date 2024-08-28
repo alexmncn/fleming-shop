@@ -42,8 +42,11 @@ nav .button {
     color: white !important;
 }
 
-.button i {
-    font-size: clamp(0.5rem, 2.5vw, 1rem);
+.button mat-icon {
+    display: flex;
+    font-size: clamp(0.5rem, 2.5vw, 1.2rem);
+    width: clamp(0.5rem, 2.5vw, 1.2rem);
+    height: clamp(0.5rem, 2.5vw, 1.2rem);
 }
 
 p {
