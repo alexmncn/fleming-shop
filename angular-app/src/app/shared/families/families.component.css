@@ -28,9 +28,10 @@ h4 {
     display: flex;
     align-items: center;
     margin: 0 1rem;
-    gap: 1rem;
-    font-size: clamp(0.75rem, 2.5vw, 1rem);
+    gap: 0.5rem;
+    font-size: clamp(0.65rem, 2.5vw, 1rem);
     cursor: pointer;
+    color: var(--gray-700);
 }
 
 @media (max-width: 600px) {
@@ -40,7 +41,7 @@ h4 {
 
     .un-fold {
         margin: 0 0.5rem;
-        gap: 0.5rem;
+        gap: 0.25rem;
     }
 }
 
@@ -49,7 +50,7 @@ h4 {
 }
 
 span {
-    font-size: clamp(1rem, 2.5vw, 1.35rem);
+    font-size: clamp(0.9rem, 2.5vw, 1.25rem);
 }
 
 section.scroller {

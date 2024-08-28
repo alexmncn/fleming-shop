@@ -14,7 +14,6 @@ input {
     border-radius: 8px;
     border: none;
     font-size: clamp(0.75rem, 2.5vw, 1rem);
-    font-weight: 600;
 }
 
 input:focus {
