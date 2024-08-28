@@ -14,7 +14,9 @@ import { environment } from '../../../environments/environment';
 })
 export class SearchBarComponent implements OnInit {
   @Output() search = new EventEmitter<string>();
+  @Output() isFocused = new EventEmitter<boolean>();
   searchParam: string = '';
+  isInputFocused: boolean = false;
 
   totalArticlesURL: string = environment.apiUrl + '/articles/total';
   totalArticles: any = 'todos los'; 
@@ -37,6 +39,7 @@ export class SearchBarComponent implements OnInit {
   }
 
   onSearch(): void {
+    this.onBlur();
     if (this.router.url !== '/search') {
       const navigationExtras: NavigationExtras = {
         queryParams: { 'q': this.searchParam }
@@ -46,5 +49,15 @@ export class SearchBarComponent implements OnInit {
     } else {
       this.search.emit(this.searchParam);
     }
+  }
+
+  onFocus(): void {
+    this.isInputFocused = true;
+    this.isFocused.emit(this.isInputFocused);
+  }
+
+  onBlur(): void {
+    this.isInputFocused = false;
+    this.isFocused.emit(this.isInputFocused);
   }
 }

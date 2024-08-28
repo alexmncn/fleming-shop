@@ -1,27 +1,58 @@
-header {
-    display: flex;
-    flex-direction: column;
-    align-items: end;
-    cursor: pointer;
-}
-
-span {
-    margin: 0 1rem;
-    cursor: pointer;
-    font-size: 1.5rem;
+section.families {
+    padding: 1rem 0;
+    border: var(--border-1-2);
+    border-radius: 12px;
+    background-color: white;
+    box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 600px) {
-    span {
-        font-size: 1rem;
+    section.families {
+        padding: 0.75rem 0;
     }
 }
 
-header:hover {
-    background-color: var(--gray-300);
+header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
 }
 
-section {
+h4 {
+    font-size: clamp(0.85rem, 2.5vw, 1.2rem);
+    margin: 0 1rem;
+}
+
+.un-fold {
+    display: flex;
+    align-items: center;
+    margin: 0 1rem;
+    gap: 1rem;
+    font-size: clamp(0.75rem, 2.5vw, 1rem);
+    cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    h4 {
+        margin: 0 0.5rem;
+    }
+
+    .un-fold {
+        margin: 0 0.5rem;
+        gap: 0.5rem;
+    }
+}
+
+.un-fold p:hover {
+    text-decoration: underline;
+}
+
+span {
+    font-size: clamp(1rem, 2.5vw, 1.35rem);
+}
+
+section.scroller {
     display: flex;
     overflow-x: scroll;
     overflow-y: hidden;
@@ -32,7 +63,7 @@ section {
     scrollbar-color: var(--primary-accent-500) white;
 }
 
-section.unfold {
+section.scroller.unfold {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     overflow-x: none;
@@ -40,26 +71,32 @@ section.unfold {
 }
 
 @media (max-width: 600px) {
-    section.unfold {
+    section.scroller {
+        gap: 0.5rem;
+        padding: 0.5rem;
+    }
+
+
+    section.scroller.unfold {
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
 }
 
 .family {
     padding: 1rem 1.25rem;
-    background-color: white;
     white-space: nowrap;
-    border: 1px solid var(--gray-300);
     text-align: center;
     border-radius: 12px;
+    border: var(--border-1-3);
+    background-color: white;
     box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.1);
     cursor: pointer;
-    font-size: clamp(0.85rem, 2.5vw, 1.10rem);
+    font-size: clamp(0.75rem, 2.5vw, 1rem);
 }
 
 @media (max-width: 600px) {
     .family {
-        padding: 0.85rem 1rem;
+        padding: 0.5rem 1rem;
     }
 }
 

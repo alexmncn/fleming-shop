@@ -2,7 +2,6 @@ section {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.75rem;
     border: 1px solid var(--gray-300);
     box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.1);
     border-radius: 12px;
@@ -11,11 +10,15 @@ section {
 
 input {
     width: 95%;
-    padding: 0.75rem;
+    padding: 1rem;
     border-radius: 8px;
     border: none;
-    font-size: clamp(0.85rem, 2.5vw, 1rem);
+    font-size: clamp(0.75rem, 2.5vw, 1rem);
     font-weight: 600;
+}
+
+input:focus {
+    outline: var(--primary-accent-500) solid 2px;
 }
 
 @media (max-width: 600px) {
@@ -23,14 +26,9 @@ input {
         padding: 0.5rem;
     }
 
-    section { 
-        padding: 0.5rem;
+    input:focus {
+        outline: var(--primary-accent-500) solid 1px;
     }
-
-}
-
-input:focus {
-    outline: var(--primary-accent-500) solid 2px;
 }
 
 div {

@@ -29,7 +29,7 @@
         <progress [max]="totalArticles" [value]="articles.length"></progress>
         <button *ngIf="!allArticlesLoaded || totalArticles == 0" (click)="load()" [disabled]="loadingArticles">
             <ng-container *ngIf="!loadingArticles; else loadingTemplate">
-              Show More
+              Mostrar más
             </ng-container>
             <ng-template #loadingTemplate>
               <i class="pi pi-spin pi-spinner"></i>

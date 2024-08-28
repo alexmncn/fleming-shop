@@ -1,0 +1,11 @@
+<nav>
+    <div @buttonOut *ngIf="!atHome && !hideButtons" class="button home" [routerLink]="['/home']">
+        <i title="Ir a la página principal" class="pi pi-home"></i>
+        <p>Inicio</p>
+    </div>
+    <div @buttonOut *ngIf="!atHome && !hideButtons" class="button arrow" (click)="goBack()">
+        <i title="Ir a la página anterior" class="pi pi-chevron-left"></i>
+        <p>Atrás</p>
+    </div>
+    <app-search-bar (isFocused)="isInputFocused($event)"/>
+</nav>

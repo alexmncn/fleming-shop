@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router, NavigationExtras  } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
 import { SkeletonModule } from 'primeng/skeleton';
+import { trigger, style, transition, animate, state } from '@angular/animations';
 
 import { CapitalizePipe } from '../../pipes/capitalize/capitalize.pipe';
 
@@ -14,7 +15,39 @@ import { environment } from '../../../environments/environment';
   standalone: true,
   imports: [CommonModule, MatIcon, SkeletonModule, CapitalizePipe],
   templateUrl: './families.component.html',
-  styleUrl: './families.component.css'
+  styleUrl: './families.component.css',
+  animations:[
+    trigger('arrowRotateLeft', [
+      state('void', style({
+        transform: 'rotate(180deg)',
+      })),
+      transition(':enter', [
+        animate('0.3s ease-out', style({
+          transform: 'rotate(0deg)',
+        }))
+      ]),
+      transition(':leave', [
+        animate('0s ease-in', style({
+          opacity: 0
+        }))
+      ])
+    ]),
+    trigger('arrowRotateRight', [
+      state('void', style({
+        transform: 'rotate(-180deg)',
+      })),
+      transition(':enter', [
+        animate('0.3s ease-out', style({
+          transform: 'rotate(0deg)',
+        }))
+      ]),
+      transition(':leave', [
+        animate('0s ease-in', style({
+          opacity: 0
+        }))
+      ])
+    ])
+  ]
 })
 export class FamiliesComponent implements OnInit {
   families: any[] = [];

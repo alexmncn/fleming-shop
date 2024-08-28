@@ -1,17 +1,24 @@
-<header (click)="toggleFamiliesDisplay()">
-    <span *ngIf="!this.familiesUnfold" class="pi pi-angle-down"></span>
-    <span *ngIf="this.familiesUnfold" class="pi pi-angle-up"></span>
-</header>
-<section [class.unfold]="this.familiesUnfold" (wheel)="onFamilyScroll($event)">
-    <ng-container *ngIf="!loading; else loadingTemplate">
-        <div class="family" *ngFor="let family of families" (click)="showFamily(family.nomfam, family.codfam)">
-            <p>{{ family.nomfam | capitalize }}</p>
+<section class="families">
+    <header>
+        <h4>Familias</h4>
+        <div class="un-fold" (click)="toggleFamiliesDisplay()">
+            <p *ngIf="!this.familiesUnfold">Desplegar</p>
+            <p *ngIf="this.familiesUnfold">Recoger</p>
+            <span @arrowRotateLeft *ngIf="!this.familiesUnfold" class="pi pi-angle-down"></span>
+            <span @arrowRotateRight *ngIf="this.familiesUnfold" class="pi pi-angle-up"></span>
         </div>
-    </ng-container>
-
-    <ng-template pTemplate="loader" #loadingTemplate>
-        <div class="family" *ngFor="let placeholder of placeholders">
-            <p-skeleton width="5rem" styleClass="mb-2" borderRadius="8px"/>
-        </div>
-    </ng-template>
+    </header>
+    <section class="scroller" [class.unfold]="this.familiesUnfold" (wheel)="onFamilyScroll($event)">
+        <ng-container *ngIf="!loading; else loadingTemplate">
+            <div class="family" *ngFor="let family of families" (click)="showFamily(family.nomfam, family.codfam)">
+                <p>{{ family.nomfam | capitalize }}</p>
+            </div>
+        </ng-container>
+    
+        <ng-template pTemplate="loader" #loadingTemplate>
+            <div class="family" *ngFor="let placeholder of placeholders">
+                <p-skeleton width="5rem" styleClass="mb-2" borderRadius="8px"/>
+            </div>
+        </ng-template>
+    </section>
 </section>

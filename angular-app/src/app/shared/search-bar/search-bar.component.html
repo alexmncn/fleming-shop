@@ -1,5 +1,5 @@
 <section>
-    <input type="text" id="search" name="search" [(ngModel)]="searchParam" [placeholder]="placeholder">
+    <input (focus)="onFocus()" (blur)="onBlur()" id="search" type="text" enterkeyhint="search" name="search" autocomplete="off" autocorrect="off" spellcheck="false" [(ngModel)]="searchParam" (keydown.enter)="onSearch()" [placeholder]="placeholder">
     <div>
         <span class="pi pi-search" (click)="onSearch()"></span>
     </div>
