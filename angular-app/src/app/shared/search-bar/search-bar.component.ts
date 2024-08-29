@@ -2,13 +2,16 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router, NavigationExtras } from '@angular/router';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { InputTextModule } from 'primeng/inputtext';
 
 import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-search-bar',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, IconFieldModule, InputIconModule, InputTextModule],
   templateUrl: './search-bar.component.html',
   styleUrl: './search-bar.component.css'
 })

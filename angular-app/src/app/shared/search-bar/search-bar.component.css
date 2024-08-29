@@ -1,23 +1,46 @@
 section {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    border: 1px solid var(--gray-300);
-    box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.1);
-    border-radius: 12px;
-    background-color: white;
 }
 
-input {
-    width: 95%;
-    padding: 1rem;
-    border-radius: 8px;
-    border: none;
+i {
+    position: absolute;
+    padding-left: 1.1rem;
+    color: var(--gray-500);
     font-size: clamp(0.75rem, 2.5vw, 1rem);
 }
 
+@media (max-width: 600px) {
+    i  {
+        padding-left: 0.75rem;
+    }
+}
+
+input {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 8px;
+    border: var(--border-1-2);
+    box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.1);
+    font-size: clamp(0.75rem, 2.5vw, 1rem);
+    transition: border-color 0.2s ease;
+}
+
+input:hover {
+    border-color: var(--gray-400);
+}
+
 input:focus {
-    outline: var(--primary-accent-500) solid 2px;
+    outline: none;
+    border-color: var(--primary-accent-500);
+}
+
+::ng-deep .p-input-icon {
+    left: 1rem;
+}
+
+::ng-deep #search {
+    padding-left: 3rem;
 }
 
 @media (max-width: 600px) {
@@ -25,29 +48,13 @@ input:focus {
         padding: 0.5rem;
     }
 
-    input:focus {
-        outline: var(--primary-accent-500) solid 1px;
+    ::ng-deep .p-input-icon {
+        left: 0.75rem;
+        font-size: 0.75rem;
     }
-}
+    
+    ::ng-deep #search {
+        padding-left: 2rem;
+    }
 
-div {
-    display: flex;
-    justify-content: center;
-    margin: 0 1rem;
-    width: 5%;
-}
-
-span {
-    border-radius: 8px;
-    font-size: clamp(1.25rem, 2.5vw, 1.7rem);
-    padding: 0.5rem;
-    cursor: pointer;
-}
-
-span:hover {
-    background-color: var(--gray-300);
-}
-
-span:active {
-    color: var(--primary-accent-500);
 }
