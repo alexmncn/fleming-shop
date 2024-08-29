@@ -16,18 +16,18 @@ import { CapitalizePipe } from '../../pipes/capitalize/capitalize.pipe';
   animations:[
     trigger('slideInDown', [
       state('void', style({
-        transform: 'scale(0.85)',
+        transform: 'scale(0.9)',
         opacity: 0
       })),
       transition(':enter', [
-        animate('0.3s ease-out', style({
+        animate('0.2s ease-out', style({
           transform: 'scale(1)',
           opacity: 1
         }))
       ]),
       transition(':leave', [
         animate('0.250s ease-in', style({
-          transform: 'scale(0.85)',
+          transform: 'scale(0.9)',
           opacity: 0
         }))
       ])

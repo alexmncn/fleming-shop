@@ -1,0 +1,30 @@
+main {
+    bottom: 0;
+    width: 100%;
+    color: white;
+    background-color: var(--primary-accent-500);
+}
+
+section {
+    max-width: 100rem;
+    margin: 0 1rem;
+    padding: 3rem 0;
+}
+
+@media (min-width: 100rem) {
+    section {
+        max-width: 100rem;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 600px) {
+    section {
+        margin: 0 0.5rem;
+        padding: 1.5rem 0;
+    }
+}
+
+h2 {
+    margin: 0;
+}
