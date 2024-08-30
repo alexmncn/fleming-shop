@@ -25,9 +25,10 @@ input {
     font-size: clamp(0.75rem, 2.5vw, 1rem);
     transition: border-color 0.2s ease;
 }
-
-input:hover {
-    border-color: var(--gray-400);
+@media (min-width: 768px) {
+    input:hover {
+        border-color: var(--gray-400);
+    }    
 }
 
 input:focus {
