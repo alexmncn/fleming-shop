@@ -9,16 +9,41 @@ from app.models import Article, Family
 from app.config import UPLOAD_ROUTE, DATA_ROUTE, DATA_LOGS_ROUTE
 
 
-column_to_attribute_map = {
+article_column_to_attribute_map = {
     'CREF': 'ref',
     'CDETALLE': 'detalle',
     'CCODFAM': 'codfam',
     'NCOSTEDIV': 'pcosto',
     'NPVP': 'pvp',
     'CCODEBAR': 'codebar',
-    'NSTOCKMIN': 'stock',
     'DACTUALIZA': 'factualizacion'
 }
+
+
+def articles_dbf_to_csv(articles_dbf):
+    selected_columns = ['CREF', 'CDETALLE', 'CCODFAM', 'NCOSTEDIV', 'NPVP', 'CCODEBAR', 'DACTUALIZA']
+    articles_dbf_name = articles_dbf[:-4]
+    table = DBF(UPLOAD_ROUTE + articles_dbf, encoding='latin1')
+    df = pd.DataFrame(iter(table))
+    csv_path = DATA_ROUTE + 'no_filtered_' + articles_dbf_name + '.csv'
+    df.to_csv(csv_path, index=False)
+    
+    df = pd.read_csv(csv_path)
+    df.columns = df.columns.str.strip()
+    
+    try:
+        df_filtered = df[selected_columns]
+    except KeyError as e:
+        missing_cols = list(set(selected_columns) - set(df.columns))
+        raise KeyError(f"Las siguientes columnas faltan en el DataFrame: {missing_cols}") from e
+    
+    filtered_csv_path = DATA_ROUTE + articles_dbf_name + '.csv'
+    df_filtered.to_csv(filtered_csv_path, index=False)
+    
+    os.remove(csv_path)
+    
+    return filtered_csv_path
+
 
 def validate_and_clean_data(row):
     """
@@ -70,40 +95,8 @@ def validate_and_clean_data(row):
     if row['CCODEBAR'] < 0:
         return False, "El campo 'CCODEBAR' debe ser un entero positivo."
     
-    # NSTOCKMIN: debe ser un entero, puede ser nulo
-    try:
-        if row.get('NSTOCKMIN') is not None:
-            row['NSTOCKMIN'] = int(row['NSTOCKMIN'])
-    except (ValueError, TypeError):
-        return False, "El campo 'NSTOCKMIN' debe ser un entero o nulo."
-    
     # Si todo está bien, devolver True
     return True, None
-
-
-def articles_dbf_to_csv(articles_dbf):
-    selected_columns = ['CREF', 'CDETALLE', 'CCODFAM', 'NCOSTEDIV', 'NPVP', 'CCODEBAR', 'NSTOCKMIN', 'DACTUALIZA']
-    articles_dbf_name = articles_dbf[:-4]
-    table = DBF(UPLOAD_ROUTE + articles_dbf, encoding='latin1')
-    df = pd.DataFrame(iter(table))
-    csv_path = DATA_ROUTE + 'no_filtered_' + articles_dbf_name + '.csv'
-    df.to_csv(csv_path, index=False)
-    
-    df = pd.read_csv(csv_path)
-    df.columns = df.columns.str.strip()
-    
-    try:
-        df_filtered = df[selected_columns]
-    except KeyError as e:
-        missing_cols = list(set(selected_columns) - set(df.columns))
-        raise KeyError(f"Las siguientes columnas faltan en el DataFrame: {missing_cols}") from e
-    
-    filtered_csv_path = DATA_ROUTE + articles_dbf_name + '.csv'
-    df_filtered.to_csv(filtered_csv_path, index=False)
-    
-    os.remove(csv_path)
-    
-    return filtered_csv_path
 
 
 def update_articles(articles_dbf):
@@ -159,7 +152,6 @@ def update_articles(articles_dbf):
                             pcosto=row['NCOSTEDIV'],
                             pvp=row['NPVP'],
                             codebar=row['CCODEBAR'],
-                            stock=row['NSTOCKMIN'],
                             factualizacion=row['DACTUALIZA']
                         )
                         session.add(article)
@@ -272,7 +264,6 @@ def update_articles(articles_dbf):
                         pcosto=row['NCOSTEDIV'],
                         pvp=row['NPVP'],
                         codebar=row['CCODEBAR'],
-                        stock=row['NSTOCKMIN'],
                         factualizacion=row['DACTUALIZA']
                     )
                     session.add(article)
@@ -316,7 +307,7 @@ def update_articles(articles_dbf):
                         continue
 
                     if new_value != last_value:
-                        attribute_name = column_to_attribute_map.get(col)
+                        attribute_name = article_column_to_attribute_map.get(col)
                         if attribute_name:    
                             #print(f"Antes de asignar: {attribute_name} = {getattr(article, attribute_name)}")
                             setattr(article, attribute_name, new_value)
@@ -388,14 +379,78 @@ def update_articles(articles_dbf):
 
     print("Comparación, actualización y registro de conflictos completados.")
     
+ 
     
-def load_families(filename=None):
+def update_families(filename=None):
     data = pd.read_csv(filename)
     for index, row in data.iterrows():
         family = Family(
             codfam=row['codfam'],
-            nomfam=row['nofam']
-           
+            nomfam=row['nofam']  
         )
         db.session.add(family)
     db.session.commit()
+    
+
+
+def stocks_dbf_to_csv(stocks_dbf):
+    selected_columns = ['CREF', 'NSTOCK']
+    stocks_dbf_name = stocks_dbf[:-4]
+    table = DBF(UPLOAD_ROUTE + stocks_dbf, encoding='latin1')
+    df = pd.DataFrame(iter(table))
+    csv_path = DATA_ROUTE + 'no_filtered_' + stocks_dbf_name + '.csv'
+    df.to_csv(csv_path, index=False)
+    
+    df = pd.read_csv(csv_path)
+    df.columns = df.columns.str.strip()
+    
+    try:
+        df_filtered = df[selected_columns]
+    except KeyError as e:
+        missing_cols = list(set(selected_columns) - set(df.columns))
+        raise KeyError(f"Las siguientes columnas faltan en el DataFrame: {missing_cols}") from e
+    
+    filtered_csv_path = DATA_ROUTE + stocks_dbf_name + '.csv'
+    df_filtered.to_csv(filtered_csv_path, index=False)
+    
+    os.remove(csv_path)
+    
+    return filtered_csv_path
+
+
+def update_stocks(stocks_dbf):
+    stocks_csv_path = stocks_dbf_to_csv(stocks_dbf)
+    time.sleep(2)
+    session = db.session
+    
+    article_stocks = session.query(Article).with_entities(Article.ref, Article.stock).all()
+    stocks_csv = pd.read_csv(stocks_csv_path)
+    
+    article_stocks_dict = {ref: stock for ref, stock in article_stocks}
+    
+    updates = 0
+    errors = 0
+    for _, row in stocks_csv.iterrows():
+        if 'CREF' and 'NSTOCK' in row:
+            try:
+                ref = int(row['CREF'])
+                new_stock = row['NSTOCK']
+                
+                if ref in article_stocks_dict:
+                    current_stock = article_stocks_dict[ref]
+                    
+                    if current_stock != new_stock:
+                        
+                        article = session.query(Article).filter_by(ref=ref).first()
+                        article.stock = new_stock
+                        session.add(article)
+                        updates += 1
+                        print(f"Actualizado {ref}: Stock cambiado de {current_stock} a {new_stock}")
+            except Exception as e:
+                errors += 1
+                print(f'Error: {e}')
+            
+    print(f'\nSe han actualizado {updates} articulos.\nSe han encontrado {errors} errores.')
+                
+    
+    session.commit()

@@ -12,7 +12,7 @@ class Article(db.Model):
     pcosto = db.Column(db.Float, nullable=True)
     pvp = db.Column(db.Float, nullable=False)
     codebar = db.Column(BIGINT, primary_key=True, autoincrement=False, nullable=False)
-    stock = db.Column(db.Integer, nullable=True)
+    stock = db.Column(db.Integer, default=0, nullable=True)
     factualizacion = db.Column(db.DateTime, nullable=True)
     destacado = db.Column(TINYINT(1), default=0, nullable=True)
     
@@ -29,6 +29,15 @@ class Article(db.Model):
             'destacado': bool(self.destacado)
         }
         
+    def to_dict_reduced(self):
+        return {
+            'ref': self.ref, 
+            'detalle': self.detalle, 
+            'codfam': self.codfam,  
+            'pvp': self.pvp,
+            'stock': self.stock
+        }
+        
     def to_dict_og_keys(self):
         return {
             'CREF': self.ref, 
@@ -40,14 +49,6 @@ class Article(db.Model):
             'NSTOCKMIN': self.stock, 
             'DACTUALIZA': self.factualizacion,
             'destacado': bool(self.destacado)
-        }
-        
-    def to_dict_reduced(self):
-        return {
-            'ref': self.ref, 
-            'detalle': self.detalle, 
-            'codfam': self.codfam,  
-            'pvp': self.pvp
         }
     
 
