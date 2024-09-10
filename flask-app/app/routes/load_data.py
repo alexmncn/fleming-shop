@@ -22,11 +22,13 @@ def upload_articles_():
         return jsonify(error='No file selected to upload'), 400
 
     if file:
+        print(f'Archivo recibido: {file.filename}')
         filename = file.filename
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         new_filename = f"{os.path.splitext(filename)[0]}_{timestamp}{os.path.splitext(filename)[1]}"
         file_path = os.path.join(UPLOAD_ROUTE, new_filename)
         file.save(file_path)
+        
         
         update_articles(new_filename)
         

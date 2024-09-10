@@ -11,7 +11,14 @@ section.article-card {
     padding: 1rem;
 }
 
+@media (max-width: 600px) {
+    section.article-card {
+        padding: 0.5rem;
+    }
+}
+
 section.article-card.grid {
+    position: relative;
     flex-direction: column;
     justify-content: space-between;
 }
@@ -24,12 +31,11 @@ section.article-card.list {
 img {
     object-fit: contain;
     width: 100%;
-    border-radius: 8px;
+    border-radius: 4px;
 }
 
 .grid img {
     height: 200px;
-    margin-bottom: 1rem;
 }
 
 .list img {
@@ -48,6 +54,69 @@ img {
     }
 }
 
+.c1 {
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+}
+
+.stock-info {
+    width: min-content;
+    font-size: clamp(0.55rem, 2.5vw, 0.85rem);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    white-space: nowrap;
+}
+
+section.grid .stock-info {
+    z-index: 100;
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0.5rem 0;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border: var(--border-1-2);
+    border-right: none;
+    background-color: white;
+    box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.1);
+}
+
+.circle {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+@media (max-width: 600px) {
+    .stock-info {
+        gap: 0.5rem;
+    }
+
+    section.grid .stock-info {
+        padding: 0.15rem 0.5rem;
+        margin: 0.35rem 0
+    }
+
+    .circle {
+        width: 6px;
+        height: 6px;
+    }
+}
+
+.circle.red {
+    background: red;
+    box-shadow: 0 0 4px 2px rgba(255, 115, 115, 0.30);
+}
+
+.circle.green {
+    background: rgb(0, 187, 0);
+    box-shadow: 0 0 4px 2px rgba(115, 255, 115, 0.50);
+}
+
 section.grid .info {
     display: flex;
     flex-direction: row;
@@ -57,7 +126,7 @@ section.grid .info {
 section.list .info {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
 }
 
 p {
@@ -75,7 +144,7 @@ section.list .info .left {
 }
 
 p.detalle {
-    font-size: clamp(0.85rem, 2.5vw, 1rem);
+    font-size: clamp(0.75rem, 2.5vw, 1rem);
 }
 
 p.ref {
@@ -93,7 +162,6 @@ p.pvp {
 .grid .placeholder-img {
     width: 100%;
     height: 200px;
-    margin-bottom: 1rem;
 }
 
 @media (max-width: 600px) {

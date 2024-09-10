@@ -61,4 +61,10 @@ export class ArticleComponent {
     }
   }
 
+  get inStock(): boolean {
+    if (this.article.stock > 0) {
+      return true
+    } else {return false}
+  }
+
 }

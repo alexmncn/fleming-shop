@@ -2,9 +2,8 @@
     <ng-container *ngIf="!loading; else loadingTemplate">
         <section class="img">
             <img *ngIf="!imgError" [src]="imgURL" (error)="showPlaceholder()" loading="lazy">
-            
             <div *ngIf="imgError" class="placeholder-img">
-                <p-skeleton class="placeholder-img" height="100%" styleClass="mb-2" />
+                <p-skeleton  height="100%" styleClass="mb-2" borderRadius="4px"/>
             </div>
         </section>
         <section class="info">
@@ -13,21 +12,33 @@
                 <p class="ref">Ref: {{ article.ref }}</p>
                 <p class="pvp">{{ article.pvp }} €</p>
             </div>
+            <div class="c1">
+                <div *ngIf="listDisplay" class="stock-info" [title]="article.stock">
+                    <div class="circle" [class.green]="inStock" [class.red]="!inStock"></div>
+                    <p *ngIf="inStock">Disponible</p>
+                    <p *ngIf="!inStock">Sin stock</p>
+                </div>
+            </div>
         </section>
+        <div *ngIf="gridDisplay" class="stock-info" [title]="article.stock">
+            <div class="circle" [class.green]="inStock" [class.red]="!inStock"></div>
+            <p *ngIf="inStock">Disponible</p>
+            <p *ngIf="!inStock">Sin stock</p>
+        </div>
     </ng-container>
 
     <ng-template pTemplate="loader" #loadingTemplate>
         <div class="placeholder-img">
-            <p-skeleton height="100%" styleClass="mb-2" borderRadius="8px"/>
+            <p-skeleton height="100%" styleClass="mb-2" borderRadius="4px"/>
         </div>
         <p class="placeholder-text">
-            <p-skeleton height="100%" styleClass="mb-2" borderRadius="8px"/>
+            <p-skeleton height="100%" styleClass="mb-2" borderRadius="4px"/>
         </p>
         <p class="placeholder-text">
-            <p-skeleton height="100%" styleClass="mb-2" borderRadius="8px"/>
+            <p-skeleton height="100%" styleClass="mb-2" borderRadius="4px"/>
         </p>
         <p class="placeholder-text">
-            <p-skeleton height="100%" styleClass="mb-2" borderRadius="8px"/>
+            <p-skeleton height="100%" styleClass="mb-2" borderRadius="4px"/>
         </p>
       </ng-template>
 </section>
@@ -39,7 +50,7 @@
             <img *ngIf="!imgError" [src]="imgURL" (error)="showPlaceholder()">
             
             <div *ngIf="imgError" class="placeholder-img">
-                <p-skeleton class="placeholder-img" height="100%" styleClass="mb-2" />
+                <p-skeleton class="placeholder-img" height="100%" styleClass="mb-2" borderRadius="4px"/>
             </div>
         </section>
         <section class="info">

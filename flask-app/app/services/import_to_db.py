@@ -440,7 +440,6 @@ def update_stocks(stocks_dbf):
                     current_stock = article_stocks_dict[ref]
                     
                     if current_stock != new_stock:
-                        
                         article = session.query(Article).filter_by(ref=ref).first()
                         article.stock = new_stock
                         session.add(article)
