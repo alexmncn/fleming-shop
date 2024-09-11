@@ -379,15 +379,40 @@ def update_articles(articles_dbf):
 
     print("Comparación, actualización y registro de conflictos completados.")
     
- 
+
+def families_dbf_to_csv(families_dbf):
+    selected_columns = ['CCODFAM', 'CNOMFAM']
+    families_dbf_name = families_dbf[:-4]
+    table = DBF(UPLOAD_ROUTE + families_dbf, encoding='latin1')
+    df = pd.DataFrame(iter(table))
+    csv_path = DATA_ROUTE + 'no_filtered_' + families_dbf_name + '.csv'
+    df.to_csv(csv_path, index=False)
     
-def update_families(filename=None):
+    df = pd.read_csv(csv_path)
+    df.columns = df.columns.str.strip()
+    
+    try:
+        df_filtered = df[selected_columns]
+    except KeyError as e:
+        missing_cols = list(set(selected_columns) - set(df.columns))
+        raise KeyError(f"Las siguientes columnas faltan en el DataFrame: {missing_cols}") from e
+    
+    filtered_csv_path = DATA_ROUTE + families_dbf_name + '.csv'
+    df_filtered.to_csv(filtered_csv_path, index=False)
+    
+    os.remove(csv_path)
+    
+    return filtered_csv_path
+
+    
+def update_families(families_dbf):
+    families_csv_path = families_dbf_to_csv(families_dbf)
     time.sleep(2)
-    data = pd.read_csv(filename)
+    data = pd.read_csv(families_csv_path)
     for index, row in data.iterrows():
         family = Family(
-            codfam=row['codfam'],
-            nomfam=row['nofam']  
+            codfam=row['CCODFAM'],
+            nomfam=row['CNOMFAM']  
         )
         db.session.add(family)
     db.session.commit()
