@@ -1,8 +1,9 @@
 # data
 */app/data
 
-# flask_migrate
+# flask
 */migrations
+run-app.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
