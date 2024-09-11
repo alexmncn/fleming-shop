@@ -382,6 +382,7 @@ def update_articles(articles_dbf):
  
     
 def update_families(filename=None):
+    time.sleep(2)
     data = pd.read_csv(filename)
     for index, row in data.iterrows():
         family = Family(

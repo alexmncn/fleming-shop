@@ -26,5 +26,5 @@ def register_blueprints(app):
     app.register_blueprint(load_data.load_data_bp)
 
 def set_CORS(app):
-    CORS(app, origins=['http://localhost:4200', 'https://3rm85g3k-4200.uks1.devtunnels.ms'])
+    CORS(app, origins=['http://localhost:4200'])
     return None
