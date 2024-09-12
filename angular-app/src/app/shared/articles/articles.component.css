@@ -45,7 +45,7 @@ h2 {
 }
 
 .info {
-    padding: 0.5rem;
+    padding: 0.4rem;
     background-color: white;
     border: var(--border-1-3);
     border-radius: 8px;
@@ -74,6 +74,12 @@ h2 {
     border: var(--border-1-3);
     box-shadow: none;
     padding: 0.1rem;
+}
+
+@media (max-width: 600px) {
+    ::ng-deep .p-dropdown {
+        padding: 0;
+    }
 }
 
 ::ng-deep .p-dropdown .p-dropdown-label {
@@ -114,7 +120,7 @@ h2 {
 @media (max-width: 600px) {
     
     ::ng-deep .p-dropdown .p-dropdown-label {
-        height: 2rem; /* Ajusta la altura del dropdown */
+        padding: 0.4rem; /* Ajusta la altura del dropdown */
         line-height: 1rem;
     } 
 }
@@ -134,8 +140,11 @@ h2 {
 }
 
 @media (max-width: 600px) {
+    .display .pattern-buttons {
+        padding: 0.1rem;
+    }
     .display .pattern-buttons i {
-        padding: 0.5rem;
+        padding: 0.4rem;
         cursor: pointer;
         border-radius: 6px;
         font-size: 0.85rem;
