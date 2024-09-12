@@ -10,7 +10,7 @@
             <div class="left">
                 <p class="detalle">{{ article.detalle | capitalize }}</p>
                 <p class="ref">Ref: {{ article.ref }}</p>
-                <p class="pvp">{{ article.pvp }} €</p>
+                <p class="pvp">{{ formatedPvp }} €</p>
             </div>
             <div class="c1">
                 <div *ngIf="listDisplay" class="stock-info" [title]="article.stock">
@@ -57,7 +57,7 @@
             <div class="left">
                 <p class="detalle">{{ article.detalle | capitalize }}</p>
                 <p class="ref">Ref: {{ article.ref }}</p>
-                <p class="pvp">{{ article.pvp }} €</p>
+                <p class="pvp">{{ formatedPvp }} €</p>
             </div>
         </section>
     </section>

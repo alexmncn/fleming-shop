@@ -67,4 +67,8 @@ export class ArticleComponent {
     } else {return false}
   }
 
+  get formatedPvp(): string {
+    return this.article.pvp.toFixed(2);
+  }
+
 }
