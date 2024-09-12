@@ -26,5 +26,5 @@ def register_blueprints(app):
     app.register_blueprint(load_data.load_data_bp)
 
 def set_CORS(app):
-    CORS(app, origins=['http://localhost:4200'])
+    CORS(app, origins=['http://localhost:4200', 'https://tiendafleming.es'])
     return None
