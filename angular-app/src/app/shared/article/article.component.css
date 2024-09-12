@@ -184,7 +184,7 @@ p.pvp {
 }
 
 .placeholder-text.detalle {
-    width: 75%;
+    width: 65%;
     height: 1.25rem;    
 }
 
@@ -197,7 +197,7 @@ p.pvp {
 .placeholder-text.pvp {
     width: 20%;
     height: 1.75rem;
-    margin: 0.75rem 0;
+    margin-top: 0.75rem;
 }
 
 @media (max-width: 600px) {
@@ -216,7 +216,7 @@ p.pvp {
     
     .placeholder-text.pvp {
         height: 1rem;
-        margin: 0.5rem 0;
+        margin-top: 0.5rem;
     }
 }
 
@@ -241,7 +241,7 @@ p.pvp {
     height: min-content;
     flex-direction: column;
     align-items: center;
-    padding: 2rem;
+    padding: 1rem;
     border: var(--border-1-3);
     border-radius: 12px;
     background-color: white;
@@ -251,7 +251,7 @@ p.pvp {
 @media (max-width: 600px) {
     .article-overlay {
         width: 75%;
-        padding: 1rem;
+        padding: 0.75rem;
     }
 }
 
@@ -284,4 +284,12 @@ p.pvp {
 .article-overlay .placeholder-img {
     width: 100%;
     height: 15rem;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 600px) {
+    .article-overlay .placeholder-img {
+        height: 10rem;
+        margin-bottom: 0.5rem;
+    }
 }
