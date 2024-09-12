@@ -1,4 +1,4 @@
 export const environment = {
     production: true,
-    apiUrl: 'https://tiendafleming.es/api'
+    apiUrl: 'https://api.tiendafleming.es'
 };
