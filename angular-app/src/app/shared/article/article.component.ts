@@ -7,6 +7,8 @@ import { Article } from '../../models/article.model';
 
 import { CapitalizePipe } from '../../pipes/capitalize/capitalize.pipe';
 
+import { environment } from '../../../environments/environment';
+
 @Component({
   selector: 'app-article',
   standalone: true,
@@ -46,7 +48,7 @@ export class ArticleComponent {
   ngOnChanges(): void {
     this.loading = !this.article.detalle;
     this.imgError = false;
-    this.imgURL = '/assets/images/articles/' + this.article.ref + '.jpg';
+    this.imgURL = environment.articleImageRoute + this.article.ref + '.jpg';
   }
 
   showPlaceholder(): void {
