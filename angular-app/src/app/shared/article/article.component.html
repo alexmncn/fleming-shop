@@ -31,16 +31,18 @@
         <div class="placeholder-img">
             <p-skeleton height="100%" styleClass="mb-2" borderRadius="4px"/>
         </div>
-        <p class="placeholder-text detalle">
-            <p-skeleton height="100%" styleClass="mb-2" borderRadius="4px"/>
-        </p>
-        <p class="placeholder-text ref">
-            <p-skeleton height="100%" styleClass="mb-2" borderRadius="4px"/>
-        </p>
-        <p class="placeholder-text pvp">
-            <p-skeleton height="100%" styleClass="mb-2" borderRadius="4px"/>
-        </p>
-      </ng-template>
+        <div class="info-placeholder">
+            <p class="placeholder-text detalle">
+                <p-skeleton height="100%" styleClass="mb-2" borderRadius="4px"/>
+            </p>
+            <p class="placeholder-text ref">
+                <p-skeleton height="100%" styleClass="mb-2" borderRadius="4px"/>
+            </p>
+            <p class="placeholder-text pvp">
+                <p-skeleton height="100%" styleClass="mb-2" borderRadius="4px"/>
+            </p>
+        </div>
+    </ng-template>
 </section>
 
 <section *ngIf="selected" class="overlay" (click)="toggleSelection()">

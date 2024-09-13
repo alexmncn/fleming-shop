@@ -17,7 +17,9 @@
     
         <ng-template pTemplate="loader" #loadingTemplate>
             <div class="family" *ngFor="let placeholder of placeholders">
-                <p-skeleton width="5rem" styleClass="mb-2" borderRadius="8px"/>
+                <div class="placeholder-text">
+                    <p-skeleton height="100%" styleClass="mb-2" borderRadius="4px"/>
+                </div>
             </div>
         </ng-template>
     </section>
