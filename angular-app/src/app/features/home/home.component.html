@@ -3,9 +3,9 @@
 </section>
 
 <section class="articles featured">   
-    <app-articles (loadArticles)="loadFeaturedArticles()" [articles]="featuredArticles" [headerTitle]="featuredHeaderTitle" [totalArticles]="totalFeaturedArticles" [per_page]="per_page" [loadingArticles]="loadingFeaturedArticles"/>
+    <app-articles (loadArticles)="loadFeaturedArticles()" [articles]="featuredArticles" [headerTitle]="featuredHeaderTitle" [totalArticles]="totalFeaturedArticles" [per_page]="per_page" [loadingArticles]="loadingFeaturedArticles" [statusCode]="featuredStatusCode"/>
 </section>
 
 <section class="articles new">
-    <app-articles (loadArticles)="loadNewArticles()" [articles]="newArticles" [headerTitle]="newHeaderTitle" [totalArticles]="totalNewArticles" [per_page]="per_page" [loadingArticles]="loadingNewArticles"/>
+    <app-articles (loadArticles)="loadNewArticles()" [articles]="newArticles" [headerTitle]="newHeaderTitle" [totalArticles]="totalNewArticles" [per_page]="per_page" [loadingArticles]="loadingNewArticles" [statusCode]="newStatusCode"/>
 </section>

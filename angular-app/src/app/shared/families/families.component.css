@@ -1,5 +1,5 @@
 section.families {
-    padding: 1rem 0;
+    padding: 1rem;
     border: var(--border-1-2);
     border-radius: 12px;
     background-color: white;
@@ -8,7 +8,7 @@ section.families {
 
 @media (max-width: 600px) {
     section.families {
-        padding: 0.75rem 0;
+        padding: 0.5rem;
     }
 }
 
@@ -17,17 +17,23 @@ header {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 600px) {
+    header {
+        margin-bottom: 0.5rem;
+    }
 }
 
 h4 {
     font-size: clamp(0.85rem, 2.5vw, 1.2rem);
-    margin: 0 1rem;
+    margin: 0;
 }
 
 .un-fold {
     display: flex;
     align-items: center;
-    margin: 0 1rem;
     gap: 0.5rem;
     font-size: clamp(0.65rem, 2.5vw, 1rem);
     cursor: pointer;
@@ -35,12 +41,8 @@ h4 {
 }
 
 @media (max-width: 600px) {
-    h4 {
-        margin: 0 0.5rem;
-    }
-
     .un-fold {
-        margin: 0 0.5rem;
+        margin: 0;
         gap: 0.25rem;
     }
 }
@@ -59,6 +61,7 @@ section.scroller {
     overflow-y: hidden;
     gap: 1rem;
     padding: 1rem;
+    padding-top: 0;
     scroll-behavior: smooth;
     scrollbar-width: thin;
     scrollbar-color: var(--primary-accent-500) white;
@@ -75,6 +78,7 @@ section.scroller.unfold {
     section.scroller {
         gap: 0.5rem;
         padding: 0.5rem;
+        padding-top: 0;
     }
 
 
@@ -119,6 +123,39 @@ p {
     height: 1rem;
 }
 
+@media (max-width: 600px) {
+    .placeholder-text {
+        width: 3.5rem;
+        height: 0.5rem;
+    }
+}
+
 .unfold .placeholder-text {
     width: 100%;
+}
+
+.no-families-info {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-self: center;
+    gap: 1rem;
+    padding: 3rem;
+    border: var(--border-1-3);
+    border-radius: 8px;
+    box-shadow: inset 0 4px 8px 1px rgba(0, 0, 0, 0.1);
+    background-color: var(--gray-100);
+    color: var(--gray-600);
+    font-size: clamp(0.75rem, 2.5vw, 1rem);
+}
+
+@media (max-width: 600px) {
+    .no-families-info {
+        gap: 0.5rem;
+        padding: 1.5rem;
+    }
+}
+
+.no-families-info p {
+    margin: 0;
 }

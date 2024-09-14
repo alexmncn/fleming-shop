@@ -25,6 +25,7 @@ export class ArticlesComponent {
   @Input() totalArticles: number = 0;
   @Input() per_page: number = 20;
   @Input() loadingArticles: boolean = false;
+  @Input() statusCode: number = -1;
   gridDisplay: boolean = true;
   listDisplay: boolean = false;
   placeholders: Article[] = new Array(this.per_page).fill('');
@@ -39,6 +40,9 @@ export class ArticlesComponent {
   selectedSort: SortByOption | undefined;
 
   ngOnChanges(changes: SimpleChanges): void {
+    if(changes["loadingArticles"])
+
+
     if (changes["articles"]) {
       this.sortArticles();
     }
@@ -83,6 +87,14 @@ export class ArticlesComponent {
       default:
         break;
     }
+  }
+
+  get noArticles(): boolean {
+    return this.statusCode == 404 && this.articles.length == 0 && !this.loadingArticles;
+  }
+
+  get serverError(): boolean {
+    return (this.statusCode == 408 || this.statusCode.toString().startsWith('5')) && this.articles.length == 0 && !this.loadingArticles;
   }
 
 }

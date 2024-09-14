@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
+import { catchError, timeout } from 'rxjs/operators';
+import { of, throwError } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 
@@ -24,6 +26,7 @@ export class SearchComponent {
   lastSearchParam: string = 'none';
   articlesPage: number = 1;
   loadingArticles: boolean = false;
+  statusCode: number = -1;
 
 
   constructor(private http: HttpClient, private route: ActivatedRoute) { }
@@ -61,12 +64,39 @@ export class SearchComponent {
       this.articles = [];
       this.getTotalSearchArticles();
       this.http.get(this.searchURL, {params: {'search': this.searchParam, 'page': this.articlesPage, 'per_page': this.per_page}})
-        .subscribe((data) => {
-          this.articles = this.articles.concat(data);
-          this.articlesPage++;
-          this.lastSearchParam = this.searchParam;
-          
-          this.loadingArticles = false;
+        .pipe(
+          timeout(10000),
+          catchError(error => {
+            this.loadingArticles = false;
+            if (error.name === 'TimeoutError') {
+              console.error('Request timed out');
+              this.statusCode = 408;
+              return of([]);
+            }
+            const status = error.status || 500;
+            const message = error.message || 'An unknown error occurred';
+
+            return throwError(() => ({
+              status,
+              message
+            }));
+          })
+        )
+        .subscribe({
+          next: (response) => {
+            this.articles = this.articles.concat(response);
+            this.articlesPage++;
+            this.lastSearchParam = this.searchParam;
+            
+            this.loadingArticles = false;
+          },
+          error: (error) => {
+            console.log(error.status)
+            this.loadingArticles = false;
+            this.statusCode = error.status;
+          },
+          complete: () => {
+          }
         });
     }
   }

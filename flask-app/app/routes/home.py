@@ -22,9 +22,12 @@ def all_articles():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 20, type=int)
     
-    articulos = home_data.all_articles(page, per_page)
-            
-    return jsonify(articulos)
+    articles = home_data.all_articles(page, per_page)
+    
+    if len(articles) == 0:
+        return jsonify(error='Not found'), 404
+    
+    return jsonify(articles)
 
 
 @home_bp.route('/articles/search')
@@ -34,6 +37,9 @@ def search_articles():
     per_page = request.args.get('per_page', 20, type=int)
     
     articles = home_data.search_articles(search, page, per_page)
+    
+    if len(articles) == 0:
+        return jsonify(error='Not found'), 404
     
     return jsonify(articles)
 
@@ -59,6 +65,9 @@ def featured_articles():
     
     articles = home_data.featured_articles(page, per_page)
     
+    if len(articles) == 0:
+        return jsonify(error='Not found'), 404
+    
     return jsonify(articles)
 
 
@@ -74,6 +83,9 @@ def new_articles():
     per_page = request.args.get('per_page', 20, type=int)
     
     articles = home_data.new_articles(page, per_page)
+    
+    if len(articles) == 0:
+        return jsonify(error='Not found'), 404
 
     return jsonify(articles)
 
@@ -84,9 +96,19 @@ def families_articles(family_id=None):
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 20, type=int)
         
-        return jsonify(home_data.family_articles(family_id, page, per_page))
+        families = home_data.family_articles(family_id, page, per_page)
+        
+        if len(families) == 0:
+            return jsonify(error='Not found'), 404
+        
+        return jsonify(families)
     
-    return jsonify(home_data.all_families())
+    families = home_data.all_families()
+    
+    if len(families) == 0:
+            return jsonify(error='Not found'), 404
+    
+    return jsonify(families)
 
 
 @home_bp.route('/articles/families/<int:family_id>/total')

@@ -1,4 +1,4 @@
 <h3>Resultados de '{{ searchParam }}'</h3>
 <section class="articles">
-    <app-articles (loadArticles)="onSearch(searchParam)" [articles]="articles" [totalArticles]="totalArticles" [per_page]="per_page" [loadingArticles]="loadingArticles"/>
+    <app-articles (loadArticles)="onSearch(searchParam)" [articles]="articles" [totalArticles]="totalArticles" [per_page]="per_page" [loadingArticles]="loadingArticles" [statusCode]="statusCode"/>
 </section>

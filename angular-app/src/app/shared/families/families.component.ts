@@ -9,6 +9,7 @@ import { trigger, style, transition, animate, state } from '@angular/animations'
 import { CapitalizePipe } from '../../pipes/capitalize/capitalize.pipe';
 
 import { environment } from '../../../environments/environment';
+import { catchError, of, throwError, timeout } from 'rxjs';
 
 @Component({
   selector: 'app-families',
@@ -54,6 +55,7 @@ export class FamiliesComponent implements OnInit {
   placeholders: any[] = new Array(20).fill('');
   loading: boolean = true;
   familiesUnfold: boolean = false;
+  statusCode: number = -1;
 
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -63,9 +65,33 @@ export class FamiliesComponent implements OnInit {
 
   loadFamilies(): void {
     this.http.get(environment.apiUrl + '/articles/families')
-      .subscribe((data) => {
-        this.families = this.families.concat(data);
-        this.loading = false;
+      .pipe(
+        timeout(10000),
+        catchError(error => {
+          this.loading = false;
+          if (error.name === 'TimeoutError') {
+            console.error('Request timed out');
+            this.statusCode = 408;
+            return of([]);
+          }
+          const status = error.status || 500;
+          const message = error.message || 'An unknown error occurred';
+
+          return throwError(() => ({
+            status,
+            message
+          }));
+        })
+      )
+      .subscribe({
+        next:(response) => {
+          this.families = this.families.concat(response);
+          this.loading = false;  
+        },
+        error: (error) => {
+          this.loading = false;
+          this.statusCode = error.status;
+        },
       });
   }
   
@@ -97,6 +123,14 @@ export class FamiliesComponent implements OnInit {
 
       this.router.navigate(['/family'], navigationExtras);;
     }
+  }
+
+  get noFamilies(): boolean {
+    return this.statusCode == 404 && this.families.length == 0 && !this.loading;
+  }
+
+  get serverError(): boolean {
+    return (this.statusCode == 408 || this.statusCode.toString().startsWith('5')) && this.families.length == 0 && !this.loading;
   }
 
 }

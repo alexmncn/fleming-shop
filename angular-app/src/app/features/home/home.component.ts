@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { catchError, timeout } from 'rxjs/operators';
+import { of, throwError } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 
@@ -24,6 +26,7 @@ export class HomeComponent implements OnInit {
   featuredArticlesPage: number = 1;
   totalFeaturedArticles: number = 0;
   loadingFeaturedArticles: boolean = false;
+  featuredStatusCode: number = 0;
 
   newArticlesURL: string = environment.apiUrl + '/articles/new';
   newHeaderTitle: string = 'Novedades';
@@ -31,6 +34,7 @@ export class HomeComponent implements OnInit {
   newArticlesPage: number = 1;
   totalNewArticles: number = 0;
   loadingNewArticles: boolean = false;
+  newStatusCode: number = 0;
 
   constructor(private http: HttpClient) { }
 
@@ -52,12 +56,39 @@ export class HomeComponent implements OnInit {
   loadFeaturedArticles(): void {
     this.loadingFeaturedArticles = true;
     this.http.get(this.featuredArticlesURL, {params: {'page': this.featuredArticlesPage, 'per_page': this.per_page}})
-    .subscribe((data) => {
-      this.featuredArticles = this.featuredArticles.concat(data);
-      this.featuredArticlesPage++;
+      .pipe(
+        timeout(10000),
+        catchError(error => {
+          this.loadingFeaturedArticles = false;
+          if (error.name === 'TimeoutError') {
+            console.error('Request timed out');
+            this.featuredStatusCode = 408;
+            return of([]);
+          }
+          const status = error.status || 500;
+          const message = error.message || 'An unknown error occurred';
 
-      this.loadingFeaturedArticles = false;
-    });
+          return throwError(() => ({
+            status,
+            message
+          }));
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          this.featuredArticles = this.featuredArticles.concat(response);
+          this.featuredArticlesPage++;
+
+          this.loadingFeaturedArticles = false;
+          console.log('si')
+        },
+        error: (error) => {
+          this.loadingFeaturedArticles = false;
+          this.featuredStatusCode = error.status;
+        },
+        complete: () => {
+        }
+      });
   }
   
   getTotalNewArticles(): void {
@@ -70,11 +101,37 @@ export class HomeComponent implements OnInit {
   loadNewArticles(): void {
   this.loadingNewArticles = true;
     this.http.get(this.newArticlesURL, {params: {'page': this.newArticlesPage, 'per_page': this.per_page}})
-    .subscribe((data) => {
-      this.newArticles = this.newArticles.concat(data);
-      this.newArticlesPage++;
+      .pipe(
+        timeout(10000),
+        catchError(error => {
+          this.loadingNewArticles = false;
+          if (error.name === 'TimeoutError') {
+            console.error('Request timed out');
+            this.newStatusCode = 408;
+            return of([]);
+          }
+          const status = error.status || 500;
+          const message = error.message || 'An unknown error occurred';
 
-      this.loadingNewArticles = false;
-    });
+          return throwError(() => ({
+            status,
+            message
+          }));
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          this.newArticles = this.newArticles.concat(response);
+          this.newArticlesPage++;
+
+          this.loadingNewArticles = false;
+        },
+        error: (error) => {
+          this.loadingNewArticles = false;
+          this.newStatusCode = error.status;
+        },
+        complete: () => {
+        }
+      });
   }
 }

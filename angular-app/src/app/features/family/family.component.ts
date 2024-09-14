@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
+import { catchError, timeout } from 'rxjs/operators';
+import { of, throwError } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 
@@ -22,7 +24,8 @@ export class FamilyComponent {
   totalArticles: number = 0;
   per_page: number = 30;
   articlesPage: number = 1;
-  loadingArticles: boolean = false; 
+  loadingArticles: boolean = false;
+  statusCode: number = -1;
 
   constructor(private http: HttpClient, private route: ActivatedRoute) { }
 
@@ -47,11 +50,37 @@ export class FamilyComponent {
   loadFamilyArticles(): void {
     this.loadingArticles = true;
     this.http.get(this.familiesURL + '/' + this.codfam, {params: {'page': this.articlesPage, 'per_page': this.per_page}})
-      .subscribe((data) => {
-        this.articles = this.articles.concat(data);
-        this.articlesPage++;
+      .pipe(
+        timeout(10000),
+        catchError(error => {
+          this.loadingArticles = false;
+          if (error.name === 'TimeoutError') {
+            console.error('Request timed out');
+            this.statusCode = 408;
+            return of([]);
+          }
+          const status = error.status || 500;
+          const message = error.message || 'An unknown error occurred';
+
+          return throwError(() => ({
+            status,
+            message
+          }));
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          this.articles = this.articles.concat(response);
+          this.articlesPage++;
         
-        this.loadingArticles = false;
+          this.loadingArticles = false;
+        },
+        error: (error) => {
+          this.loadingArticles = false;
+          this.statusCode = error.status;
+        },
+        complete: () => {
+        }
       });
   }
 }

@@ -1,39 +1,61 @@
 <main>
     <div class="header">
         <h2 *ngIf="headerTitle">{{ headerTitle }}</h2>
-        <div class="toolbar">
-            <div class="info">
-                <h4>{{ totalArticles }} artículos</h4>
-            </div>
-            <div class="display">
-                <p-dropdown class="sort-by"
-                    [options]="sortOptions" 
-                    [(ngModel)]="selectedSort"
-                    (onChange)="sortArticles()"
-                    [checkmark]="true" 
-                    optionLabel="name"
-                    placeholder="Ordenar por" >
-                </p-dropdown>
-                <div class="pattern-buttons">
-                    <i title="Cuadrícula" class="pi pi-th-large" [class.selected]="gridDisplay" (click)="setGridDisplay()"></i>
-                    <i title="Lista" class="pi pi-list" [class.selected]="listDisplay" (click)="setListDisplay()"></i>
+        
+        <div *ngIf="!noArticles && !serverError">
+            <div class="toolbar">
+                <div class="info">
+                    <h4>{{ totalArticles }} artículos</h4>
+                </div>
+                
+                <div class="display">
+                    <p-dropdown class="sort-by"
+                        [options]="sortOptions" 
+                        [(ngModel)]="selectedSort"
+                        (onChange)="sortArticles()"
+                        [checkmark]="true" 
+                        optionLabel="name"
+                        placeholder="Ordenar por" >
+                    </p-dropdown>
+                    
+                    <div class="pattern-buttons">
+                        <i title="Cuadrícula" class="pi pi-th-large" [class.selected]="gridDisplay" (click)="setGridDisplay()"></i>
+                        <i title="Lista" class="pi pi-list" [class.selected]="listDisplay" (click)="setListDisplay()"></i>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <section class="articles" [class.grid]="gridDisplay" [class.list]="listDisplay">
-        <app-article *ngFor="let article of (articles.length ? articles : placeholders)" [article]="article" [gridDisplay]="gridDisplay" [listDisplay]="listDisplay"></app-article>
-    </section>
-    <div class="footer">
-        <p>{{ articles.length }} de {{ totalArticles }} artículos</p>
-        <progress [max]="totalArticles" [value]="articles.length"></progress>
-        <button *ngIf="!allArticlesLoaded || totalArticles == 0" (click)="load()" [disabled]="loadingArticles">
-            <ng-container *ngIf="!loadingArticles; else loadingTemplate">
-              Mostrar más
-            </ng-container>
-            <ng-template #loadingTemplate>
-              <i class="pi pi-spin pi-spinner"></i>
-            </ng-template>
-        </button>
+    
+    <div *ngIf="!noArticles && !serverError">
+        <section class="articles" [class.grid]="gridDisplay" [class.list]="listDisplay">
+            <app-article *ngFor="let article of (articles.length ? articles : placeholders)" [article]="article" [gridDisplay]="gridDisplay" [listDisplay]="listDisplay"></app-article>
+        </section>
+
+        <div class="footer">
+            <p>{{ articles.length }} de {{ totalArticles }} artículos</p>
+        
+            <progress [max]="totalArticles" [value]="articles.length"></progress>
+        
+            <button *ngIf="!allArticlesLoaded || totalArticles == 0" (click)="load()" [disabled]="loadingArticles">
+                <ng-container *ngIf="!loadingArticles; else loadingTemplate">
+                Mostrar más
+                </ng-container>
+            
+                <ng-template #loadingTemplate>
+                <i class="pi pi-spin pi-spinner"></i>
+                </ng-template>
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="noArticles" class="no-articles-info">
+        <span class="material-symbols-outlined">search_off</span>
+        <p>No se han encontrado artículos</p>
+    </div>
+
+    <div *ngIf="serverError" class="no-articles-info">
+        <span class="material-symbols-outlined">warning</span>
+        <p>Se ha producido un error</p>
     </div>
 </main>
