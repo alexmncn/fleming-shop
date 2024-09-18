@@ -43,12 +43,12 @@ export class SearchBarComponent implements OnInit {
 
   onSearch(): void {
     this.onBlur();
-    if (this.router.url !== '/search') {
+    if (this.router.url !== '/catalog/search') {
       const navigationExtras: NavigationExtras = {
         queryParams: { 'q': this.searchParam }
       };
 
-      this.router.navigate(['/search'], navigationExtras);;
+      this.router.navigate(['/catalog/search'], navigationExtras);;
     } else {
       this.search.emit(this.searchParam);
     }

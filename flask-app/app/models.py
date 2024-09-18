@@ -1,9 +1,14 @@
 """Database models"""
+import pytz
+from datetime import datetime
+from flask_login import UserMixin
+from sqlalchemy import Column, Integer, String
+from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.dialects.mysql import TINYINT, BIGINT
 
 from .extensions import db
 
-# article
+
 class Article(db.Model):
     __tablename__ = "article"
     ref = db.Column(BIGINT, nullable=False)
@@ -62,3 +67,18 @@ class Family(db.Model):
             'codfam': self.codfam, 
             'nomfam': self.nomfam
         }
+        
+        
+class User(UserMixin,db.Model):
+    __tablename__ = "users"
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), index=True, unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    last_login = db.Column(db.DateTime, nullable=True)
+    date_created = db.Column(db.DateTime, default=datetime.now(pytz.timezone('Europe/Madrid')), nullable=False)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)

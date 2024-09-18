@@ -52,7 +52,7 @@ export class NavBarComponent {
   }
 
   get atHome(): boolean {
-    return this.currentRoute === '/home';
+    return this.currentRoute === '/catalog/home';
   }
 
   isInputFocused(param: boolean = false): void {

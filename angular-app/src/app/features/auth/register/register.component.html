@@ -1,0 +1,39 @@
+<section>
+    <form [formGroup]="registerForm" (ngSubmit)="sendRegister()" class="register-form">
+    <div class="form-group">
+        <label for="username">Usuario</label>
+        <input type="text" id="username" formControlName="username" placeholder="Introduce tu nombre de usuario" autocomplete="off" [class.error]="registerForm.controls['username'].touched && registerForm.controls['username'].hasError('required') || credentialsError">
+        <div class="message error" @errorAnimation *ngIf="registerForm.controls['username'].touched && registerForm.controls['username'].hasError('required')">
+            <p>* Obligatorio</p>
+        </div>
+        </div>
+
+        <div class="form-group">
+        <label form="password">Contraseña</label>
+        <input type="password" id="password" formControlName="password" placeholder="Introduce tu contraseña" autocomplete="off" [class.error]="registerForm.controls['password'].touched && (registerForm.controls['password'].hasError('required') || registerForm.controls['password'].hasError('minlength')) || credentialsError">
+        <div class="message error">
+            <p @errorAnimation *ngIf="registerForm.controls['password'].touched && registerForm.controls['password'].hasError('required')">* Obligatorio</p>
+            <p @errorAnimation *ngIf="registerForm.controls['password'].hasError('minlength')">La contraseña debe tener al menos {{ passwordMinLen }} caracteres</p>
+        </div>
+        </div>
+
+        <div class="form-group">
+            <label form="confirm-password">Confirmar contraseña</label>
+            <input type="password" id="confirm_password" formControlName="confirm_password" placeholder="Introduce tu contraseña" autocomplete="off" [class.error]="registerForm.controls['confirm_password'].touched && (registerForm.controls['confirm_password'].hasError('required') || registerForm.controls['password'].hasError('minlength')) || credentialsError">
+            <div class="message error">
+                <p @errorAnimation *ngIf="registerForm.controls['confirm_password'].touched && registerForm.controls['confirm_password'].hasError('required')">* Obligatorio</p>
+                <p @errorAnimation *ngIf="registerForm.controls['confirm_password'].hasError('minlength')">La contraseña debe tener al menos {{ passwordMinLen }} caracteres</p>
+            </div>
+        </div>
+
+        <button type="submit" [disabled]="!registerForm.valid && (registerForm.controls['username'].touched || registerForm.controls['password'].touched)">
+            <ng-container *ngIf="!isLoading; else loadingTemplate">
+            Enviar
+            </ng-container>
+        
+            <ng-template #loadingTemplate>
+            <i class="pi pi-spin pi-spinner"></i>
+            </ng-template>
+        </button>
+    </form>
+</section>

@@ -70,9 +70,19 @@ section.scroller {
 section.scroller.unfold {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    overflow-x: none;
-    overflow-y: none;
+    height: auto;
+    animation: unfold 2s ease-out;
 }
+
+@keyframes unfold {
+    from {
+        max-height: 4rem;
+    }
+    to {
+        max-height: 10000px;
+    }
+}
+
 
 @media (max-width: 600px) {
     section.scroller {

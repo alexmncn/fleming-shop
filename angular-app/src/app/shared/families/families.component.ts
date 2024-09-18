@@ -23,7 +23,7 @@ import { catchError, of, throwError, timeout } from 'rxjs';
         transform: 'rotate(180deg)',
       })),
       transition(':enter', [
-        animate('0.3s ease-out', style({
+        animate('0.25s ease-out', style({
           transform: 'rotate(0deg)',
         }))
       ]),
@@ -38,7 +38,7 @@ import { catchError, of, throwError, timeout } from 'rxjs';
         transform: 'rotate(-180deg)',
       })),
       transition(':enter', [
-        animate('0.3s ease-out', style({
+        animate('0.25s ease-out', style({
           transform: 'rotate(0deg)',
         }))
       ]),
@@ -108,20 +108,16 @@ export class FamiliesComponent implements OnInit {
   }
 
   toggleFamiliesDisplay() {
-    if (this.familiesUnfold) {
-      this.familiesUnfold = false;
-    } else {
-      this.familiesUnfold = true;
-    }
+    this.familiesUnfold = !this.familiesUnfold;
   }
 
   showFamily(nomfam: string, codfam: number): void {
-    if (this.router.url !== '/family') {
+    if (this.router.url !== '/catalog/family') {
       const navigationExtras: NavigationExtras = {
         queryParams: {'nomfam': nomfam, 'codfam': codfam }
       };
 
-      this.router.navigate(['/family'], navigationExtras);;
+      this.router.navigate(['/catalog/family'], navigationExtras);;
     }
   }
 

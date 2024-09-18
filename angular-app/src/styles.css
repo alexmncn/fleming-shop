@@ -22,6 +22,8 @@
   --primary-accent-800: #01357a;
   --primary-accent-900: #012b63;
 
+  --warn-accent: #e60017;
+
 
   --border-1-2: 1px solid var(--gray-200);
   --border-1-3: 1px solid var(--gray-300);
