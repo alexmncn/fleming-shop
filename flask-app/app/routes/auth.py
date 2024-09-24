@@ -57,11 +57,18 @@ def register_():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
+    otp_code = data.get('otp', None)
     
-    status = register(username, password)
+    status = register(username, password, otp_code)
     
-    if status == 200:
-        return jsonify(message='Registered successfully'), 200
+    if status == 201:
+        return jsonify(message='Registered successfully'), 201
+    elif status == 303:
+        return jsonify(message='Verify OTP code to complete the register'), 303
+    elif status == 422:
+        return jsonify(message='Invalid OTP code'), 422
+    elif status == 410:
+        return jsonify(message='OTP code has expired'), 410
     elif status == 409:
         return jsonify(message='This user already exists'), 409
     elif status == 500:

@@ -1,6 +1,6 @@
 """Database models"""
 import pytz
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask_login import UserMixin
 from sqlalchemy import Column, Integer, String
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -83,3 +83,19 @@ class User(UserMixin,db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    
+    
+class OTPCode(db.Model):
+    __tablename__ = 'otp_codes'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), nullable=False)
+    otp_code = db.Column(db.String(6), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now())
+    expires_at = db.Column(db.DateTime, nullable=False)
+    is_valid = db.Column(db.Boolean, default=True)
+
+    def __init__(self, username, otp_code):
+        self.username = username
+        self.otp_code = otp_code
+        self.expires_at = datetime.now() + timedelta(minutes=5)
