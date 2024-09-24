@@ -48,7 +48,7 @@ export class ArticleComponent {
   ngOnChanges(): void {
     this.loading = !this.article.detalle;
     this.imgError = false;
-    this.imgURL = environment.articleImageRoute + this.article.ref + '.jpg';
+    this.imgURL = environment.articleImageRoute + this.article.codebar + '.webp';
   }
 
   showPlaceholder(): void {

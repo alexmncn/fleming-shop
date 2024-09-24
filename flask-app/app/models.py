@@ -36,7 +36,8 @@ class Article(db.Model):
         
     def to_dict_reduced(self):
         return {
-            'ref': self.ref, 
+            'ref': self.ref,
+            'codebar': self.codebar, 
             'detalle': self.detalle, 
             'codfam': self.codfam,  
             'pvp': self.pvp,
