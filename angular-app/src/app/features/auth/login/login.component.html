@@ -1,5 +1,5 @@
 <section>
-<form [formGroup]="loginForm" (ngSubmit)="sendLogin()" class="login-form">
+<form @slideInDown [formGroup]="loginForm" (ngSubmit)="sendLogin()" class="login-form">
     <div class="form-group">
       <label for="username">Usuario</label>
       <input type="text" id="username" formControlName="username" placeholder="Introduce tu nombre de usuario" autocomplete="off" [class.error]="loginForm.controls['username'].touched && loginForm.controls['username'].hasError('required') || credentialsError">

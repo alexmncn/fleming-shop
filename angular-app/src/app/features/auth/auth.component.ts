@@ -1,4 +1,4 @@
-import { Component, OnChanges } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet, RouterLink } from '@angular/router';
 import { MatDivider } from '@angular/material/divider';
@@ -10,14 +10,14 @@ import { MatDivider } from '@angular/material/divider';
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.css'
 })
-export class AuthComponent {
+export class AuthComponent implements OnInit{
   loginActive: boolean = true;
   registerActive: boolean = false;
 
   constructor(private router: Router) { }
 
-  onChanges(): void {
-    this.changeActive
+  ngOnInit(): void {
+    this.changeActive()
   }
 
   changeActive(select: string = ''): void {

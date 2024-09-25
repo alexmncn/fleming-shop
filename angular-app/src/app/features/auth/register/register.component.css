@@ -77,11 +77,11 @@ input:focus {
 }
 
 input.error {
-    border-color: var(--warn-accent);
+    border-color: var(--error-accent);
 }
 
 .message.error {
-    color: var(--warn-accent);
+    color: var(--error-accent);
     font-size: clamp(0.65rem, 2vw, 0.9rem);
     line-height: 0;
     position: absolute;

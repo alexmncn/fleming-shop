@@ -1,5 +1,5 @@
 <section>
-    <form *ngIf="registerStep == 0" [formGroup]="registerForm" (ngSubmit)="sendRegister()" class="register-form">
+    <form @slideInDown *ngIf="registerStep == 0" [formGroup]="registerForm" (ngSubmit)="sendRegister()" class="register-form">
         <div class="form-group">
             <label for="username">Usuario</label>
             <input type="text" id="username" formControlName="username" placeholder="Introduce tu nombre de usuario" autocomplete="off" [class.error]="registerForm.controls['username'].touched && registerForm.controls['username'].hasError('required') || credentialsError">
@@ -37,7 +37,7 @@
         </button>
     </form>
 
-    <form *ngIf="registerStep == 1" [formGroup]="otpForm" (ngSubmit)="sendRegister()" class="register-form">
+    <form @slideInDown *ngIf="registerStep == 1" [formGroup]="otpForm" (ngSubmit)="sendRegister()" class="register-form">
         <div class="form-group">
             <label form="confirm-password">Código de confirmación</label>
             <input type="text" id="OTPcode" formControlName="OTPcode" placeholder="Introduce el código de confirmación" autocomplete="off" [class.error]="otpForm.controls['OTPcode'].touched && (otpForm.controls['OTPcode'].hasError('required') || otpForm.controls['OTPcode'].hasError('minlength') || otpForm.controls['OTPcode'].hasError('maxlength'))">

@@ -22,7 +22,11 @@
   --primary-accent-800: #01357a;
   --primary-accent-900: #012b63;
 
-  --warn-accent: #e60017;
+  --success-accent: #58a042;
+  --warn-accent: #e99b27;
+  --error-accent: #e60017;
+  --error-accent-400: #f03447;
+  
 
 
   --border-1-2: 1px solid var(--gray-200);

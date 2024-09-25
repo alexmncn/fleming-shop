@@ -3,9 +3,10 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { trigger, style, transition, animate } from '@angular/animations';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 
 import { AuthService } from '../../../services/auth/auth.service';
+import { MessageService } from '../../../services/message/message.service';
 
 @Component({
   selector: 'app-login',
@@ -21,6 +22,18 @@ import { AuthService } from '../../../services/auth/auth.service';
       ]),
       transition(':leave', [
         animate('0ms ease-out', style({ height: '0', opacity: 0 }))
+      ])
+    ]),
+    trigger('slideInDown', [
+      state('void', style({
+        transform: 'translateY(-25%)',
+        opacity: 0
+      })),
+      transition(':enter', [
+        animate('0.5s ease-out', style({
+          transform: 'translateY(0)',
+          opacity: 1
+        }))
       ])
     ])
   ]
@@ -38,7 +51,7 @@ export class LoginComponent {
 
 
 
-  constructor(private authService: AuthService, private router: Router, private fb: FormBuilder) { 
+  constructor(private messageService: MessageService, private authService: AuthService, private router: Router, private fb: FormBuilder) { 
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(this.passwordMinLen)]]
@@ -48,40 +61,35 @@ export class LoginComponent {
   sendLogin() {
     if (this.loginForm.valid) {
       this.isLoading = true;
-      this.loadingInfo = 'Enviando...';
 
       this.authService.login(this.loginForm.value.username, this.loginForm.value.password)
         .subscribe({
           next: (response) => {
-            this.loadingInfo = 'Procesando...';
-              // Save the token with AuthService
-              this.authService.storeToken(response.token, response.expires_at);
-              this.authService.setUsername(response.username);
-              setTimeout(() => {
-              // Show success message
-              //this.messageService.showMessage('success', 'Has iniciado sesión');
+            // Save the token with AuthService
+            this.authService.storeToken(response.token, response.expires_at);
+            this.authService.setUsername(response.username);
 
-              // Close loading overlay
-              this.isLoading = false;
-              
-              // Redirect
-              const redirectUrl = this.authService.redirectUrl || this.defaultRedirectRoute;
-              this.router.navigate([redirectUrl]);
-              }, 1000);
+            this.isLoading = false;
+
+            this.messageService.showMessage('success', 'Has iniciado sesión', 5);
+            
+            // Redirect
+            const redirectUrl = this.authService.redirectUrl || this.defaultRedirectRoute;
+            this.router.navigate([redirectUrl]);
           },
           error: (error) => {
             if (error.status == 401) {
-              //this.messageService.showMessage('error', 'Credenciales incorrectas');
+              this.messageService.showMessage('error', 'Credenciales incorrectas');
               this.credentialsError = true;
             } else if (error.status == 0 || error.status == 500) {
-              //this.messageService.showMessage('error', 'Error del servidor. Inténtalo de nuevo mas tarde...');
+              this.messageService.showMessage('error', 'Error del servidor. Inténtalo de nuevo mas tarde');
             }
 
             this.isLoading = false;
           }
         });
     } else {
-      //this.messageService.showMessage('error', 'Los datos introducidos no son válidos');
+      this.messageService.showMessage('error', 'Los datos introducidos no son válidos');
       document.querySelectorAll('input').forEach(input => { input.classList.add('error');})
     }
   }
