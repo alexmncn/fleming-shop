@@ -27,16 +27,22 @@ import { AuthService } from '../../../services/auth/auth.service';
 })
 export class RegisterComponent {
   registerForm: FormGroup;
-
+  otpForm: FormGroup;
+  
   passwordMinLen: number = 4;
-  password_match: boolean = true;
+  passwordMatch: boolean = true;
   credentialsError: boolean = false;
 
-  defaultRedirectRoute: string = 'login'
+  tempUsername: string = '';
+  tempPassword: string = '';
 
-  // loading overlay
+  OTPlength = 6
+
+  registerStep = 0;
+
+  defaultRedirectRoute: string = '/auth/login'
+
   isLoading: boolean = false;
-  loadingInfo: string = '';
 
 
   constructor(private authService: AuthService, private router: Router, private fb: FormBuilder) { 
@@ -45,42 +51,74 @@ export class RegisterComponent {
       password: ['', [Validators.required, Validators.minLength(this.passwordMinLen)]],
       confirm_password: ['', Validators.required]
     });
+
+    this.otpForm = this.fb.group({
+      OTPcode: ['', Validators.required]
+    });
   }
 
   sendRegister() {
-    if (this.registerForm.valid) {
-      if (this.registerForm.value.password == this.registerForm.value.confirm_password) {
-        this.isLoading = true;
-        this.loadingInfo = 'Enviando...';
-        
-        this.authService.register(this.registerForm.value.username, this.registerForm.value.password)
-          .subscribe({
-            next: (response) => {
-              this.loadingInfo = 'Procesando...';
-              setTimeout(() => {
-                // redirect
-                const redirectUrl = this.authService.redirectUrl || this.defaultRedirectRoute;
-                this.router.navigate([redirectUrl]);
-              }, 1000);    
-            },
-            error: (error) => {
-              if (error.status == 409) {
-                //this.messageService.showMessage('error', 'Este usuario ya existe');
-                this.credentialsError = true;
-              } else if (error.status == 0 || error.status == 500) {
-                //this.messageService.showMessage('error', 'Error del servidor. Inténtalo de nuevo mas tarde...');
+    if (this.registerStep == 0) {
+      if (this.registerForm.valid) {
+        if (this.registerForm.value.password == this.registerForm.value.confirm_password) {
+            this.isLoading = true;
+
+            this.authService.register(this.registerForm.value.username, this.registerForm.value.password)
+            .subscribe({
+              error: (error) => {
+                if (error.status == 303) {
+                  this.registerStep = 1;
+                  this.tempUsername = this.registerForm.value.username;
+                  this.tempPassword = this.registerForm.value.password;
+                  console.log(error.error.message)
+                } else if (error.status == 409) {
+                  this.credentialsError = true;
+                  console.log(error.error.message)
+                } else if (error.status == 0 || error.status == 500) {
+                  console.log(error.error.message)
+                }
+                this.isLoading = false;
               }
-              this.isLoading = false;
-            }
-          });
+            });
+        } else {
+          this.passwordMatch = false;
+          console.log('password doesnt match')
+        } 
       } else {
-        //this.messageService.showMessage('error','Las contraseñas deben coincidir');
-        this.password_match = false;
+        document.querySelectorAll('input').forEach(input => { input.classList.add('error');})
       }
 
-    } else {
-      //this.messageService.showMessage('error','Los datos introducidos no son válidos');
-      document.querySelectorAll('input').forEach(input => { input.classList.add('error');})
+    } else if (this.registerStep == 1) {
+      console.log('OTP STEP SEND')
+      if (this.registerForm.valid) {
+        this.isLoading = true;
+
+        this.authService.register(this.tempUsername, this.tempPassword, this.otpForm.value.OTPcode)
+        .subscribe({
+          next: (response) => {
+              console.log(response.message)
+
+            setTimeout(() => {
+              // redirect
+              const redirectUrl = this.authService.redirectUrl || this.defaultRedirectRoute;
+              this.router.navigate([redirectUrl]);
+            }, 1000);
+          },
+          error: (error) => {
+            if (error.status == 409) {
+              this.credentialsError = true;
+              console.log(error.error.message)
+            } else if (error.status == 422) {
+              console.log(error.error.message)
+            } else if (error.status == 410) {
+              console.log(error.error.message)
+            } else if (error.status == 0 || error.status == 500) {
+              console.log(error.error.message)
+            }
+            this.isLoading = false;
+          }
+        });
+      }
     }
   }
 }

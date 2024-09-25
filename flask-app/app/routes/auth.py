@@ -57,7 +57,7 @@ def register_():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
-    otp_code = data.get('otp', None)
+    otp_code = data.get('OTPcode', None)
     
     status = register(username, password, otp_code)
     

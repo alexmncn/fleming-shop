@@ -20,8 +20,12 @@ export class AuthService {
 
   constructor(private http: HttpClient, private cookieService: CookieService) { }
 
-  register(username: string, password:string): Observable<any> {
-    return this.http.post<any>(this.registerUrl, {username, password})
+  register(username: string, password: string, OTPcode: string = ''): Observable<any> {
+    if (OTPcode == '') {
+      return this.http.post<any>(this.registerUrl, {username, password})
+    } else {
+      return this.http.post<any>(this.registerUrl, {username, password, OTPcode})
+    }
   }
 
   login(username: string, password: string): Observable<any> {

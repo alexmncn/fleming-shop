@@ -1,4 +1,4 @@
-import random, string, pytz
+import secrets, string
 from datetime import datetime
 from app.extensions import db
 from app.models import User, OTPCode
@@ -47,7 +47,7 @@ def register(username, password, otp_code):
 def generate_otp(username):
 
     length=6
-    otp_code = ''.join(random.choices(string.digits, k=length))
+    otp_code = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(length))
     
     otp = OTPCode(username=username, otp_code=otp_code)
     
