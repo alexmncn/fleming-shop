@@ -4,6 +4,9 @@ app_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
 sys.path.append(app_path)
 
 from app.config import CLOUDFLARE_API_TOKEN, DNS_ZONE_ID
+from app.services.pushover_alerts import send_alert
+
+errors = []
 
 HEADERS = {
     'Authorization': f'Bearer {CLOUDFLARE_API_TOKEN}',
@@ -16,7 +19,7 @@ def get_server_ip():
 
 def obtener_dns_record_id(domain):
     url = f"https://api.cloudflare.com/client/v4/zones/{DNS_ZONE_ID}/dns_records"
-    params = {'name': domain}
+    params = {'name': domain.name}
     response = requests.get(url, headers=HEADERS, params=params)
     data = response.json()
     if data['success']:
@@ -29,32 +32,35 @@ def actualizar_dns_record(record_id, domain, current_server_ip, current_record_i
     url = f"https://api.cloudflare.com/client/v4/zones/{DNS_ZONE_ID}/dns_records/{record_id}"
     
     if current_server_ip == current_record_ip:
-        print('La IP del registro ya está actualizada')
-
-    if domain == 'ssh.tiendafleming.es':
-        proxied = False
-    else: proxied = True
+        return
     
     data = {
         'type': 'A',
-        'name': domain,
+        'name': domain.name,
         'content': current_server_ip,
         'ttl': 1, # auto
-        'proxied': proxied
+        'proxied': domain.proxied
     }
     response = requests.put(url, headers=HEADERS, json=data)
     data = response.json()
     if data['success']:
-        print(f"Registro DNS para {domain} actualizado con éxito.")
+        domain.updated = True
+        
     else:
         print(f"Error actualizando el registro DNS para {domain}: {data['errors']}")
 
+def send_update_status():
+    return
+
 
 def main():
-    domains = ['tiendafleming.es', 'api.tiendafleming.es', 'ssh.tiendafleming.es']
+    domains = [
+        {'name': 'tiendafleming.es', 'proxied': True, 'updated': False}, 
+        {'name': 'api.tiendafleming.es', 'proxied': True, 'updated': False}, 
+        {'name': 'ssh.tiendafleming.es', 'proxied': False, 'updated': False}
+    ]
 
     current_server_ip = get_server_ip()
-    print(f"Current public IP: {current_server_ip}")
 
     for domain in domains:
         record_id, current_record_ip = obtener_dns_record_id(domain)
