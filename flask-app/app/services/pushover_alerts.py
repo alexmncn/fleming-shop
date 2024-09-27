@@ -19,7 +19,8 @@ def send_alert(message, priority):
             'message': message,
             'priority': priority,
             'retry': retry,
-            'expire': expire
+            'expire': expire,
+            'html': 1
         }), 
         { 'Content-type': 'application/x-www-form-urlencoded' })
         
