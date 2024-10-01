@@ -9,13 +9,18 @@ admin_bp = Blueprint('admin', __name__)
 @admin_bp.route('/articles/feature', methods=['POST'])
 @jwt_required()
 def feature_article():
-    codebar = request.args.get('codebar', None)
+    codebar = request.args.get('codebar', None, int)
+    featured = request.args.get('featured', 'true') in ['True','true', '1', 'yes', 'y']
     
     if codebar:
-        status = admin_data.feature_article(codebar)
+        status = admin_data.feature_article(codebar, featured)
         
         if status == True:
-            return jsonify(message=f'Article with codebar `{codebar}` featured successfully.'), 200
+            if featured == True:
+                message=f'Article with codebar `{codebar}` featured successfully.'
+            else:
+                message = f'Article with codebar `{codebar}` removed from featured successfully.'
+            return jsonify(message=message), 200
         elif status == False:
             return jsonify(error=f'No articles with codebar `{codebar}` in database.'), 404
         
