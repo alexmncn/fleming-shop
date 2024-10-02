@@ -65,6 +65,9 @@ section.scroller {
     scroll-behavior: smooth;
     scrollbar-width: thin;
     scrollbar-color: var(--primary-accent-500) white;
+    interpolate-size: allow-keywords;
+    height: 100%;
+    transition: height .4s ease-out;
 }
 
 section.scroller.unfold {
