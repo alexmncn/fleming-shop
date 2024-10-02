@@ -21,7 +21,6 @@ def all_articles(page, per_page):
 def search_articles(search, page, per_page):
     offset = (page - 1) * per_page
     
-    # Realizamos la búsqueda usando SQL crudo con MATCH() y AGAINST(), envolviendo la consulta en text()
     query = db.session.execute(
         text("""
         SELECT * FROM article 
@@ -31,10 +30,9 @@ def search_articles(search, page, per_page):
         {'search': search, 'per_page': per_page, 'offset': offset}
     ).mappings()
     
-    # Recuperamos los resultados
     articles = query.fetchall()
     
-    # Convertimos los resultados en el formato deseado (to_dict_reduced)
+ 
     return [dict(article) for article in articles]
 
 
