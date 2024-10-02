@@ -52,6 +52,7 @@ def search_articles_total():
     
     return jsonify(total=total)
 
+
 @catalog_bp.route('/articles/featured/total', methods=['GET'])
 def featured_articles_total():
     total = catalog_data.featured_articles_total()
@@ -88,6 +89,7 @@ def new_articles():
         return jsonify(error='Not found'), 404
 
     return jsonify(articles)
+
 
 @catalog_bp.route('/articles/families', methods=['GET'])
 @catalog_bp.route('/articles/families/<int:family_id>', methods=['GET'])

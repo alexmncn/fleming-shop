@@ -1,6 +1,7 @@
 import datetime
-from sqlalchemy import desc
+from sqlalchemy import desc,text
 
+from app.extensions import db
 from app.models import Article, Family
 
 new_articles_range = 30 # in days
@@ -20,19 +21,35 @@ def all_articles(page, per_page):
 def search_articles(search, page, per_page):
     offset = (page - 1) * per_page
     
-    articles = Article.query.filter(
-        (Article.detalle.ilike(f'%{search}%')) | 
-        (Article.ref.ilike(f'%{search}%'))
-    ).limit(per_page).offset(offset).all()
-    return [article.to_dict_reduced() for article in articles]
+    # Realizamos la búsqueda usando SQL crudo con MATCH() y AGAINST(), envolviendo la consulta en text()
+    query = db.session.execute(
+        text("""
+        SELECT * FROM article 
+        WHERE MATCH(detalle) AGAINST(:search IN NATURAL LANGUAGE MODE) 
+        LIMIT :per_page OFFSET :offset
+        """), 
+        {'search': search, 'per_page': per_page, 'offset': offset}
+    ).mappings()
     
+    # Recuperamos los resultados
+    articles = query.fetchall()
+    
+    # Convertimos los resultados en el formato deseado (to_dict_reduced)
+    return [dict(article) for article in articles]
+
 
 def search_articles_total(search):
-    total_articles = Article.query.filter(
-        (Article.detalle.ilike(f'%{search}%')) | 
-        (Article.ref.ilike(f'%{search}%'))
-    ).count()
+    query = db.session.execute(
+        text("""
+        SELECT COUNT(*) as total FROM article
+        WHERE MATCH(detalle) AGAINST(:search IN NATURAL LANGUAGE MODE)
+        """),
+        {'search': search}
+    )
+    total_articles = query.fetchone()[0]
+    
     return total_articles
+
 
 def featured_articles_total():
     return Article.query.filter_by(destacado=1).count()
