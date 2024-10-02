@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -13,50 +13,52 @@ export class AuthService {
   private logoutUrl = environment.apiUrl + '/logout';
   private authUrl = environment.apiUrl + '/auth';
 
-  // Url to redirect after the login
   public redirectUrl: string | null = null;
+  public username: string = '';
 
-  public username: string='';
+  // Observable auth status for components
+  private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.isAuthenticated());
+  public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
+
+  // Observable username for components
+  private usernameSubject = new BehaviorSubject<string | null>(this.getUsername());
+  public username$ = this.usernameSubject.asObservable();
+
 
   constructor(private http: HttpClient, private cookieService: CookieService) { }
 
+
   register(username: string, password: string, OTPcode: string = ''): Observable<any> {
-    if (OTPcode == '') {
-      return this.http.post<any>(this.registerUrl, {username, password})
-    } else {
-      return this.http.post<any>(this.registerUrl, {username, password, OTPcode})
-    }
+    return OTPcode === '' 
+      ? this.http.post<any>(this.registerUrl, { username, password }) 
+      : this.http.post<any>(this.registerUrl, { username, password, OTPcode });
   }
 
   login(username: string, password: string): Observable<any> {
-    return this.http.post<any>(this.loginUrl, {username, password})
+    return this.http.post<any>(this.loginUrl, { username, password }).pipe(
+      tap((response: any) => {
+        this.storeToken(response.token, response.expires_at);
+        this.setUsername(username);
+        this.isAuthenticatedSubject.next(true);
+        this.usernameSubject.next(username);
+      })
+    );
   }
 
-  // Clear user data
-  logout(): void {     
-    this.clearToken();
-    localStorage.clear();
+  logout(): Observable<any> {
+    return this.http.post<any>(this.logoutUrl, {}).pipe(
+      tap((response: any) => {
+        this.clearToken();
+        localStorage.clear();
+      })
+    );
   }
 
-  // Request to backend logout
-  logoutReq(): Observable<any> {
+  isAuthenticated(): boolean {
     const token = this.getToken();
-    const headers = new HttpHeaders({
-      'Authorization': 'Bearer ' + token
-    });
-    return this.http.post<any>(this.logoutUrl, {}, { headers })
+    return !!token;
   }
 
-  isAuthtenticated(): boolean {
-    const token = this.getToken();
-    if (token) {
-      return true;
-    }
-    return false;
-  }
-
-
-  // JWTtoken cookie
   storeToken(token: string, expiresAt: string): void {
     const expireDate = new Date(expiresAt);
     this.cookieService.set('authToken', token, expireDate, '/', undefined, true, 'Strict');
@@ -68,10 +70,9 @@ export class AuthService {
 
   clearToken(): void {
     this.cookieService.delete('authToken');
+    this.isAuthenticatedSubject.next(false);
   }
 
-
-  // User
   setUsername(username: string): void {
     localStorage.setItem('username', username);
   }

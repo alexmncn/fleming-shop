@@ -80,7 +80,6 @@ export class HomeComponent implements OnInit {
           this.featuredArticlesPage++;
 
           this.loadingFeaturedArticles = false;
-          console.log('si')
         },
         error: (error) => {
           this.loadingFeaturedArticles = false;

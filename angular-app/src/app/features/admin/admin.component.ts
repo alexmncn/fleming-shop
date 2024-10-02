@@ -14,11 +14,9 @@ export class AdminComponent {
   constructor(private authService: AuthService) {}
 
   logout(): void {
-    this.authService.logoutReq()
+    this.authService.logout()
       .subscribe({
         next: (response) => {
-          console.log(response);
-          this.authService.logout();
           window.location.reload();
         },
         error: (error) => {
@@ -27,6 +25,5 @@ export class AdminComponent {
         complete: () => {
         }
       });
-
   }
 }

@@ -1,5 +1,13 @@
 <header>
-    <section>
-            <img [routerLink]="['/catalog/home']" routerLinkActive="router-link-active"  src="assets/logos/fleming_logo.webp" alt="Fleming Logo">
-    </section>
+    <div class="container" [class.extended]="isAuth">
+        <img [routerLink]="['/catalog/home']" routerLinkActive="router-link-active" src="assets/logos/fleming_logo.webp" alt="Fleming Logo">
+        <section *ngIf="isAuth" class="admin-menu">
+            <section class="links">
+                <p [routerLink]="['/admin']">Panel</p>
+            </section>
+            <aside class="greeting">
+                <p>Bienvenido admin:  <strong>{{ username }}</strong></p>
+            </aside>
+        </section>
+    </div>
 </header>

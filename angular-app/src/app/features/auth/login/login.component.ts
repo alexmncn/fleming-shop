@@ -65,10 +65,6 @@ export class LoginComponent {
       this.authService.login(this.loginForm.value.username, this.loginForm.value.password)
         .subscribe({
           next: (response) => {
-            // Save the token with AuthService
-            this.authService.storeToken(response.token, response.expires_at);
-            this.authService.setUsername(response.username);
-
             this.isLoading = false;
 
             this.messageService.showMessage('success', 'Has iniciado sesión', 5);
