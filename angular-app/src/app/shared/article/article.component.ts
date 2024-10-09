@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, HostListener, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SkeletonModule } from 'primeng/skeleton';
 import { trigger, style, transition, animate, state } from '@angular/animations';
@@ -59,7 +59,9 @@ export class ArticleComponent {
     if (this.selected) {
       this.selected = false;
     } else {
-      this.selected = true;
+      if (!this.loading) {
+        this.selected = true;
+      }
     }
   }
 

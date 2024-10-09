@@ -12,12 +12,10 @@
                 <p class="ref">Ref: {{ article.ref }}</p>
                 <p class="pvp">{{ formatedPvp }} €</p>
             </div>
-            <div class="c1">
-                <div *ngIf="listDisplay" class="stock-info" [title]="article.stock">
-                    <div class="circle" [class.green]="inStock" [class.red]="!inStock"></div>
-                    <p *ngIf="inStock">Disponible</p>
-                    <p *ngIf="!inStock">Sin stock</p>
-                </div>
+            <div *ngIf="listDisplay" class="stock-info" [title]="article.stock">
+                <div class="circle" [class.green]="inStock" [class.red]="!inStock"></div>
+                <p *ngIf="inStock">Disponible</p>
+                <p *ngIf="!inStock">Sin stock</p>
             </div>
         </section>
         <div *ngIf="gridDisplay" class="stock-info" [title]="article.stock">
@@ -47,7 +45,16 @@
 
 <section *ngIf="selected" class="overlay" (click)="toggleSelection()">
     <section @slideInDown class="article-overlay" (click)="$event.stopPropagation()">
-        <i title="cerrar" class="pi pi-times" (click)="toggleSelection()"></i>
+        <div class="c-left">
+        <div class="options admin-menu">
+            <i title="cerrar" class="pi pi-times" (click)="toggleSelection()"></i>
+        </div>
+        </div>
+        <div class="c-right">
+            <div class="options close-icon">
+                <i title="cerrar" class="pi pi-times" (click)="toggleSelection()"></i>
+            </div>
+        </div>
         <section class="img">
             <img *ngIf="!imgError" [src]="imgURL" (error)="showPlaceholder()">
             
