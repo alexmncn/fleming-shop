@@ -1,7 +1,7 @@
 import { Component, HostListener, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SkeletonModule } from 'primeng/skeleton';
-import { trigger, style, transition, animate, state } from '@angular/animations';
+import { trigger, style, transition, animate, state, AnimationEvent } from '@angular/animations';
 
 import { Article } from '../../models/article.model';
 
@@ -16,6 +16,21 @@ import { environment } from '../../../environments/environment';
   templateUrl: './article.component.html',
   styleUrl: './article.component.css',
   animations:[
+    trigger('fadeIn', [
+      state('void', style({
+        opacity: 0
+      })),
+      transition(':enter', [
+        animate('0.15s ease-out', style({
+          opacity: 1
+        }))
+      ]),
+      transition(':leave', [
+        animate('0.10s ease-in', style({
+          opacity: 0
+        }))
+      ])
+    ]),
     trigger('slideInDown', [
       state('void', style({
         transform: 'scale(0.9)',
@@ -28,7 +43,7 @@ import { environment } from '../../../environments/environment';
         }))
       ]),
       transition(':leave', [
-        animate('0.250s ease-in', style({
+        animate('0.10s ease-in', style({
           transform: 'scale(0.9)',
           opacity: 0
         }))

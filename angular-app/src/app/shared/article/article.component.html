@@ -43,11 +43,13 @@
     </ng-template>
 </section>
 
-<section *ngIf="selected" class="overlay" (click)="toggleSelection()">
-    <section @slideInDown class="article-overlay" (click)="$event.stopPropagation()">
+<section *ngIf="selected" @fadeIn class="overlay-back"></section>
+
+<section *ngIf="selected" @slideInDown class="overlay" (click)="toggleSelection()">
+    <section class="article-overlay" (click)="$event.stopPropagation()">
         <div class="c-left">
         <div class="options admin-menu">
-            <i title="cerrar" class="pi pi-times" (click)="toggleSelection()"></i>
+            <i title="opciones" class="pi pi-ellipsis-h"></i>
         </div>
         </div>
         <div class="c-right">

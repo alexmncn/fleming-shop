@@ -226,6 +226,19 @@ section.list .info-placeholder {
     }
 }
 
+.overlay-back {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 900;
+    overflow: hidden;
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
 .overlay {
     position: fixed;
     top: 0;
@@ -233,12 +246,11 @@ section.list .info-placeholder {
     width: 100vw;
     height: 100vh;
     z-index: 900;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
 }
 
 .article-overlay {
@@ -271,17 +283,14 @@ section.list .info-placeholder {
     cursor: pointer;
 }
 
-.article-overlay .close-icon {
-    margin: -0.75rem;
-    padding: 0.25rem 0.5rem;
+.article-overlay .options i {
+    margin: -0.5rem;
+    padding: 0.5rem;
     border: var(--border-1-3);
-    border-radius: 10px;
+    border-radius: 50%;
     background-color: white;
     box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.1);
-}
-
-.article-overlay .close-icon i {
-    font-size: clamp(0.85rem, 2.5vw, 1.25rem);
+    font-size: clamp(0.9rem, 2.5vw, 1.25rem);
     align-self: center;
     max-height: min-content;
 }
@@ -321,7 +330,7 @@ section.list .info-placeholder {
     }
 
     .article-overlay img {
-        max-height: 600px;
+        max-height: 500px;
     }
 }
 
@@ -329,11 +338,6 @@ section.list .info-placeholder {
     .article-overlay {
         width: 65%;
         padding: 1.25rem;
-    }
-
-    .article-overlay .close-icon {
-        margin: -0.5rem;
-        padding: 0.1rem 0.4rem;
     }
 }
 
@@ -345,11 +349,6 @@ section.list .info-placeholder {
 
     .article-overlay img {
         max-height: 200px;
-    }
-
-    .article-overlay .close-icon {
-        margin: -0.5rem;
-        padding: 0.15rem 0.35rem;
     }
 
     .article-overlay .placeholder-img {
