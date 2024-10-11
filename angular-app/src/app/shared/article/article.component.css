@@ -254,6 +254,8 @@ section.list .info-placeholder {
 }
 
 .article-overlay {
+    width: 40%;
+    max-width: 800px;
     height: min-content;
     flex-direction: column;
     align-items: center;
@@ -284,13 +286,13 @@ section.list .info-placeholder {
 }
 
 .article-overlay .options i {
-    margin: -0.5rem;
-    padding: 0.5rem;
+    margin: -0.6rem;
+    padding: 0.7rem;
     border: var(--border-1-3);
     border-radius: 50%;
     background-color: white;
     box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.1);
-    font-size: clamp(0.9rem, 2.5vw, 1.25rem);
+    font-size: clamp(0.7rem, 1.5vw, 1rem);
     align-self: center;
     max-height: min-content;
 }
@@ -319,25 +321,20 @@ section.list .info-placeholder {
 
 .article-overlay .placeholder-img {
     width: 100%;
+    max-height: 400px;
     height: 15rem;
     margin-bottom: 1rem;
-}
-
-@media (min-width: 1025px) {
-    .article-overlay {
-        width: 40%;
-        max-width: 800px;
-    }
-
-    .article-overlay img {
-        max-height: 500px;
-    }
 }
 
 @media (min-width: 601px) and (max-width: 1024px) {
     .article-overlay {
         width: 65%;
         padding: 1.25rem;
+    }
+
+    .article-overlay .options i {
+        margin: -0.75rem -0.5rem;
+        padding: 0.6rem;
     }
 }
 
@@ -351,6 +348,11 @@ section.list .info-placeholder {
         max-height: 200px;
     }
 
+    .article-overlay .options i {
+        transform: translateY(-0.3rem);
+        padding: 0.5rem;
+    }
+    
     .article-overlay .placeholder-img {
         height: 8rem;
     }
