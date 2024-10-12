@@ -129,6 +129,7 @@ export class ArticleComponent implements OnInit {
               s_message = 'El articulo se ha eliminado de destacados correctamente';
             }
             this.messageService.showMessage('success', s_message)
+            this.articleSelected = false;
           },
           error: (error) => {
             console.log(error)

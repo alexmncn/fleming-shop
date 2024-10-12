@@ -1,6 +1,6 @@
 <header>
     <div class="container" [class.extended]="isAuth">
-        <img [routerLink]="['/catalog/home']" routerLinkActive="router-link-active" src="assets/logos/fleming_logo.webp" alt="Fleming Logo">
+        <img [routerLink]="['/auth/login']"  src="assets/logos/fleming_logo.webp" alt="Fleming Logo">
         <section *ngIf="isAuth" class="admin-menu">
             <section class="links">
                 <p [routerLink]="['/admin']">Panel</p>
