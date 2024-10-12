@@ -5,4 +5,5 @@ export interface Article {
     detalle: string;
     pvp: number;
     stock: number;
+    destacado: boolean;
 }

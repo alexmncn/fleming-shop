@@ -11,7 +11,7 @@ admin_bp = Blueprint('admin', __name__)
 def feature_article():
     codebar = request.args.get('codebar', None, int)
     featured = request.args.get('featured', 'true') in ['True','true', '1', 'yes', 'y']
-    
+
     if codebar:
         status = admin_data.feature_article(codebar, featured)
         

@@ -43,17 +43,24 @@
     </ng-template>
 </section>
 
-<section *ngIf="selected" @fadeIn class="overlay-back"></section>
+<section *ngIf="articleSelected" @fadeIn class="overlay-back"></section>
 
-<section *ngIf="selected" @slideInDown class="overlay" (click)="toggleSelection()">
+<section *ngIf="articleSelected" @slideInDown class="overlay" (click)="toggleSelection()">
     <section class="article-overlay" (click)="$event.stopPropagation()">
         <div class="c-left">
-        <div class="options admin-menu">
-            <i title="opciones" class="pi pi-ellipsis-h"></i>
-        </div>
+            <div *ngIf="isAuth" class="float-button admin-menu">
+                <i title="opciones" class="pi pi-ellipsis-h" (click)="toggleAdminMenu()"></i>
+                <div *ngIf="adminMenuActive" @slideInDown class="options-card">
+                    <div class="option featured" (click)="toggleFeaturedCheckbox($event)">
+                        <p>Destacar</p>
+                        <input type="checkbox" [checked]="isFeatured">
+                    </div>
+                    
+                </div>
+            </div>
         </div>
         <div class="c-right">
-            <div class="options close-icon">
+            <div class="float-button close-icon">
                 <i title="cerrar" class="pi pi-times" (click)="toggleSelection()"></i>
             </div>
         </div>

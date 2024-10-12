@@ -3,7 +3,9 @@
         <mat-icon class="material-symbols-outlined" *ngIf="message?.type === 'info' || message?.type === 'warn'">info</mat-icon>
         <mat-icon class="material-symbols-outlined" *ngIf="message?.type === 'success'">check_circle</mat-icon>
         <mat-icon class="material-symbols-outlined" *ngIf="message?.type === 'error'">error</mat-icon>
-        <p>{{ message.text }}</p>
+        <div class="message">
+            <p>{{ message.text }}</p>
+        </div>
         <mat-icon class="material-symbols-outlined close" (click)="closeMessage()">close</mat-icon>
     </section>
 </main>

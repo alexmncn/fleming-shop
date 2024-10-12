@@ -1,9 +1,14 @@
-import { Component, HostListener, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { trigger, style, transition, animate, state} from '@angular/animations';
+import { Observable } from 'rxjs';
 import { SkeletonModule } from 'primeng/skeleton';
-import { trigger, style, transition, animate, state, AnimationEvent } from '@angular/animations';
 
 import { Article } from '../../models/article.model';
+
+import { AuthService } from '../../services/auth/auth.service';
+import { MessageService } from '../../services/message/message.service';
 
 import { CapitalizePipe } from '../../pipes/capitalize/capitalize.pipe';
 
@@ -51,19 +56,32 @@ import { environment } from '../../../environments/environment';
     ])
   ]
 })
-export class ArticleComponent {
+export class ArticleComponent implements OnInit {
   @Input() article!: Article;
   @Input() gridDisplay: boolean = false;
   @Input() listDisplay: boolean = false;
   loading: boolean = true;
   imgURL: string = '';
   imgError: boolean = false;
-  selected: boolean = false;
+  articleSelected: boolean = false;
+  isAuth: boolean = false;
+  adminMenuActive: boolean = false;
+  featureURL: string = environment.apiUrl + '/articles/feature';
+  isFeatured: boolean = false;
+
+  constructor(private http: HttpClient, private messageService: MessageService, private authService: AuthService) { }
+
+  ngOnInit(): void {
+    this.authService.isAuthenticated$.subscribe((auth: boolean) => {
+      this.isAuth = auth;
+    });
+  }
 
   ngOnChanges(): void {
     this.loading = !this.article.detalle;
     this.imgError = false;
     this.imgURL = environment.articleImageRoute + this.article.codebar + '.webp';
+    this.isFeatured = this.article.destacado;
   }
 
   showPlaceholder(): void {
@@ -71,13 +89,60 @@ export class ArticleComponent {
   }
 
   toggleSelection(): void {
-    if (this.selected) {
-      this.selected = false;
+    if (this.articleSelected) {
+      this.articleSelected = false;
+      this.adminMenuActive = false;
     } else {
       if (!this.loading) {
-        this.selected = true;
+        this.articleSelected = true;
       }
     }
+  }
+
+  toggleAdminMenu(): void {
+    this.adminMenuActive = !this.adminMenuActive;
+  }
+
+  toggleFeaturedCheckbox(event: Event): void {
+    event.preventDefault();
+
+    const checkbox = event.target as HTMLInputElement;
+
+    var confirmed = false;
+    if (!this.isFeatured) {
+      confirmed = confirm('Seguro que quieres destacar el articulo?');
+    } else {
+      confirmed = confirm('Seguro que quieres eliminar de destacados el articulo?');
+    }
+    if (confirmed) {
+      this.featureArticle(!this.isFeatured)
+        .subscribe({
+          next: (response) => {
+            this.article.destacado = !this.article.destacado;
+            this.isFeatured = this.article.destacado;
+            checkbox.checked = this.isFeatured;
+
+            var s_message = '';
+            if (this.isFeatured) {
+              s_message = 'El articulo se ha destacado correctamente';
+            } else {
+              s_message = 'El articulo se ha eliminado de destacados correctamente';
+            }
+            this.messageService.showMessage('success', s_message)
+          },
+          error: (error) => {
+            console.log(error)
+            this.messageService.showMessage('error', 'Ha ocurrido un error al destacar el articulo')
+          }
+        });
+    } else {
+      this.messageService.showMessage('warn', 'Proceso abortado')
+    }
+  }
+
+  featureArticle(newValue: boolean): Observable<any> {
+    console.log(this.article.codebar)
+    return this.http.post(this.featureURL, {},{params: {'codebar': this.article.codebar, 'featured': newValue}});
   }
 
   get inStock(): boolean {

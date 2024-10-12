@@ -41,7 +41,8 @@ class Article(db.Model):
             'detalle': self.detalle, 
             'codfam': self.codfam,  
             'pvp': self.pvp,
-            'stock': self.stock
+            'stock': self.stock,
+            'destacado': bool(self.destacado)
         }
         
     def to_dict_og_keys(self):
