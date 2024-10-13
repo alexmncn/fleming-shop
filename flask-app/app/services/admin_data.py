@@ -11,7 +11,12 @@ def feature_article(codebar, featured):
             session.commit()
             session.close()
             
-            send_alert(f'Se ha destacado el articulo con <b>codebar: {codebar}</b>', -1)
+            if featured is True:
+                message = f'Se ha destacado el articulo con <b>codebar: {codebar}</b>'
+            else:
+                message = f'Se ha eliminado de destacados el articulo con <b>codebar: {codebar}</b>'
+            
+            send_alert(message, -1)
             return True 
         
         session.close()
