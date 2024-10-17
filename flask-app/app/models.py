@@ -20,6 +20,7 @@ class Article(db.Model):
     stock = db.Column(db.Integer, default=0, nullable=True)
     factualizacion = db.Column(db.DateTime, nullable=True)
     destacado = db.Column(TINYINT(1), default=0, nullable=True)
+    hidden = db.Column(TINYINT(1), default=0, nullable=True)
     
     def to_dict(self):
         return {
@@ -31,7 +32,8 @@ class Article(db.Model):
             'codebar': self.codebar, 
             'stock': self.stock, 
             'factualizacion': self.factualizacion,
-            'destacado': bool(self.destacado)
+            'destacado': bool(self.destacado),
+            'hidden': bool(self.hidden)
         }
         
     def to_dict_reduced(self):
@@ -55,16 +57,25 @@ class Article(db.Model):
             'CCODEBAR': self.codebar, 
             'NSTOCKMIN': self.stock, 
             'DACTUALIZA': self.factualizacion,
-            'destacado': bool(self.destacado)
+            'destacado': bool(self.destacado),
+            'hidden': bool(self.hidden)
         }
     
 
 class Family(db.Model):
     __tablename__= "family"
     codfam = db.Column(db.Integer, primary_key=True, nullable=False)
-    nomfam = db.Column(db.String(50), nullable=False)
+    nomfam = db.Column(db.String(50), nullable=False),
+    hidden = db.Column(TINYINT(1), default=0, nullable=True)
     
     def to_dict(self):
+        return {
+            'codfam': self.codfam, 
+            'nomfam': self.nomfam,
+            'hidden': self.hidden
+        }
+
+    def to_dict_reduced(self):
         return {
             'codfam': self.codfam, 
             'nomfam': self.nomfam

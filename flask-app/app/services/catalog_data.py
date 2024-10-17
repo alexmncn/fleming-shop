@@ -80,7 +80,7 @@ def new_articles(page, per_page):
 
 def all_families():
     families = Family.query.all()
-    return [family.to_dict() for family in families]
+    return [family.to_dict_reduced() for family in families]
 
 
 def family_articles(family_id, page, per_page):
