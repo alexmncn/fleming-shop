@@ -65,22 +65,22 @@ class Article(db.Model):
 class Family(db.Model):
     __tablename__= "family"
     codfam = db.Column(db.Integer, primary_key=True, nullable=False)
-    nomfam = db.Column(db.String(50), nullable=False),
+    nomfam = db.Column(db.String(50), nullable=False)
     hidden = db.Column(TINYINT(1), default=0, nullable=True)
     
     def to_dict(self):
         return {
-            'codfam': self.codfam, 
+            'codfam': self.codfam,
             'nomfam': self.nomfam,
             'hidden': self.hidden
         }
 
     def to_dict_reduced(self):
         return {
-            'codfam': self.codfam, 
+            'codfam': self.codfam,
             'nomfam': self.nomfam
         }
-        
+    
         
 class User(UserMixin,db.Model):
     __tablename__ = "users"
