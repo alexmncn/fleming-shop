@@ -52,3 +52,51 @@ def hide_article():
         return jsonify(error='Internal error.'), 500
         
     return jsonify(error='No codebar in request.'), 400
+
+
+@admin_bp.route('/families/hide', methods=['POST'])
+
+def hide_family():
+    codfam = request.args.get('codfam', None, int)
+    hidden = request.args.get('hidden', 'true') in ['True','true', '1', 'yes', 'y']
+    
+    if codfam:
+        status = admin_data.hide_family(codfam, hidden)
+        
+        if status == True:
+            if hidden == True:
+                message = f'Family with code `{codfam}` successfully hidden.'
+            else:
+                message = f'Family with code `{codfam}` removed from hidden.'
+            return jsonify(message=message), 200
+        
+        elif status == False:
+            return jsonify(error=f'No family with code `{codfam}` in database.'), 404
+
+        return jsonify(error='Internal error.'), 500
+        
+    return jsonify(error='No codebar in request.'), 400
+
+
+@admin_bp.route('/family/articles/hide', methods=['POST'])
+
+def hide_family_articles():
+    codfam = request.args.get('codfam', None, int)
+    hidden = request.args.get('hidden', 'true') in ['True','true', '1', 'yes', 'y']
+    
+    if codfam:
+        status = admin_data.hide_family_articles(codfam, hidden)
+        
+        if status == True:
+            if hidden == True:
+                message = f'Articles from family with code `{codfam}` successfully hidden.'
+            else:
+                message = f'Articles from family with code `{codfam}` removed from hidden.'
+            return jsonify(message=message), 200
+        
+        elif status == False:
+            return jsonify(error=f'No family with code `{codfam}` in database.'), 404
+
+        return jsonify(error='Internal error.'), 500
+        
+    return jsonify(error='No codebar in request.'), 400
