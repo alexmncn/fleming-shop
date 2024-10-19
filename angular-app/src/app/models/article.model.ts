@@ -6,4 +6,5 @@ export interface Article {
     pvp: number;
     stock: number;
     destacado: boolean;
+    hidden: boolean;
 }
