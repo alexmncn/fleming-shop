@@ -232,7 +232,7 @@ app-article {
 }
 
 .footer p {
-    font-size: clamp(0.5rem, 2.5vw, 0.85rem);
+    font-size: clamp(0.7rem, 2.5vw, 0.85rem);
 }
 
 progress {
@@ -298,17 +298,15 @@ progress::-ms-fill {
 
 @media (max-width: 600px) {
     .footer {
-        margin-top: 0.5rem;
+        margin-top: 1rem;
     }
 
     progress {
-        margin: 0 auto 0.5rem;
-        width: 8rem;
+        width: 9rem;
     }
     
     progress[value]::-webkit-progress-bar {
-        margin: 0 auto 0.5rem;
-        width: 10rem;
+        width: 9rem;
     }
     
 
