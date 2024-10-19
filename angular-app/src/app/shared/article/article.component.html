@@ -52,10 +52,13 @@
                 <i title="opciones" class="pi pi-ellipsis-h" (click)="toggleAdminMenu()"></i>
                 <div *ngIf="adminMenuActive" @slideInDown class="options-card">
                     <div class="option featured" (click)="toggleFeaturedCheckbox($event)">
-                        <p>Destacar</p>
+                        <p>{{ isFeatured ? 'Destacado' : 'Destacar'}}</p>
                         <input type="checkbox" [checked]="isFeatured">
                     </div>
-                    
+                    <div class="option hidden" (click)="toggleFeaturedCheckbox($event)">
+                        <p>{{ isHidden ? 'Oculto' : 'Ocultar'}}</p>
+                        <input type="checkbox" [checked]="isHidden">
+                    </div>
                 </div>
             </div>
         </div>

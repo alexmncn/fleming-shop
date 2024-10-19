@@ -68,6 +68,7 @@ export class ArticleComponent implements OnInit {
   adminMenuActive: boolean = false;
   featureURL: string = environment.apiUrl + '/articles/feature';
   isFeatured: boolean = false;
+  isHidden: boolean = false;
 
   constructor(private http: HttpClient, private messageService: MessageService, private authService: AuthService) { }
 
@@ -82,6 +83,7 @@ export class ArticleComponent implements OnInit {
     this.imgError = false;
     this.imgURL = environment.articleImageRoute + this.article.codebar + '.webp';
     this.isFeatured = this.article.destacado;
+    this.isHidden = this.article.hidden;
   }
 
   showPlaceholder(): void {
