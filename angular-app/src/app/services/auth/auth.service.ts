@@ -69,7 +69,7 @@ export class AuthService {
   }
 
   clearToken(): void {
-    this.cookieService.delete('authToken');
+    this.cookieService.delete('authToken', '/'); // Is necessary to specify the cookie path, otherwise dont it will not delete it.
     this.isAuthenticatedSubject.next(false);
   }
 
@@ -81,3 +81,4 @@ export class AuthService {
     return localStorage.getItem('username');
   }
 }
+  
