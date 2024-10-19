@@ -1,6 +1,6 @@
 <section class="article-card" [class.grid]="gridDisplay" [class.list]="listDisplay" (click)="toggleSelection()">
     <ng-container *ngIf="!loading; else loadingTemplate">
-        <section class="img">
+        <section class="img" [class.placeholder]="imgError">
             <img *ngIf="!imgError" [src]="imgURL" (error)="showPlaceholder()" loading="lazy">
             <div *ngIf="imgError" class="placeholder-img">
                 <p-skeleton  height="100%" styleClass="mb-2" borderRadius="4px"/>

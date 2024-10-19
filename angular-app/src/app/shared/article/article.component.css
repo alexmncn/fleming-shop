@@ -33,7 +33,7 @@ section.article-card.list {
     }
 }
 
-section.list .img {
+section.list .img:not(.placeholder){
     align-self: center;
 }
 
@@ -143,7 +143,7 @@ section.list .info {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-
+    width: 50%;
 }
 
 @media (max-width: 600px) {
