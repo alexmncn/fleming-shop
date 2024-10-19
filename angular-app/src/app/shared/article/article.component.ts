@@ -68,6 +68,7 @@ export class ArticleComponent implements OnInit {
   adminMenuActive: boolean = false;
   featureURL: string = environment.apiUrl + '/articles/feature';
   isFeatured: boolean = false;
+  hideURL: string = environment.apiUrl + '/articles/hide';
   isHidden: boolean = false;
 
   constructor(private http: HttpClient, private messageService: MessageService, private authService: AuthService) { }
@@ -144,8 +145,50 @@ export class ArticleComponent implements OnInit {
   }
 
   featureArticle(newValue: boolean): Observable<any> {
-    console.log(this.article.codebar)
     return this.http.post(this.featureURL, {},{params: {'codebar': this.article.codebar, 'featured': newValue}});
+  }
+
+  toggleHiddenCheckbox(event: Event): void {
+    event.preventDefault();
+
+    const checkbox = event.target as HTMLInputElement;
+
+    var confirmed = false;
+    if (!this.isHidden) {
+      confirmed = confirm('Seguro que quieres ocultar el articulo?');
+    } else {
+      confirmed = confirm('Seguro que quieres eliminar de ocultos el articulo?');
+    }
+    if (confirmed) {
+      this.hideArticle(!this.isHidden)
+        .subscribe({
+          next: (response) => {
+            this.article.hidden = !this.article.hidden;
+            this.isHidden = this.article.hidden;
+            checkbox.checked = this.isHidden;
+
+            var s_message = '';
+            if (this.isHidden) {
+              s_message = 'El articulo se ha ocultado correctamente';
+            } else {
+              s_message = 'El articulo se ha eliminado de ocultos correctamente';
+            }
+            this.messageService.showMessage('success', s_message)
+            this.articleSelected = false;
+          },
+          error: (error) => {
+            console.log(error)
+            this.messageService.showMessage('error', 'Ha ocurrido un error al destacar el articulo')
+          }
+        });
+    } else {
+      this.messageService.showMessage('warn', 'Proceso abortado')
+    }
+  }
+
+  hideArticle(newValue: boolean): Observable<any> {
+    console.log(this.article.codebar)
+    return this.http.post(this.hideURL, {},{params: {'codebar': this.article.codebar, 'hidden': newValue}});
   }
 
   get inStock(): boolean {
