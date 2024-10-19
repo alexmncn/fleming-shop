@@ -21,9 +21,34 @@ def feature_article():
             else:
                 message = f'Article with codebar `{codebar}` removed from featured successfully.'
             return jsonify(message=message), 200
+        
         elif status == False:
             return jsonify(error=f'No articles with codebar `{codebar}` in database.'), 404
         
         return jsonify(error='Internal error.'), 500
     
+    return jsonify(error='No codebar in request.'), 400
+
+
+@admin_bp.route('/articles/hide', methods=['POST'])
+@jwt_required()
+def hide_article():
+    codebar = request.args.get('codebar', None, int)
+    hidden = request.args.get('hidden', 'true') in ['True','true', '1', 'yes', 'y']
+    
+    if codebar:
+        status = admin_data.hide_article(codebar, hidden)
+        
+        if status == True:
+            if hidden == True:
+                message = f'Article with codebar `{codebar}` successfully hidden.'
+            else:
+                message = f'Article with codebar `{codebar}` removed from hidden.'
+            return jsonify(message=message), 200
+        
+        elif status == False:
+            return jsonify(error=f'No articles with codebar `{codebar}` in database.'), 404
+
+        return jsonify(error='Internal error.'), 500
+        
     return jsonify(error='No codebar in request.'), 400
