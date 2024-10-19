@@ -232,7 +232,7 @@ app-article {
 }
 
 .footer p {
-    font-size: 0.85rem;
+    font-size: clamp(0.65rem, 2.5vw, 0.85rem);
 }
 
 progress {
@@ -240,7 +240,7 @@ progress {
     border: 0;
     display: block;
     height: .2rem;
-    margin: 0 auto 2rem;
+    margin: 0 auto 1rem;
     width: 12.5rem;
     border-radius: 12px;
     background-color: var(--gray-300);
@@ -252,16 +252,16 @@ progress[value]::-webkit-progress-bar {
     border: 0;
     display: block;
     height: .2rem;
-    margin: 0 auto 2rem;
+    margin: 0 auto 1rem;
     width: 12.5rem;
     background-color: var(--gray-300);
     border-radius: 12px;
-  }
+}
 
 progress::-webkit-progress-value {
     background-color: var(--primary-accent-500);
     border-radius: 12px; 
-  }
+}
   
 progress::-moz-progress-bar {
     background-color: var(--primary-accent-500);
@@ -275,6 +275,7 @@ progress::-ms-fill {
 
 .footer button {
     width: 100%;
+    margin-top: 1rem;
     padding: 0.75rem 3rem;
     color: white;
     background-color: var(--primary-accent-500);
@@ -296,7 +297,23 @@ progress::-ms-fill {
 }
 
 @media (max-width: 600px) {
+    .footer {
+        margin-top: 1rem;
+    }
+
+    progress {
+        margin: 0 auto 0.5rem;
+        width: 8rem;
+    }
+    
+    progress[value]::-webkit-progress-bar {
+        margin: 0 auto 0.5rem;
+        width: 10rem;
+    }
+    
+
     .footer button {
+        margin-top: 0.5rem;
         padding: 0.5rem 1.5rem;
     }
 }
