@@ -77,8 +77,17 @@
         <section class="info">
             <div class="left">
                 <p class="detalle">{{ article.detalle | capitalize }}</p>
-                <p class="ref">Ref: {{ article.ref }}</p>
-                <p class="pvp">{{ formatedPvp }} €</p>
+                <div class="mini-info">
+                    <p class="ref">Ref: {{ article.ref }}</p>
+                    <div class="codebar">
+                        <i class="pi pi-barcode"></i>
+                        <p>: {{article.codebar}}</p>
+                    </div>
+                </div>
+                <div class="prize">
+                    <p class="pvp">{{ formatedPvp }} €</p>
+                    <p *ngIf="isAuth" class="pcosto"><b>{{ formatedPcosto }} €</b></p>
+                </div>
             </div>
         </section>
     </section>

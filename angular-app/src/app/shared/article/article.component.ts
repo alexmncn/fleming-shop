@@ -201,4 +201,8 @@ export class ArticleComponent implements OnInit {
     return this.article.pvp.toFixed(2);
   }
 
+  get formatedPcosto(): string {
+    return this.article.pcosto.toFixed(2);
+  }
+
 }

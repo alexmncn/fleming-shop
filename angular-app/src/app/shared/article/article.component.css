@@ -364,27 +364,59 @@ section.list .info-placeholder {
     margin-bottom: 1rem;
 }
 
-.article-overlay .info {
-    width: 100%;
-}
-
-.article-overlay p.detalle {
-    font-size: clamp(1rem, 2.5vw, 1.15rem);
-}
-
-.article-overlay p.ref {
-    font-size: clamp(0.8rem, 2.5vw, 1rem);
-}
-
-.article-overlay p.pvp {
-    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
-}
-
 .article-overlay .placeholder-img {
     width: 100%;
     max-height: 400px;
     height: 15rem;
     margin-bottom: 1rem;
+}
+
+.article-overlay .info {
+    width: 100%;
+}
+
+
+.article-overlay p.detalle {
+    font-size: clamp(1rem, 2.5vw, 1.15rem);
+}
+
+.mini-info {
+    margin-top: 0.2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+}
+
+.article-overlay p.ref {
+    font-size: clamp(0.8rem, 2vw, 1rem);
+}
+
+.codebar {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    color: var(--gray-600);
+    font-size: clamp(0.8rem, 2vw, 1rem);
+}
+
+.codebar i {
+    font-size: clamp(0.65rem, 1.5vw, 1rem);
+}
+
+.article-overlay .prize {
+    display: flex;
+    align-items: end;
+    gap: 1rem;
+}
+
+.article-overlay p.pcosto {
+    color: var(--gray-500);
+    font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+}
+
+.article-overlay p.pvp {
+    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
 }
 
 @media (min-width: 601px) and (max-width: 1024px) {
@@ -407,22 +439,35 @@ section.list .info-placeholder {
         padding: 0.75rem;
     }
 
-    .article-overlay .info {
-        padding: 0.5rem 0.75rem;
-    }
-
-    .article-overlay img {
-        max-height: 200px;
-    }
-
     .article-overlay .float-button i {
         transform: translateY(-0.2rem);
         padding: 0.5rem;
         margin: -0.4rem;
     }
 
-    
+    .article-overlay img {
+        max-height: 200px;
+    }
+
     .article-overlay .placeholder-img {
         height: 8rem;
     }
+
+    .article-overlay .info {
+        padding: 0.5rem 0.75rem;
+    }
+
+    .mini-info {
+        margin-top: 0;
+        gap: 0.1rem;
+    }
+    
+    .article-overlay p.ref {
+        font-size: clamp(0.8rem, 2vw, 1.1rem);
+    }
+    
+    .article-overlay .prize {
+        gap: 0.5rem;
+    }
+
 }

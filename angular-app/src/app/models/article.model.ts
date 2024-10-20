@@ -3,6 +3,7 @@ export interface Article {
     codebar: number;
     codfam: number;
     detalle: string;
+    pcosto: number;
     pvp: number;
     stock: number;
     destacado: boolean;
