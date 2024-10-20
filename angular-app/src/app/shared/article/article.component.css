@@ -131,7 +131,7 @@ section .info {
     border-radius: 8px;
     background-color: var(--gray-50);
     border: var(--border-1-2);
-    padding: 1rem;
+    padding: 0.75rem 1rem;
 }
 
 section.grid .info {
@@ -148,7 +148,7 @@ section.list .info {
 
 @media (max-width: 600px) {
     section .info {
-        padding: 0.5rem;
+        padding: 0.4rem 0.5rem;
     }  
 }
 
@@ -245,6 +245,7 @@ section.list .info-placeholder {
     
     .placeholder-text.pvp {
         height: 1rem;
+        width: 30%;
         margin-top: 0.5rem;
     }
 }
@@ -403,7 +404,11 @@ section.list .info-placeholder {
     .article-overlay {
         width: 85%;
         min-width: 0px;
-        padding: 1rem;
+        padding: 0.75rem;
+    }
+
+    .article-overlay .info {
+        padding: 0.5rem 0.75rem;
     }
 
     .article-overlay img {
@@ -411,8 +416,9 @@ section.list .info-placeholder {
     }
 
     .article-overlay .float-button i {
-        transform: translateY(-0.3rem);
+        transform: translateY(-0.2rem);
         padding: 0.5rem;
+        margin: -0.4rem;
     }
 
     
