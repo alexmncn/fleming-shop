@@ -101,6 +101,16 @@ section.list .stock-info {
     border-radius: 50%;
 }
 
+.circle.red {
+    background: red;
+    box-shadow: 0 0 4px 2px rgba(255, 115, 115, 0.30);
+}
+
+.circle.green {
+    background: rgb(0, 187, 0);
+    box-shadow: 0 0 4px 2px rgba(115, 255, 115, 0.50);
+}
+
 @media (max-width: 600px) {
     .stock-info {
         gap: 0.5rem;
@@ -117,14 +127,46 @@ section.list .stock-info {
     }
 }
 
-.circle.red {
-    background: red;
-    box-shadow: 0 0 4px 2px rgba(255, 115, 115, 0.30);
+.hidden-info {
+    position: absolute;
 }
 
-.circle.green {
-    background: rgb(0, 187, 0);
-    box-shadow: 0 0 4px 2px rgba(115, 255, 115, 0.50);
+section.grid .hidden-info {
+    z-index: 100;
+    top: 0;
+    left: 0;
+    margin: 0.5rem;
+}
+
+section.list .hidden-info {
+    margin-top: -1.75rem;
+    margin-left: -0.5rem;
+}
+
+.hidden-info i {
+    padding: 0.5rem;
+    border-radius: 50%;
+    color: white;
+    background-color: var(--gray-800);
+    box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.075);
+    font-size: clamp(0.6rem, 2.5vw, 1rem);
+}
+
+@media (max-width: 600px) {
+    section.grid .hidden-info {
+        margin: 0.25rem 0.35rem;
+    }
+     
+    section.list .hidden-info {
+        margin-top: -1.25rem;
+        margin-left: -0.25rem;
+    }
+
+    .hidden-info i {
+        padding: 0.35rem;
+    }
+
+
 }
 
 section .info {
@@ -302,7 +344,6 @@ section.list .info-placeholder {
     flex-direction: column;
     align-items: start;
 }
-
 
 .article-overlay .float-button {
     position: absolute;

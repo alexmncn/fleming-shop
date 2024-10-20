@@ -17,11 +17,19 @@
                 <p *ngIf="inStock">Disponible</p>
                 <p *ngIf="!inStock">Sin stock</p>
             </div>
+            <div class="c-bottom">
+                <div *ngIf="isHidden && listDisplay" class="hidden-info">
+                    <i class="pi pi-eye-slash"></i>
+                </div>
+            </div>
         </section>
         <div *ngIf="gridDisplay" class="stock-info" [title]="article.stock">
             <div class="circle" [class.green]="inStock" [class.red]="!inStock"></div>
             <p *ngIf="inStock">Disponible</p>
             <p *ngIf="!inStock">Sin stock</p>
+        </div>
+        <div *ngIf="isHidden && gridDisplay" class="hidden-info">
+            <i class="pi pi-eye-slash"></i>
         </div>
     </ng-container>
 
