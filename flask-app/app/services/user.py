@@ -8,7 +8,7 @@ from app.services.pushover_alerts import send_alert
 def authenticate(username, password, ip=None):
     user = User.query.filter_by(username=username).first()
     if user and user.check_password(password):
-        send_alert(f'<b>{username}</b> ha iniciado sesión.\nIp: {ip}', 0)
+        send_alert(f'<b>{username}</b> ha iniciado sesión.', 0)
         return True  
     return False
 
