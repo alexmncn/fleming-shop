@@ -1,10 +1,11 @@
 import os
 from datetime import datetime
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
 
 from app.services.import_to_db import update_articles, update_families, update_stocks
 
-from app.config import UPLOAD_ROUTE, MAX_CONTENT_LENGTH
+from app.config import UPLOAD_ROUTE
 
 os.makedirs(UPLOAD_ROUTE, exist_ok=True)
 
@@ -12,6 +13,7 @@ load_data_bp = Blueprint('load_data', __name__)
 
 
 @load_data_bp.route('/upload/articles', methods=['POST'])
+@jwt_required()
 def upload_articles_():
     if 'file' not in request.files:
         return jsonify(error='No file part in request'), 400
@@ -38,6 +40,7 @@ def upload_articles_():
 
 
 @load_data_bp.route('/upload/families', methods=['POST'])
+@jwt_required()
 def upload_families_():
     if 'file' not in request.files:
         return jsonify(error='No file part in request'), 400
@@ -62,6 +65,7 @@ def upload_families_():
 
 
 @load_data_bp.route('/upload/stocks', methods=['POST'])
+@jwt_required()
 def upload_stocks_():
     if 'file' not in request.files:
         return jsonify(error='No file part in request'), 400
