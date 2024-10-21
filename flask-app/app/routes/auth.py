@@ -23,7 +23,7 @@ def login():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
-    remote_host = request.remote_addr
+    remote_host = request.headers.get('X-Real-IP')
     
     user_authenticated = authenticate(username, password, remote_host)
     
