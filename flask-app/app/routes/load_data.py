@@ -31,7 +31,6 @@ def upload_articles_():
         file_path = os.path.join(UPLOAD_ROUTE, new_filename)
         file.save(file_path)
         
-        
         update_articles(new_filename)
         
         return jsonify(message='OK'), 200
