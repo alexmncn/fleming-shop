@@ -48,7 +48,7 @@ def upload_article_images():
             
         if extension != 'webp':
             time.sleep(2)
-            status = image_to_webp(file_path, image_route, filename)
+            status = image_to_webp(file_path, image_route, new_filename)
             
             if status is False:
                 return jsonify(error='Error converting image to webp format')
