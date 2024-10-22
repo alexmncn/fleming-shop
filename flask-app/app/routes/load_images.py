@@ -32,12 +32,14 @@ def upload_article_images():
             new_filename = filename
             
         if extension != 'webp':
-            image_route = image_route + '/tmp'
+            route = image_route + '/tmp'
+        else:
+            route = image_route
             
-        if not os.path.exists(image_route):
-            os.makedirs(image_route)
+        if not os.path.exists(route):
+            os.makedirs(route)
             
-        file_path = os.path.join(image_route, new_filename)
+        file_path = os.path.join(route, new_filename)
             
         try:
             file.save(file_path)
