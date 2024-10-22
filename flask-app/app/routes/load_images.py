@@ -51,10 +51,10 @@ def upload_article_images():
             status = image_to_webp(file_path, image_route, new_filename)
             
             if status is False:
-                return jsonify(error='Error converting image to webp format')
+                return jsonify(error='Error converting image to webp format'), 500
             
             os.remove(file_path)
                     
-        return jsonify(message='OK'), 200
+        return jsonify(message='The image has been uploaded successfully'), 200
     
-    return jsonify(error='Request error')
+    return jsonify(error='A server error ocurred uploading the image'), 500

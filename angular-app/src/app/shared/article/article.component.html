@@ -55,46 +55,77 @@
 
 <section *ngIf="articleSelected" @slideInDown class="overlay" (click)="toggleSelection()">
     <section class="article-overlay" (click)="$event.stopPropagation()">
-        <div class="c-left">
-            <div *ngIf="isAuth" class="float-button admin-menu">
-                <i title="opciones" class="pi pi-ellipsis-h" (click)="toggleAdminMenu()"></i>
-                <div *ngIf="adminMenuActive" @slideInDown class="options-card">
-                    <div class="option featured" (click)="toggleFeaturedCheckbox($event)">
-                        <p>{{ isFeatured ? 'Destacado' : 'Destacar'}}</p>
-                        <input type="checkbox" [checked]="isFeatured">
-                    </div>
-                    <div class="option hidden" (click)="toggleHiddenCheckbox($event)">
-                        <p>{{ isHidden ? 'Oculto' : 'Ocultar'}}</p>
-                        <input type="checkbox" [checked]="isHidden">
+        <section *ngIf="!uploadImageMenuActive" class="main-content">
+            <div class="c-left">
+                <div *ngIf="isAuth" class="float-button">
+                    <i title="opciones" class="pi pi-ellipsis-h" (click)="toggleAdminMenu()"></i>
+                </div>
+                <div class="admin-menu">
+                    <div *ngIf="adminMenuActive" @slideInDown class="options-card">
+                        <div class="option featured" (click)="toggleFeaturedCheckbox($event)">
+                            <p>{{ isFeatured ? 'Destacado' : 'Destacar'}}</p>
+                            <input type="checkbox" [checked]="isFeatured">
+                        </div>
+                        <div class="option hidden" (click)="toggleHiddenCheckbox($event)">
+                            <p>{{ isHidden ? 'Oculto' : 'Ocultar'}}</p>
+                            <input type="checkbox" [checked]="isHidden">
+                        </div>
+                        <div class="option hidden" (click)="toggleImageUploadMenu()">
+                            <p>{{ imgError ? 'Subir imagen' : 'Actualizar imagen'}}</p>
+                            <i class="pi pi-upload"></i>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="c-right">
-            <div class="float-button close-icon">
-                <i title="cerrar" class="pi pi-times" (click)="toggleSelection()"></i>
+            <div class="c-right">
+                <div class="float-button close-icon">
+                    <i title="cerrar" class="pi pi-times" (click)="toggleSelection()"></i>
+                </div>
             </div>
-        </div>
-        <section class="img">
-            <img *ngIf="!imgError" [src]="imgURL" (error)="showPlaceholder()">
-            
-            <div *ngIf="imgError" class="placeholder-img">
-                <p-skeleton class="placeholder-img" height="100%" styleClass="mb-2" borderRadius="4px"/>
-            </div>
+            <section class="img">
+                <img *ngIf="!imgError" [src]="imgURL" (error)="showPlaceholder()">
+                
+                <div *ngIf="imgError" class="placeholder-img">
+                    <p-skeleton class="placeholder-img" height="100%" styleClass="mb-2" borderRadius="4px"/>
+                </div>
+            </section>
+            <section class="info">
+                <div class="left">
+                    <p class="detalle">{{ article.detalle | capitalize }}</p>
+                    <div class="mini-info">
+                        <p class="ref">Ref: {{ article.ref }}</p>
+                        <div class="codebar">
+                            <i class="pi pi-barcode"></i>
+                            <p>: {{article.codebar}}</p>
+                        </div>
+                    </div>
+                    <div class="prize">
+                        <p class="pvp">{{ formatedPvp }} €</p>
+                        <p *ngIf="isAuth" class="pcosto"><b>{{ formatedPcosto }} €</b></p>
+                    </div>
+                </div>
+            </section>
         </section>
-        <section class="info">
-            <div class="left">
-                <p class="detalle">{{ article.detalle | capitalize }}</p>
-                <div class="mini-info">
-                    <p class="ref">Ref: {{ article.ref }}</p>
-                    <div class="codebar">
-                        <i class="pi pi-barcode"></i>
-                        <p>: {{article.codebar}}</p>
-                    </div>
+
+        <section *ngIf="uploadImageMenuActive" class="upload-image-menu">
+            <div class="c-left">
+                <div class="float-button">
+                    <i title="Atrás" class="pi pi-arrow-left" (click)="toggleImageUploadMenu()"></i>
                 </div>
-                <div class="prize">
-                    <p class="pvp">{{ formatedPvp }} €</p>
-                    <p *ngIf="isAuth" class="pcosto"><b>{{ formatedPcosto }} €</b></p>
+            </div>
+            <div class="main-content">
+                <label *ngIf="!selectedFile" for="file-upload" class="file-select">
+                        <i title="Atrás" class="pi pi-image"></i>
+                        <p>Seleccionar imagen</p>
+                </label>
+                <input id="file-upload" type="file" accept="image/*" (change)="onFileSelected($event)" />
+                
+                <div *ngIf="uploadImagePreview" class="image-preview">
+                    <img [src]="uploadImagePreview" alt="Preview Image" style="max-width: 100%; border-radius: 8px;" />
+                </div>
+                <div class="option-buttons">
+                    <button *ngIf="selectedFile" class="clean-file" (click)="cleanFileSelected()" [disabled]="!selectedFile">Cambiar</button>
+                    <button *ngIf="selectedFile" class="upload" (click)="uploadImage()" [disabled]="!selectedFile">Subir imagen</button>
                 </div>
             </div>
         </section>

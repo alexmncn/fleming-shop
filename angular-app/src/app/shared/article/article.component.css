@@ -347,7 +347,7 @@ section.list .info-placeholder {
 
 .article-overlay .float-button {
     position: absolute;
-    z-index: 1000;
+    z-index: 800;
 }
 
 .article-overlay .float-button i {
@@ -364,8 +364,11 @@ section.list .info-placeholder {
 }
 
 .admin-menu .options-card {
+    position: absolute;
+    z-index: 900;
     display: flex;
     flex-direction: column;
+    margin: 0.75rem;
     gap: 0.3rem;
     padding: 0.3rem;
     border: var(--border-1-3);
@@ -374,7 +377,6 @@ section.list .info-placeholder {
     box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.1);
     font-size: clamp(0.90rem, 2.5vw, 1.1rem);
     cursor: pointer;
-    font-weight: 600;
     max-width: 75vw;
 }
 
@@ -385,6 +387,8 @@ section.list .info-placeholder {
     display: flex;
     justify-content: space-between;
     min-width: 10rem;
+    gap: 1rem;
+    align-items: center;
 }
 
 .admin-menu .options-card .option:hover {
@@ -511,4 +515,69 @@ section.list .info-placeholder {
         gap: 0.5rem;
     }
 
+}
+
+.upload-image-menu .main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#file-upload {
+    display: none;
+}
+  
+.file-select {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 0;
+    gap: 1rem;
+    height: 100%;
+    width: 100%;
+    color: var(--gray-600);
+    background-color: var(--gray-100);
+    border: 2px dashed var(--gray-300);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: clamp(0.90rem, 2.5vw, 1.2rem);
+    font-weight: 600;
+}
+
+.file-select i {
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+}
+
+.option-buttons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+button {
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: clamp(0.80rem, 2.5vw, 1rem);
+    cursor: pointer;
+    font-weight: 600;
+}
+
+button.clean-file {
+    background-color: white;
+    color: var(--primary-accent-500);
+    border: 2px solid var(--primary-accent-500);
+}
+
+button.upload {
+    background-color: var(--primary-accent-500);
+    color: white;
+    border: 2px solid var(--primary-accent-500);
+}
+
+
+@media (max-width: 600px) {
+    .file-select {
+        padding: 2.5rem 0;
+    }
 }

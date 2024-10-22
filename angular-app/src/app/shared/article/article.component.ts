@@ -70,6 +70,10 @@ export class ArticleComponent implements OnInit {
   isFeatured: boolean = false;
   hideURL: string = environment.apiUrl + '/articles/hide';
   isHidden: boolean = false;
+  uploadImageURL: string = environment.apiUrl + '/upload/articles/images';
+  uploadImageMenuActive: boolean = false;
+  selectedFile: File | null = null;
+  uploadImagePreview: string | ArrayBuffer | null = null;
 
   constructor(private http: HttpClient, private messageService: MessageService, private authService: AuthService) { }
 
@@ -95,6 +99,7 @@ export class ArticleComponent implements OnInit {
     if (this.articleSelected) {
       this.articleSelected = false;
       this.adminMenuActive = false;
+      this.uploadImageMenuActive = false;
     } else {
       if (!this.loading) {
         this.articleSelected = true;
@@ -190,6 +195,50 @@ export class ArticleComponent implements OnInit {
     console.log(this.article.codebar)
     return this.http.post(this.hideURL, {},{params: {'codebar': this.article.codebar, 'hidden': newValue}});
   }
+
+  toggleImageUploadMenu():void {
+    this.uploadImageMenuActive = !this.uploadImageMenuActive;
+    if (this.selectedFile) {
+      this.cleanFileSelected();
+    }
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.selectedFile = input.files[0];
+    
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.uploadImagePreview = reader.result;
+      };
+      reader.readAsDataURL(this.selectedFile);
+    }
+  }
+
+  cleanFileSelected(): void {
+    this.selectedFile = null;
+    this.uploadImagePreview = null;
+  }
+
+  uploadImage(): void {
+    if (this.selectedFile) {
+      const formData = new FormData();
+      formData.append('file', this.selectedFile, this.selectedFile.name);
+
+      this.http.post(this.uploadImageURL, formData, {params: {'codebar': this.article.codebar}})
+        .subscribe({
+          next: (response) => {
+            this.messageService.showMessage('success', 'La imagen se ha añadido correctamente')
+          },
+          error: (error) => {
+            console.log(error)
+            this.messageService.showMessage('error', 'Ha ocurrido un error al subir la imagen')
+          }
+        });
+    }
+  }
+
 
   get inStock(): boolean {
     if (this.article.stock > 0) {
