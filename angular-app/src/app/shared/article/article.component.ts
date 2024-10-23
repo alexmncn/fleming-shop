@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { Router, ActivatedRoute } from '@angular/router';
 import { trigger, style, transition, animate, state} from '@angular/animations';
 import { Observable } from 'rxjs';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -73,9 +74,10 @@ export class ArticleComponent implements OnInit {
   uploadImageURL: string = environment.apiUrl + '/upload/articles/images';
   uploadImageMenuActive: boolean = false;
   selectedFile: File | null = null;
+  uploadingImage: boolean = false;
   uploadImagePreview: string | ArrayBuffer | null = null;
 
-  constructor(private http: HttpClient, private messageService: MessageService, private authService: AuthService) { }
+  constructor(private http: HttpClient, private messageService: MessageService, private authService: AuthService, private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
     this.authService.isAuthenticated$.subscribe((auth: boolean) => {
@@ -223,22 +225,26 @@ export class ArticleComponent implements OnInit {
 
   uploadImage(): void {
     if (this.selectedFile) {
+      this.uploadingImage = true;
+
       const formData = new FormData();
       formData.append('file', this.selectedFile, this.selectedFile.name);
 
       this.http.post(this.uploadImageURL, formData, {params: {'codebar': this.article.codebar}})
         .subscribe({
           next: (response) => {
+            this.uploadingImage = false;
             this.messageService.showMessage('success', 'La imagen se ha añadido correctamente')
+            window.location.reload();
           },
           error: (error) => {
             console.log(error)
+            this.uploadingImage = false;
             this.messageService.showMessage('error', 'Ha ocurrido un error al subir la imagen')
           }
         });
     }
   }
-
 
   get inStock(): boolean {
     if (this.article.stock > 0) {

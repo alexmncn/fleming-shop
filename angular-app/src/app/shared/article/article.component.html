@@ -1,4 +1,4 @@
-<section class="article-card" [class.grid]="gridDisplay" [class.list]="listDisplay" (click)="toggleSelection()">
+<section [id]="article.codebar" class="article-card" [class.grid]="gridDisplay" [class.list]="listDisplay" (click)="toggleSelection()">
     <ng-container *ngIf="!loading; else loadingTemplate">
         <section class="img" [class.placeholder]="imgError">
             <img *ngIf="!imgError" [src]="imgURL" (error)="showPlaceholder()" loading="lazy">
@@ -125,7 +125,15 @@
                 </div>
                 <div class="option-buttons">
                     <button *ngIf="selectedFile" class="clean-file" (click)="cleanFileSelected()" [disabled]="!selectedFile">Cambiar</button>
-                    <button *ngIf="selectedFile" class="upload" (click)="uploadImage()" [disabled]="!selectedFile">Subir imagen</button>
+                    <button *ngIf="selectedFile" class="upload" (click)="uploadImage()" [disabled]="!selectedFile">
+                        <ng-container *ngIf="!uploadingImage; else loadingTemplate">
+                            Subir imagen
+                        </ng-container>
+
+                        <ng-template #loadingTemplate>
+                            <i class="pi pi-spin pi-spinner"></i>
+                        </ng-template>
+                    </button>
                 </div>
             </div>
         </section>
