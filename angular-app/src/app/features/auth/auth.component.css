@@ -3,14 +3,14 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 85vh;
+    height: 85svh;
     gap: 3%;
 }
 
 @media (max-width: 600px) {
     main {
         flex-direction: column;
-        height: auto;
+        height: 85svh;
         gap: 1rem;
     }
 }

@@ -1,7 +1,7 @@
 <section [id]="article.codebar" class="article-card" [class.grid]="gridDisplay" [class.list]="listDisplay" (click)="toggleSelection()">
     <ng-container *ngIf="!loading; else loadingTemplate">
         <section class="img" [class.placeholder]="imgError">
-            <img *ngIf="!imgError" [src]="imgURL" (error)="showPlaceholder()" loading="lazy">
+            <img *ngIf="!imgError" [src]="imgURL" (error)="imgError=true" loading="lazy">
             <div *ngIf="imgError" class="placeholder-img">
                 <p-skeleton  height="100%" styleClass="mb-2" borderRadius="4px"/>
             </div>
@@ -83,7 +83,7 @@
                 </div>
             </div>
             <section class="img">
-                <img *ngIf="!imgError" [src]="imgURL" (error)="showPlaceholder()">
+                <img *ngIf="!imgError" [src]="imgURL" (error)="imgError=true">
                 
                 <div *ngIf="imgError" class="placeholder-img">
                     <p-skeleton class="placeholder-img" height="100%" styleClass="mb-2" borderRadius="4px"/>

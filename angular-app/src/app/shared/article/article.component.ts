@@ -93,10 +93,6 @@ export class ArticleComponent implements OnInit {
     this.isHidden = this.article.hidden;
   }
 
-  showPlaceholder(): void {
-    this.imgError = true;
-  }
-
   toggleSelection(): void {
     if (this.articleSelected) {
       this.articleSelected = false;
@@ -235,7 +231,6 @@ export class ArticleComponent implements OnInit {
           next: (response) => {
             this.uploadingImage = false;
             this.messageService.showMessage('success', 'La imagen se ha añadido correctamente')
-            window.location.reload();
           },
           error: (error) => {
             console.log(error)
