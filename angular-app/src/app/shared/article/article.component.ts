@@ -231,6 +231,7 @@ export class ArticleComponent implements OnInit {
           next: (response) => {
             this.uploadingImage = false;
             this.messageService.showMessage('success', 'La imagen se ha añadido correctamente')
+            this.toggleSelection()
           },
           error: (error) => {
             console.log(error)
