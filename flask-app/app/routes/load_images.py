@@ -4,6 +4,7 @@ from flask_jwt_extended import jwt_required
 
 from app.config import IMAGES_ROUTE
 from app.services.images import image_to_webp
+from app.services.pushover_alerts import send_alert
 
 load_images_bp = Blueprint('load_images', __name__)
 
@@ -44,17 +45,23 @@ def upload_article_images():
         try:
             file.save(file_path)
         except Exception:
-            return jsonify(error=f'Error saving image.')
+            send_alert(f'Error guardando la imagen para el articulo con <b>codebar: {codebar}</b>', 1)
+            return jsonify(error=f'Error saving image.'), 500
             
         if extension != 'webp':
             time.sleep(2)
             status = image_to_webp(file_path, image_route, new_filename)
             
             if status is False:
+                send_alert(f'Error convirtiendo la imagen <b>{new_filename}</b>', 1)
                 return jsonify(error='Error converting image to webp format'), 500
             
             os.remove(file_path)
                     
+        send_alert(f'Nueva imagen para el articulo con <b>codebar: {codebar}</b>', 0)
+                    
         return jsonify(message='The image has been uploaded successfully'), 200
+    
+    send_alert(f'Error subiendo una imagen para el articulo <b>codebar: {codebar}</b>', 1)
     
     return jsonify(error='A server error ocurred uploading the image'), 500
