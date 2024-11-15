@@ -35,64 +35,90 @@ def all_articles(page, per_page):
 
 
 @jwt_required(optional=True)
-def search_articles(search, page, per_page):
+def search_articles(search, filter, page, per_page):
     offset = (page - 1) * per_page
-    
+    articles = None
+
     jwt = get_jwt()
-    if jwt:
-        text_query = """
-        SELECT * FROM article 
-        WHERE MATCH(detalle) AGAINST(:search IN NATURAL LANGUAGE MODE) 
-        LIMIT :per_page OFFSET :offset
-        """
-    else:
-        sql_conditions = [str(condition.compile(dialect=mysql.dialect())) for condition in def_article_filter]
-        sql_conditions_text = ' AND '.join(sql_conditions)
+    
+    if filter == 'detalle':
+        if jwt:
+            text_query = """
+            SELECT * FROM article 
+            WHERE MATCH(detalle) AGAINST(:search IN NATURAL LANGUAGE MODE) 
+            LIMIT :per_page OFFSET :offset
+            """
+        else:
+            sql_conditions = [str(condition.compile(dialect=mysql.dialect())) for condition in def_article_filter]
+            sql_conditions_text = ' AND '.join(sql_conditions)
+            
+            reduced_columns = ['ref', 'codebar', 'detalle', 'codfam', 'pvp', 'stock', 'destacado']
+            
+            text_query = f"""
+            SELECT {', '.join(reduced_columns)} FROM article 
+            WHERE MATCH(detalle) AGAINST(:search IN NATURAL LANGUAGE MODE)
+            AND {sql_conditions_text}
+            LIMIT :per_page OFFSET :offset
+            """
         
-        reduced_columns = ['ref', 'codebar', 'detalle', 'codfam', 'pvp', 'stock', 'destacado']
+        query = db.session.execute(
+            text(text_query), 
+            {'search': search, 'per_page': per_page, 'offset': offset}
+        ).mappings()
         
-        text_query = f"""
-        SELECT {', '.join(reduced_columns)} FROM article 
-        WHERE MATCH(detalle) AGAINST(:search IN NATURAL LANGUAGE MODE)
-        AND {sql_conditions_text}
-        LIMIT :per_page OFFSET :offset
-        """
-    
-    query = db.session.execute(
-        text(text_query), 
-        {'search': search, 'per_page': per_page, 'offset': offset}
-    ).mappings()
-    
-    articles = query.fetchall()
-    
- 
-    return [dict(article) for article in articles]
+        articles = query.fetchall()
+        return [dict(article) for article in articles]
+            
+    elif filter == 'codebar':
+        try:
+            codebar = int(search)
+            if jwt:
+                articles = Article.query.filter_by(codebar=codebar).limit(per_page).offset(offset)
+                return [article.to_dict() for article in articles]
+            else:
+                articles = Article.query.filter(*def_article_filter).filter_by(codebar=codebar).limit(per_page).offset(offset)
+                return [article.to_dict_reduced() for article in articles]
+        except ValueError:
+            return None
 
 
 @jwt_required(optional=True)
-def search_articles_total(search):
+def search_articles_total(search, filter):
+    total_articles = None
     jwt = get_jwt()
-    if jwt:
-        text_query = """
-        SELECT COUNT(*) as total FROM article
-        WHERE MATCH(detalle) AGAINST(:search IN NATURAL LANGUAGE MODE)
-        """
-    else:
-        sql_conditions = [str(condition.compile(dialect=mysql.dialect())) for condition in def_article_filter]
-        sql_conditions_text = ' AND '.join(sql_conditions)
+    
+    if filter == 'detalle':
+        if jwt:
+            text_query = """
+            SELECT COUNT(*) as total FROM article
+            WHERE MATCH(detalle) AGAINST(:search IN NATURAL LANGUAGE MODE)
+            """
+        else:
+            sql_conditions = [str(condition.compile(dialect=mysql.dialect())) for condition in def_article_filter]
+            sql_conditions_text = ' AND '.join(sql_conditions)
+            
+            text_query = f"""
+            SELECT COUNT(*) as total FROM article
+            WHERE MATCH(detalle) AGAINST(:search IN NATURAL LANGUAGE MODE)
+            AND {sql_conditions_text}
+            """
         
-        text_query = f"""
-        SELECT COUNT(*) as total FROM article
-        WHERE MATCH(detalle) AGAINST(:search IN NATURAL LANGUAGE MODE)
-        AND {sql_conditions_text}
-        """
-    
-    query = db.session.execute(
-        text(text_query),
-        {'search': search}
-    )
-    total_articles = query.fetchone()[0]
-    
+        query = db.session.execute(
+            text(text_query),
+            {'search': search}
+        )
+        total_articles = query.fetchone()[0]
+        
+    elif filter == 'codebar':
+        try:
+            codebar = int(search)
+            if jwt:
+                total_articles = Article.query.filter_by(codebar=codebar).count()
+            else:
+                total_articles = Article.query.filter(*def_article_filter).filter_by(codebar=codebar).count()
+        except ValueError:
+            return None
+        
     return total_articles
 
 

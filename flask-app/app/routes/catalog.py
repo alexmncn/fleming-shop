@@ -33,10 +33,11 @@ def all_articles():
 @catalog_bp.route('/articles/search', methods=['GET'])
 def search_articles():
     search = request.args.get('search', None)
+    filter = request.args.get('filter', 'detalle')
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 20, type=int)
     
-    articles = catalog_data.search_articles(search, page, per_page)
+    articles = catalog_data.search_articles(search, filter, page, per_page)
     
     if len(articles) == 0:
         return jsonify(error='Not found'), 404
@@ -47,8 +48,9 @@ def search_articles():
 @catalog_bp.route('/articles/search/total', methods=['GET'])
 def search_articles_total():
     search = request.args.get('search', None)
+    filter = request.args.get('filter', 'detalle')
     
-    total = catalog_data.search_articles_total(search)
+    total = catalog_data.search_articles_total(search, filter)
     
     return jsonify(total=total)
 
