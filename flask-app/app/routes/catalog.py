@@ -39,7 +39,9 @@ def search_articles():
     
     articles = catalog_data.search_articles(search, filter, page, per_page)
     
-    if len(articles) == 0:
+    if articles is None:
+        return jsonify(error='Error with filter or search value.'), 400
+    elif len(articles) == 0:
         return jsonify(error='Not found'), 404
     
     return jsonify(articles)
@@ -51,6 +53,9 @@ def search_articles_total():
     filter = request.args.get('filter', 'detalle')
     
     total = catalog_data.search_articles_total(search, filter)
+    
+    if total is None:
+        return jsonify(error='Error with filter or search value.'), 400
     
     return jsonify(total=total)
 

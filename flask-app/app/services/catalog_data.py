@@ -38,7 +38,6 @@ def all_articles(page, per_page):
 def search_articles(search, filter, page, per_page):
     offset = (page - 1) * per_page
     articles = None
-
     jwt = get_jwt()
     
     if filter == 'detalle':
