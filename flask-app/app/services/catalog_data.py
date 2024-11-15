@@ -46,7 +46,6 @@ def search_articles(search, page, per_page):
         LIMIT :per_page OFFSET :offset
         """
     else:
-        query = Article.query.filter(*def_article_filter)
         sql_conditions = [str(condition.compile(dialect=mysql.dialect())) for condition in def_article_filter]
         sql_conditions_text = ' AND '.join(sql_conditions)
         
@@ -58,7 +57,6 @@ def search_articles(search, page, per_page):
         AND {sql_conditions_text}
         LIMIT :per_page OFFSET :offset
         """
-        print(text_query)
     
     query = db.session.execute(
         text(text_query), 
@@ -80,7 +78,6 @@ def search_articles_total(search):
         WHERE MATCH(detalle) AGAINST(:search IN NATURAL LANGUAGE MODE)
         """
     else:
-        query = Article.query.filter(*def_article_filter)
         sql_conditions = [str(condition.compile(dialect=mysql.dialect())) for condition in def_article_filter]
         sql_conditions_text = ' AND '.join(sql_conditions)
         
