@@ -17,6 +17,12 @@ def all_articles_total():
     return jsonify(total=total)
 
 
+@catalog_bp.route('/articles/all/codebars', methods=['GET'])
+def all_articles_codebars():
+    codebars = catalog_data.all_articles_codebars()
+    return jsonify(codebars)
+
+
 @catalog_bp.route('/articles/all', methods=['GET'])
 def all_articles():
     page = request.args.get('page', 1, type=int)

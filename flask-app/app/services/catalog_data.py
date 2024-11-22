@@ -22,6 +22,17 @@ def all_articles_total():
 
 
 @jwt_required(optional=True)
+def all_articles_codebars():
+    jwt = get_jwt()
+    if jwt:
+        codebars = db.session.query(Article.codebar).all()
+    else:
+        codebars = db.session.query(Article.codebar).filter(*def_article_filter).all()
+    
+    return [codebar[0] for codebar in codebars]
+    
+
+@jwt_required(optional=True)
 def all_articles(page, per_page):
     offset = (page - 1) * per_page
     
