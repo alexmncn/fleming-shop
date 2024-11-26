@@ -72,7 +72,7 @@ class Family(db.Model):
         return {
             'codfam': self.codfam,
             'nomfam': self.nomfam,
-            'hidden': self.hidden
+            'hidden': bool(self.hidden)
         }
 
     def to_dict_reduced(self):
