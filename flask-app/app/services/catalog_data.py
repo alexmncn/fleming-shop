@@ -65,7 +65,7 @@ def search_articles(search, filter, page, per_page):
             reduced_columns = ['ref', 'codebar', 'detalle', 'codfam', 'pvp', 'stock', 'destacado']
             
             text_query = f"""
-            SELECT {', '.join(reduced_columns)} FROM article 
+            SELECT * FROM article 
             WHERE MATCH(detalle) AGAINST(:search IN NATURAL LANGUAGE MODE)
             AND {sql_conditions_text}
             LIMIT :per_page OFFSET :offset
@@ -76,8 +76,12 @@ def search_articles(search, filter, page, per_page):
             {'search': search, 'per_page': per_page, 'offset': offset}
         ).mappings()
         
-        articles = query.fetchall()
-        return [dict(article) for article in articles]
+        articles_raw = query.fetchall()
+        
+        if jwt:
+            return [Article(**article).to_dict() for article in articles_raw]
+        
+        return [Article(**article).to_dict_reduced() for article in articles_raw]
             
     elif filter == 'codebar':
         try:
