@@ -5,6 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { trigger, style, transition, animate, state} from '@angular/animations';
 import { Observable } from 'rxjs';
 import { SkeletonModule } from 'primeng/skeleton';
+import { MatIcon } from '@angular/material/icon';
 
 import { Article } from '../../models/article.model';
 
@@ -18,7 +19,7 @@ import { environment } from '../../../environments/environment';
 @Component({
   selector: 'app-article',
   standalone: true,
-  imports: [CommonModule, SkeletonModule, CapitalizePipe],
+  imports: [CommonModule, SkeletonModule, CapitalizePipe, MatIcon],
   templateUrl: './article.component.html',
   styleUrl: './article.component.css',
   animations:[
@@ -190,7 +191,6 @@ export class ArticleComponent implements OnInit {
   }
 
   hideArticle(newValue: boolean): Observable<any> {
-    console.log(this.article.codebar)
     return this.http.post(this.hideURL, {},{params: {'codebar': this.article.codebar, 'hidden': newValue}});
   }
 
