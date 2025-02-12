@@ -255,29 +255,44 @@ def update_articles(articles_dbf):
         
         
     # Registrar los cambios y errores en un archivo de log
-    status_message = f"Nuevos artículos: {len(new_articles)}, Actualizados: {len(updated_articles)}, Eliminados: {len(deleted_articles)}, Duplicados: {len(duplicated_rows)}, Errores: {len(conflict_log)}"
+    status_message = f"Nuevos: {len(new_articles)}, Actualizados: {len(updated_articles)}, Eliminados: {len(deleted_articles)}, Duplicados: {len(duplicated_rows)}, Errores: {len(conflict_log)}"
+    
     if conflict_log:
         conflict_log.append({'Error': 'RESUMEN', 'CREF': '', 'CCODEBAR': '', 'CDETALLE': '', 'Info': status_message})
         
+        # Save conflict log csv
         log_file_path = os.path.join(DATA_LOGS_ROUTE, f"conflicts_{os.path.basename(articles_csv_path)}")
         with open(log_file_path, mode='w', newline='', encoding='utf-8') as log_file:
             log_writer = pd.DataFrame(conflict_log)
             log_writer.to_csv(log_file, index=False)
+            
+        # Delete old conflict logs
+        pattern = os.path.join(f"{str.split(log_file_path,'_')[0]}_{str.split(log_file_path,'_')[1]}_*.csv") # Get old file versions
+
+        for file_ in glob.glob(pattern):
+            file_name = os.path.basename(file_)
+            new_file_name = os.path.basename(log_file_path)
+
+            if file_name != new_file_name: # Remove all except the new one
+                os.remove(file_)
+                
         print(f"Conflictos guardados en {log_file_path}")
         
     print(status_message)
     
 
 def families_dbf_to_csv(families_dbf):
-    selected_columns = ['CCODFAM', 'CNOMFAM']
-    families_dbf_name = families_dbf[:-4]
-    table = DBF(UPLOAD_ROUTE + families_dbf, encoding='latin1')
-    df = pd.DataFrame(iter(table))
+    dbf_table = DBF(UPLOAD_ROUTE + families_dbf, encoding='latin1')
+    df = pd.DataFrame(iter(dbf_table))
+    
+    families_dbf_name, extension = os.path.splitext(families_dbf) # Clean (with date) filename and extension
+    clean_families_dbf_name = str.split(families_dbf_name,'_')[0]
     csv_path = DATA_ROUTE + 'no_filtered_' + families_dbf_name + '.csv'
     df.to_csv(csv_path, index=False)
     
     df = pd.read_csv(csv_path)
     df.columns = df.columns.str.strip()
+    selected_columns = ['CCODFAM', 'CNOMFAM']
     
     try:
         df_filtered = df[selected_columns]
@@ -288,7 +303,16 @@ def families_dbf_to_csv(families_dbf):
     filtered_csv_path = DATA_ROUTE + families_dbf_name + '.csv'
     df_filtered.to_csv(filtered_csv_path, index=False)
     
-    os.remove(csv_path)
+    os.remove(csv_path) # Remove no filtered csv file
+    
+    pattern = os.path.join(DATA_ROUTE, f"{clean_families_dbf_name}_*.csv") # Get old file versions
+
+    for file_ in glob.glob(pattern):
+        file_name = os.path.basename(file_)
+        new_file_name = os.path.basename(filtered_csv_path)
+
+        if file_name != new_file_name: # Remove all except the new one
+            os.remove(file_)
     
     return filtered_csv_path
 
@@ -308,15 +332,17 @@ def update_families(families_dbf):
 
 
 def stocks_dbf_to_csv(stocks_dbf):
-    selected_columns = ['CREF', 'NSTOCK']
-    stocks_dbf_name = stocks_dbf[:-4]
-    table = DBF(UPLOAD_ROUTE + stocks_dbf, encoding='latin1')
-    df = pd.DataFrame(iter(table))
+    dbf_table = DBF(UPLOAD_ROUTE + stocks_dbf, encoding='latin1')
+    df = pd.DataFrame(iter(dbf_table))
+    
+    stocks_dbf_name, extension = os.path.splitext(stocks_dbf) # Clean (with date) filename and extension
+    clean_stocks_dbf_name = str.split(stocks_dbf_name,'_')[0]
     csv_path = DATA_ROUTE + 'no_filtered_' + stocks_dbf_name + '.csv'
     df.to_csv(csv_path, index=False)
     
     df = pd.read_csv(csv_path)
     df.columns = df.columns.str.strip()
+    selected_columns = ['CREF', 'NSTOCK']
     
     try:
         df_filtered = df[selected_columns]
@@ -327,7 +353,16 @@ def stocks_dbf_to_csv(stocks_dbf):
     filtered_csv_path = DATA_ROUTE + stocks_dbf_name + '.csv'
     df_filtered.to_csv(filtered_csv_path, index=False)
     
-    os.remove(csv_path)
+    os.remove(csv_path) # Remove no filtered csv file
+    
+    pattern = os.path.join(DATA_ROUTE, f"{clean_stocks_dbf_name}_*.csv") # Get old file versions
+
+    for file_ in glob.glob(pattern):
+        file_name = os.path.basename(file_)
+        new_file_name = os.path.basename(filtered_csv_path)
+
+        if file_name != new_file_name: # Remove all except the new one
+            os.remove(file_)
     
     return filtered_csv_path
 
