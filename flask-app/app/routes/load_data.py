@@ -1,4 +1,4 @@
-import os
+import os, glob
 from datetime import datetime
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
@@ -24,18 +24,30 @@ def upload_articles_():
         return jsonify(error='No file selected to upload'), 400
 
     if file:
-        print(f'Archivo recibido: {file.filename}')
         filename = file.filename
+        clean_filename, extension = os.path.splitext(filename)
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        new_filename = f"{os.path.splitext(filename)[0]}_{timestamp}{os.path.splitext(filename)[1]}"
+        new_filename = f"{clean_filename}_{timestamp}{extension}"
         file_path = os.path.join(UPLOAD_ROUTE, new_filename)
-        file.save(file_path)
+        
+        try:
+            file.save(file_path)
+            
+            pattern = os.path.join(UPLOAD_ROUTE, f"{clean_filename}_*.dbf") # Get old file versions
+
+            for file_ in glob.glob(pattern):
+                file_name = os.path.basename(file_)
+
+                if file_name != new_filename: # Remove all except the new one
+                    os.remove(file_)
+        except Exception as e:
+            return jsonify(error='Error saving file'), 500
         
         update_articles(new_filename)
         
         return jsonify(message='OK'), 200
     
-    return jsonify(error='Request error')
+    return jsonify(error='Request error'), 400
 
 
 @load_data_bp.route('/upload/families', methods=['POST'])
@@ -51,16 +63,30 @@ def upload_families_():
 
     if file:
         filename = file.filename
+        clean_filename, extension = os.path.splitext(filename)
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        new_filename = f"{os.path.splitext(filename)[0]}_{timestamp}{os.path.splitext(filename)[1]}"
+        new_filename = f"{clean_filename}_{timestamp}{extension}"
         file_path = os.path.join(UPLOAD_ROUTE, new_filename)
-        file.save(file_path)
+        
+        try:
+            file.save(file_path)
+            
+            pattern = os.path.join(UPLOAD_ROUTE, f"{clean_filename}_*.dbf") # Get old file versions
+
+            for file_ in glob.glob(pattern):
+                file_name = os.path.basename(file_)
+
+                if file_name != new_filename: # Remove all except the new one
+                    os.remove(file_)
+        except Exception as e:
+            return jsonify(error='Error saving file'), 500
         
         update_families(new_filename)
         
         return jsonify(message='OK'), 200
     
-    return jsonify(error='Request error')
+    return jsonify(error='Request error'), 400
+
 
 
 @load_data_bp.route('/upload/stocks', methods=['POST'])
@@ -76,13 +102,26 @@ def upload_stocks_():
 
     if file:
         filename = file.filename
+        clean_filename, extension = os.path.splitext(filename)
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        new_filename = f"{os.path.splitext(filename)[0]}_{timestamp}{os.path.splitext(filename)[1]}"
+        new_filename = f"{clean_filename}_{timestamp}{extension}"
         file_path = os.path.join(UPLOAD_ROUTE, new_filename)
-        file.save(file_path)
+        
+        try:
+            file.save(file_path)
+            
+            pattern = os.path.join(UPLOAD_ROUTE, f"{clean_filename}_*.dbf") # Get old file versions
+
+            for file_ in glob.glob(pattern):
+                file_name = os.path.basename(file_)
+
+                if file_name != new_filename: # Remove all except the new one
+                    os.remove(file_)
+        except Exception as e:
+            return jsonify(error='Error saving file'), 500
         
         update_stocks(new_filename)
         
         return jsonify(message='OK'), 200
     
-    return jsonify(error='Request error')
+    return jsonify(error='Request error'), 400

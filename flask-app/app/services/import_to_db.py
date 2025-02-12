@@ -1,4 +1,4 @@
-import os, time, csv
+import os, time, csv, glob
 import pandas as pd
 from dbfread import DBF
 from datetime import datetime
@@ -9,6 +9,7 @@ from app.models import Article, Family
 from app.config import UPLOAD_ROUTE, DATA_ROUTE, DATA_LOGS_ROUTE
 
 
+# dbf to equivalent DB keys names
 article_column_to_attribute_map = {
     'CREF': 'ref',
     'CDETALLE': 'detalle',
@@ -21,26 +22,37 @@ article_column_to_attribute_map = {
 
 
 def articles_dbf_to_csv(articles_dbf):
-    selected_columns = ['CREF', 'CDETALLE', 'CCODFAM', 'NCOSTEDIV', 'NPVP', 'CCODEBAR', 'DACTUALIZA']
-    articles_dbf_name = articles_dbf[:-4]
-    table = DBF(UPLOAD_ROUTE + articles_dbf, encoding='latin1')
-    df = pd.DataFrame(iter(table))
-    csv_path = DATA_ROUTE + 'no_filtered_' + articles_dbf_name + '.csv'
-    df.to_csv(csv_path, index=False)
+    dbf_table = DBF(os.path.join(UPLOAD_ROUTE, articles_dbf), encoding='latin1') # Read dbf as a table
+    df = pd.DataFrame(iter(dbf_table)) # dbf table to pandas dataframe
     
-    df = pd.read_csv(csv_path)
+    articles_dbf_name, extension = os.path.splitext(articles_dbf) # Clean (with date) filename and extension
+    clean_articles_dbf_name = str.split(articles_dbf_name,'_')[0]
+    csv_path = os.path.join(DATA_ROUTE, f'no_filtered_{articles_dbf_name}.csv') # No filtered csv path
+    df.to_csv(csv_path, index=False) # Save raw data as csv
+    
+    df = pd.read_csv(csv_path) # Read the csv data
     df.columns = df.columns.str.strip()
+    selected_columns = article_column_to_attribute_map.keys() # Set the needed columns from keys of defined map
     
     try:
-        df_filtered = df[selected_columns]
+        df_filtered = df[selected_columns] # Get selected columns
     except KeyError as e:
-        missing_cols = list(set(selected_columns) - set(df.columns))
+        missing_cols = list(set(selected_columns) - set(df.columns)) # Num missing columns
         raise KeyError(f"Las siguientes columnas faltan en el DataFrame: {missing_cols}") from e
     
-    filtered_csv_path = DATA_ROUTE + articles_dbf_name + '.csv'
-    df_filtered.to_csv(filtered_csv_path, index=False)
+    filtered_csv_path = os.path.join(DATA_ROUTE, f'{articles_dbf_name}.csv') # Filtered csv path
+    df_filtered.to_csv(filtered_csv_path, index=False) # Save filtered csv data
     
-    os.remove(csv_path)
+    os.remove(csv_path) # Remove no filtered csv file
+    
+    pattern = os.path.join(DATA_ROUTE, f"{clean_articles_dbf_name}_*.csv") # Get old file versions
+
+    for file_ in glob.glob(pattern):
+        file_name = os.path.basename(file_)
+        new_file_name = os.path.basename(filtered_csv_path)
+
+        if file_name != new_file_name: # Remove all except the new one
+            os.remove(file_)
     
     return filtered_csv_path
 
@@ -104,7 +116,8 @@ def update_articles(articles_dbf):
     time.sleep(2)
     session = db.session
 
-    files = sorted([f for f in os.listdir(DATA_ROUTE) if f.endswith('.csv')], reverse=True)
+    files = sorted([f for f in os.listdir(DATA_ROUTE) if f.startswith('articulo') and f.endswith('.csv')], reverse=True)
+    return
 
     if len(files) < 2:
         print("No se encontró un archivo anterior. Insertando todos los datos.")
