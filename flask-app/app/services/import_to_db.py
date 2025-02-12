@@ -1,7 +1,8 @@
-import os, time, csv, glob
+import os, time, csv, glob, re, math
 import pandas as pd
 from dbfread import DBF
 from datetime import datetime
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
 from app.models import Article, Family
@@ -64,19 +65,50 @@ def validate_and_clean_data(row):
     - Retorna True si la fila es válida, o False con un mensaje de error si hay un conflicto.
     """
     
-    # Asegúrate de que CREF es un entero positivo
+    # CCODEBAR: debe ser un entero positivo y único
+    codebar = row.get('CCODEBAR')
+    if not isinstance(codebar, (int, str)):
+        return False, "El campo 'CCODEBAR' debe ser un entero positivo."
+
+    # Eliminar decimales (BUG de .0 a la derecha)
+    codebar = codebar.split('.')[0]
+
+    # Eliminar espacios y caracteres no numéricos
+    codebar = re.sub(r'\D', '', str(codebar)).strip()
+
+    # Verificar si después de limpiar hay un valor válido
+    if not codebar:
+        return False, "El campo 'CCODEBAR' debe ser un entero positivo."
+
     try:
-        row['CREF'] = int(row['CREF'])
+        row['CCODEBAR'] = int(codebar)
+    except ValueError:
+        return False, "El campo 'CCODEBAR' debe ser un entero positivo."
+    
+    
+    # CREF debe ser un entero positivo
+    ref = row.get('CREF')
+    if not isinstance(ref, (int, str)):
+        return False, "El campo 'CREF' debe ser un entero positivo."
+
+    # Eliminar espacios y caracteres no numéricos
+    ref = re.sub(r'\D', '', str(ref)).strip()
+
+    # Verificar si después de limpiar hay un valor válido
+    if not ref:
+        return False, "El campo 'CREF' debe ser un entero positivo."
+    
+    try:
+        row['CREF'] = int(ref)
     except (ValueError, TypeError):
         return False, "El campo 'CREF' debe ser un entero positivo."
     
-    if row['CREF'] < 0:
-        return False, "El campo 'CREF' debe ser un entero positivo."
     
     # CDETALLE: cadena de hasta 50 caracteres, puede contener cualquier carácter UTF-8
     detalle = row.get('CDETALLE')
     if detalle is not None and (not isinstance(detalle, str) or len(detalle) > 50):
         return False, "El campo 'CDETALLE' debe ser una cadena de texto de máximo 50 caracteres."
+    
     
     # CCODFAM: debe ser un entero, puede ser nulo
     try:
@@ -85,12 +117,14 @@ def validate_and_clean_data(row):
     except (ValueError, TypeError):
         return False, "El campo 'CCODFAM' debe ser un entero o nulo."
 
+
     # NCOSTEDIV y NPVP: deben ser flotantes y positivos
     for key in ['NCOSTEDIV', 'NPVP']:
         value = row.get(key)
         try:
             if value is not None:
-                row[key] = float(value)  # Convertir a float
+                value = float(value)  # Convertir a float
+                row[key] = math.trunc(value * 100) / 100 # Truncar a 2 decimales
         except (ValueError, TypeError):
             return False, f"El campo '{key}' debe ser un número positivo."
 
@@ -98,299 +132,140 @@ def validate_and_clean_data(row):
         if value is not None and row[key] < 0:
             return False, f"El campo '{key}' debe ser un número positivo."
 
-    # CCODEBAR: debe ser un entero positivo y único
-    try:
-        row['CCODEBAR'] = int(row['CCODEBAR'])
-    except (ValueError, TypeError):
-        return False, "El campo 'CCODEBAR' debe ser un entero positivo."
 
-    if row['CCODEBAR'] < 0:
-        return False, "El campo 'CCODEBAR' debe ser un entero positivo."
-    
-    # Si todo está bien, devolver True
-    return True, None
+    # Si todo está bien, devolver True y los datos corregidos
+    return True, row
 
 
 def update_articles(articles_dbf):
     articles_csv_path = articles_dbf_to_csv(articles_dbf)
     time.sleep(2)
-    session = db.session
 
-    files = sorted([f for f in os.listdir(DATA_ROUTE) if f.startswith('articulo') and f.endswith('.csv')], reverse=True)
-    return
-
-    if len(files) < 2:
-        print("No se encontró un archivo anterior. Insertando todos los datos.")
-        csv_new = pd.read_csv(articles_csv_path)
-        conflict_log = []
-        change_log = []
-
-        for _, row in csv_new.iterrows():
-            if 'CCODEBAR' in row:
-                if pd.isna(row['CCODEBAR']):
-                    conflict_log.append({
-                        'Error': 'Código de barras faltante',
-                        'CREF': row.get('CREF'),
-                        'CCODEBAR': row.get('CCODEBAR'),
-                        'Detalle': 'El código de barras está ausente'
-                    })
-                    continue  # Skip this iteration if codebar is NaN
-
-                    
-                # Validar y limpiar datos antes de intentar insertar
-                is_valid, error_detail = validate_and_clean_data(row)
-                if not is_valid:
-                    conflict_log.append({
-                        'Error': 'Datos inválidos',
-                        'CREF': row.get('CREF'),
-                        'CCODEBAR': row.get('CCODEBAR'),
-                        'Detalle': error_detail
-                    })
-                    continue
-                
-                existing_article = session.query(Article).filter_by(codebar=row['CCODEBAR']).first()
-                if existing_article:
-                    conflict_log.append({
-                        'Error': 'Codebar duplicado',
-                        'CREF': row['CREF'],
-                        'CCODEBAR': row['CCODEBAR'],
-                        'Detalle': 'El código de barras ya existe en la base de datos'
-                    })
-                else:
-                    try:
-                        article = Article(
-                            ref=row['CREF'],
-                            detalle=row['CDETALLE'],
-                            codfam=row['CCODFAM'],
-                            pcosto=row['NCOSTEDIV'],
-                            pvp=row['NPVP'],
-                            codebar=row['CCODEBAR'],
-                            factualizacion=row['DACTUALIZA']
-                        )
-                        session.add(article)
-                        change_log.append({
-                            'CREF': row['CREF'],
-                            'CCODEBAR': row['CCODEBAR'],
-                            'Cambio': 'Nuevo artículo añadido'
-                        })
-                    except Exception as e:
-                        conflict_log.append({
-                            'Error': 'Error al insertar el artículo',
-                            'CREF': row.get('CREF'),
-                            'CCODEBAR': row.get('CCODEBAR'),
-                            'Detalle': f'Excepción: {str(e)}'
-                        })
-
-        session.commit()
-        session.close()
-
-        if conflict_log:
-            log_file_path = os.path.join(DATA_LOGS_ROUTE, f"conflicts_{os.path.basename(articles_csv_path)}")
-            with open(log_file_path, mode='w', newline='', encoding='utf-8') as log_file:
-                log_writer = csv.DictWriter(log_file, fieldnames=['Error', 'CREF', 'CCODEBAR', 'Detalle'])
-                log_writer.writeheader()
-                for conflict in conflict_log:
-                    log_writer.writerow(conflict)
-            print(f"Conflictos guardados en {log_file_path}")
-
-        if change_log:
-            change_log_file_path = os.path.join(DATA_LOGS_ROUTE, f"changes_{os.path.basename(articles_csv_path)}")
-            with open(change_log_file_path, mode='w', newline='', encoding='utf-8') as change_log_file:
-                change_writer = csv.DictWriter(change_log_file, fieldnames=['CREF', 'CCODEBAR', 'Cambio'])
-                change_writer.writeheader()
-                for change in change_log:
-                    change_writer.writerow(change)
-            print(f"Cambios guardados en {change_log_file_path}")
-
-        print("Datos insertados y conflictos procesados.")
+    # Leer los datos del CSV importado
+    try:
+        articles_csv = pd.read_csv(articles_csv_path)
+    except Exception as e:
+        print(f"Error al leer el CSV: {str(e)}")
         return
     
-    articles_csv_filename = os.path.basename(articles_csv_path)
-    last_file = None
-
-    for file in files:
-        if file != articles_csv_filename:
-            last_file = file
-            break
-
-    if last_file is None:
-        raise ValueError("No se encontró un archivo anterior diferente para comparar.")
-
-    print(f"Archivo nuevo: {articles_csv_filename}")
-    print(f"Archivo anterior: {last_file}")
-
-    csv_new = pd.read_csv(os.path.join(DATA_ROUTE, articles_csv_filename))
-    csv_last = pd.read_csv(os.path.join(DATA_ROUTE, last_file))
     
-    if 'CCODEBAR' not in csv_new.columns or 'CCODEBAR' not in csv_last.columns:
-        raise KeyError("Falta la columna 'CCODEBAR' en uno de los archivos")
-
-    new_entries = csv_new[~csv_new['CCODEBAR'].isin(csv_last['CCODEBAR'])]
-    merged_csv = csv_new.merge(csv_last, on='CCODEBAR', suffixes=('_new', '_last'))
-
-    common_columns_new = [f'{col}_new' for col in csv_new.columns if f'{col}_new' in merged_csv.columns]
-    common_columns_last = [f'{col}_last' for col in csv_new.columns if f'{col}_last' in merged_csv.columns]
-
-    changes = merged_csv.loc[(merged_csv[common_columns_new].values != merged_csv[common_columns_last].values).any(axis=1)]
-    changes = changes.dropna(subset=['CCODEBAR'])
-
-    change_log = []
+    # Limpiamos los datos del CSV
+    clean_rows = []
     conflict_log = []
 
-    # Manejo de nuevas entradas
-    for _, row in new_entries.iterrows():
-        if 'CCODEBAR' in row:
-            if pd.isna(row['CCODEBAR']):
-                conflict_log.append({
-                    'Error': 'Código de barras faltante',
-                    'CREF': row.get('CREF'),
-                    'CCODEBAR': row.get('CCODEBAR'),
-                    'Detalle': 'El código de barras está ausente'
-                })
-                continue  # Skip this iteration if codebar is NaN
+    for _, row in articles_csv.iterrows():
+        codebar = row.get('CCODEBAR')
+        ref = row.get('CREF')
+        detalle = row.get('CDETALLE')
+        # Si no hay código de barras, se descarta directamente
+        if pd.isna(codebar):
+            conflict_log.append({'Error': 'Código de barras faltante', 'CREF': ref, 'CCODEBAR': codebar, 'CDETALLE': detalle, 'Info': 'Código de barras ausente'})
+            continue
+        
+        # Validar y limpiar los datos de la fila
+        is_valid, clean_row = validate_and_clean_data(row)
+        if not is_valid:
+            conflict_log.append({'Error': 'Datos inválidos', 'CREF': ref, 'CCODEBAR': codebar, 'CDETALLE': detalle, 'Info': clean_row})
+            continue
+        
+        # Si se es valida se añade a la nueva lista
+        clean_rows.append(clean_row)
+        
+    # Crear un nuevo DataFrame con las filas limpias
+    clean_articles_csv = pd.DataFrame(clean_rows, columns=articles_csv.columns)
+    
+    
+    # Identificar filas duplicadas
+    duplicated_rows = clean_articles_csv[clean_articles_csv.duplicated(subset=['CCODEBAR'], keep='first')]
+    for _, row in duplicated_rows.iterrows():
+        codebar = row['CCODEBAR']
+        ref = row['CREF']
+        detalle = row['CDETALLE']
+        conflict_log.append({'Error': 'Duplicado', 'CREF': ref, 'CCODEBAR': codebar, 'CDETALLE': detalle, 'Info': 'Código de barras duplicado'})
+        
+    # Eliminar duplicados, manteniendo solo la primera ocurrencia
+    clean_articles_csv = clean_articles_csv.drop_duplicates(subset=['CCODEBAR'], keep='first')
+        
+    
+    # Cargamos todos los artículos existentes en la DB
+    db_articles = {article.codebar: article for article in Article.query.all()}
+    deleted_articles = set(db_articles.keys()) # Inicializamos los artículos a eliminar
+    
+    # Actualizar o crear los artículos en la DB
+    new_articles = []
+    updated_articles = []
+    
+    for _, article_csv in clean_articles_csv.iterrows():
+        codebar = article_csv['CCODEBAR']
+        
+        # Si el artículo ya existe, se actualiza
+        if codebar in db_articles:
+            article_db = db_articles[codebar] # Obtener el artículo de la lista de la DB
+            deleted_articles.remove(codebar) # Eliminar de la lista de articulos a eliminar
             
-            # Validar y limpiar datos antes de intentar insertar
-            is_valid, error_detail = validate_and_clean_data(row)
-            if not is_valid:
-                conflict_log.append({
-                    'Error': 'Datos inválidos',
-                    'CREF': row['CREF'],
-                    'CCODEBAR': row['CCODEBAR'],
-                    'Detalle': error_detail
-                })
-                continue
-
-            existing_article = session.query(Article).filter_by(codebar=row['CCODEBAR']).first()
-            if existing_article:
-                conflict_log.append({
-                    'Error': 'Codebar duplicado',
-                    'CREF': row['CREF'],
-                    'CCODEBAR': row['CCODEBAR'],
-                    'Detalle': 'El código de barras ya existe en la base de datos'
-                })
-            else:
-                try:
-                    article = Article(
-                        ref=row['CREF'],
-                        detalle=row['CDETALLE'],
-                        codfam=row['CCODFAM'],
-                        pcosto=row['NCOSTEDIV'],
-                        pvp=row['NPVP'],
-                        codebar=row['CCODEBAR'],
-                        factualizacion=row['DACTUALIZA']
-                    )
-                    session.add(article)
-                    change_log.append({
-                        'CREF': row['CREF'],
-                        'CCODEBAR': row['CCODEBAR'],
-                        'Cambio': 'Nuevo artículo añadido'
-                    })
-                except Exception as e:
-                    conflict_log.append({
-                        'Error': 'Error al insertar el artículo',
-                        'CREF': row.get('CREF'),
-                        'CCODEBAR': row.get('CCODEBAR'),
-                        'Detalle': f'Excepción: {str(e)}'
-                    })
-
-    print(f"Subidas {len(new_entries)} nuevas entradas.")
-
-
-    # Manejo de cambios en las entradas existentes
-    for _, row in changes.iterrows():
-        codebar = row.get('CCODEBAR', None)
-        if pd.notna(codebar):
-            article = session.query(Article).filter_by(codebar=codebar).first()
-            if article:
-                updated = False
-                for col in csv_new.columns:
-                    if col == 'CCODEBAR':
-                            continue  # Saltar la actualización del codebar
-                        
-                    new_value = row.get(f'{col}_new', None)
-                    last_value = row.get(f'{col}_last', None)
-
-                    if pd.isna(new_value):
-                        conflict_log.append({
-                            'Error': 'Valor NaN encontrado',
-                            'CREF': row.get('CREF_new', None),
-                            'CCODEBAR': codebar,
-                            'Detalle': f'El valor de {col} es NaN y no puede ser actualizado'
-                        })
-                        continue
-
-                    if new_value != last_value:
-                        attribute_name = article_column_to_attribute_map.get(col)
-                        if attribute_name:    
-                            #print(f"Antes de asignar: {attribute_name} = {getattr(article, attribute_name)}")
-                            setattr(article, attribute_name, new_value)
-                            #print(f"Después de asignar: {attribute_name} = {getattr(article, attribute_name)}")
-                            updated = True
-                            change_log.append({
-                                'CREF': row.get('CREF_new', None),
-                                'CCODEBAR': codebar,
-                                'Cambio': f"{col} actualizado de {last_value} a {new_value}"
-                            })
-
-                # Validar y limpiar los datos después de haber identificado los cambios
-                if updated:
-                    is_valid, error_detail = validate_and_clean_data(pd.Series(article.to_dict_og_keys()))
-                    if not is_valid:
-                        conflict_log.append({
-                            'Error': 'Datos inválidos después de la actualización',
-                            'CREF': row.get('CREF_new', None),
-                            'CCODEBAR': codebar,
-                            'Detalle': error_detail
-                        })
-                        continue  # Saltar la adición del artículo si la validación falla
-
-                    try:
-                        session.add(article)  # Agregar el artículo a la sesión para actualizarlo
-                        session.flush()  # Asegurarse de que los cambios se envíen a la base de datos
-                    except Exception as e:
-                        session.rollback()  # Deshacer cambios si ocurre un error
-                        conflict_log.append({
-                            'Error': 'Error al actualizar el artículo',
-                            'CREF': row.get('CREF_new', None),
-                            'CCODEBAR': codebar,
-                            'Detalle': f'Excepción: {str(e)}'
-                        })
+            changes = {}
+            for col, attr in  {'CREF': 'ref', 'CDETALLE': 'detalle', 'CCODFAM': 'codfam', 'NCOSTEDIV': 'pcosto', 'NPVP': 'pvp', 'DACTUALIZA': 'factualizacion'}.items():
+                new_value = article_csv[col] # Valor 'nuevo' del CSV
+                db_value = getattr(article_db, attr) # Valor actual en la DB
                 
-                if updated:
-                    session.add(article)
-                    session.flush()
+                # Convertir la fecha a string sin la hora, para comparar con el CSV
+                if attr == 'factualizacion':
+                    db_value = db_value.strftime('%Y-%m-%d')
+                    
+                # Si cambia el valor, se guarda en 'changes'
+                if new_value != db_value:
+                    changes[attr] = new_value
+                    
+            # Si hay cambios, se actualiza el artículo y se guarda en la lista de actualizados
+            if changes:
+                for attr, new_value in changes.items():
+                    setattr(article_db, attr, new_value)
+                updated_articles.append(article_db)
+                
+        else:
+            # Inserta como nuevo artículo 
+            article = Article(
+                ref=article_csv['CREF'],
+                detalle=article_csv['CDETALLE'],
+                codfam=article_csv['CCODFAM'],
+                pcosto=article_csv['NCOSTEDIV'],
+                pvp=article_csv['NPVP'],
+                codebar=article_csv['CCODEBAR'],
+                factualizacion=article_csv['DACTUALIZA']
+            )
+            new_articles.append(article)
+        
+    # Guardar los cambios en la DB
+    session = db.session
+        
+    # Aplicar cambios en la base de datos
+    try:
+        session.add_all(new_articles) # Insertar los nuevos artículos
+        session.add_all(updated_articles) # Actualizar los artículos modificados 
 
-            else:
-                conflict_log.append({
-                    'Error': 'Artículo no encontrado',
-                    'CREF': row.get('CREF_new', None),
-                    'CCODEBAR': codebar,
-                    'Detalle': 'El artículo con este código de barras no existe para ser actualizado'
-                })
-
-    session.commit()
-    session.close()
-
-    # Guardado de conflictos y cambios
+        for codebar in deleted_articles:
+            session.delete(db_articles[codebar]) # Eliminar los artículos que ya no existen
+             
+        session.commit()
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Error en la base de datos: {str(e)}")
+    finally:
+        session.close()
+        
+        
+    # Registrar los cambios y errores en un archivo de log
+    status_message = f"Nuevos artículos: {len(new_articles)}, Actualizados: {len(updated_articles)}, Eliminados: {len(deleted_articles)}, Duplicados: {len(duplicated_rows)}, Errores: {len(conflict_log)}"
     if conflict_log:
+        conflict_log.append({'Error': 'RESUMEN', 'CREF': '', 'CCODEBAR': '', 'CDETALLE': '', 'Info': status_message})
+        
         log_file_path = os.path.join(DATA_LOGS_ROUTE, f"conflicts_{os.path.basename(articles_csv_path)}")
         with open(log_file_path, mode='w', newline='', encoding='utf-8') as log_file:
-            log_writer = csv.DictWriter(log_file, fieldnames=['Error', 'CREF', 'CCODEBAR', 'Detalle'])
-            log_writer.writeheader()
-            for conflict in conflict_log:
-                log_writer.writerow(conflict)
+            log_writer = pd.DataFrame(conflict_log)
+            log_writer.to_csv(log_file, index=False)
         print(f"Conflictos guardados en {log_file_path}")
-
-    if change_log:
-        change_log_file_path = os.path.join(DATA_LOGS_ROUTE, f"changes_{os.path.basename(articles_csv_path)}")
-        with open(change_log_file_path, mode='w', newline='', encoding='utf-8') as change_log_file:
-            change_writer = csv.DictWriter(change_log_file, fieldnames=['CREF', 'CCODEBAR', 'Cambio'])
-            change_writer.writeheader()
-            for change in change_log:
-                change_writer.writerow(change)
-        print(f"Cambios guardados en {change_log_file_path}")
-
-    print("Comparación, actualización y registro de conflictos completados.")
+        
+    print(status_message)
     
 
 def families_dbf_to_csv(families_dbf):
