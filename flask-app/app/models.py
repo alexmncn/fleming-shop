@@ -3,7 +3,7 @@ import pytz
 import uuid
 from datetime import datetime, timedelta
 from flask_login import UserMixin
-from sqlalchemy import Column, Integer, String, Boolean, Text, Float, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, Text, Float, DateTime, ForeignKey, Index
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.dialects.mysql import TINYINT, BIGINT
@@ -23,6 +23,10 @@ class Article(db.Model):
     factualizacion = Column(DateTime, nullable=True)
     destacado = Column(TINYINT(1), default=0, nullable=True)
     hidden = Column(TINYINT(1), default=0, nullable=True)
+    
+    __table_args__ = (
+        Index('detalle_index', 'detalle', mysql_prefix='FULLTEXT'),
+    )
     
     def to_dict(self):
         return {
@@ -76,7 +80,7 @@ class Article_import(db.Model):
     info = Column(Text, nullable=True)
     date = Column(DateTime, default=datetime.now(pytz.timezone('Europe/Madrid')), nullable=False)
     
-    Article_import_log = relationship('article_import_log', back_populates='article_imports')
+    logs = relationship('Article_import_log', back_populates='import_record')
     
 class Article_import_log(db.Model):
     __tablename__="article_import_logs"
@@ -88,7 +92,7 @@ class Article_import_log(db.Model):
     detalle = Column(String(100), nullable=True)
     info = Column(Text, nullable=True)
     
-    Article_import = relationship('article_import', back_populates='article_import_logs')
+    import_record = relationship('Article_import', back_populates='logs')
     
 
 class Family(db.Model):
