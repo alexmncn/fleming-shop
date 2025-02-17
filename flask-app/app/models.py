@@ -2,7 +2,8 @@
 import pytz
 from datetime import datetime, timedelta
 from flask_login import UserMixin
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Boolean, Text, Float, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.dialects.mysql import TINYINT, BIGINT
 
@@ -11,16 +12,16 @@ from .extensions import db
 
 class Article(db.Model):
     __tablename__ = "article"
-    ref = db.Column(BIGINT, nullable=False)
-    detalle = db.Column(db.String(50), nullable=True)
-    codfam = db.Column(db.Integer, db.ForeignKey('family.codfam'), index=True, nullable=True)
-    pcosto = db.Column(db.Float, nullable=True)
-    pvp = db.Column(db.Float, nullable=False)
-    codebar = db.Column(BIGINT, primary_key=True, autoincrement=False, nullable=False)
-    stock = db.Column(db.Integer, default=0, nullable=True)
-    factualizacion = db.Column(db.DateTime, nullable=True)
-    destacado = db.Column(TINYINT(1), default=0, nullable=True)
-    hidden = db.Column(TINYINT(1), default=0, nullable=True)
+    ref = Column(BIGINT, nullable=False)
+    detalle = Column(String(50), nullable=True)
+    codfam = Column(Integer, ForeignKey('family.codfam'), index=True, nullable=True)
+    pcosto = Column(Float, nullable=True)
+    pvp = Column(Float, nullable=False)
+    codebar = Column(BIGINT, primary_key=True, autoincrement=False, nullable=False)
+    stock = Column(Integer, default=0, nullable=True)
+    factualizacion = Column(DateTime, nullable=True)
+    destacado = Column(TINYINT(1), default=0, nullable=True)
+    hidden = Column(TINYINT(1), default=0, nullable=True)
     
     def to_dict(self):
         return {
@@ -60,13 +61,39 @@ class Article(db.Model):
             'destacado': bool(self.destacado),
             'hidden': bool(self.hidden)
         }
+        
+class Article_import(db.Model):
+    __tablename__="article_imports"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, db.ForeignKey('users.id'), index=True, nullable=True)
+    new_rows = Column(Integer, default=0)
+    updated_rows = Column(Integer, default=0)
+    deleted_rows = Column(Integer, default=0)
+    duplicated_rows = Column(Integer, default=0)
+    errors = db.Column(Integer, default=0)
+    status = db.Column(TINYINT(1), default=1, nullable=True)
+    date = db.Column(DateTime, default=datetime.now(pytz.timezone('Europe/Madrid')), nullable=False)
+    
+    Article_import_log = relationship('article_import_log', back_populates='article_imports')
+    
+class Article_import_log(db.Model):
+    __tablename__="article_import_logs"
+    id = db.Column(Integer, primary_key=True, autoincrement=True)
+    import_id = Column(Integer, ForeignKey('article_imports.id'), nullable=False)
+    type = Column(Integer, nullable=False)
+    ref = Column(String(50), nullable=True)
+    codebar = Column(String(50), nullable=True)
+    detalle = Column(String(100), nullable=True)
+    info = Column(Text, nullable=True)
+    
+    Article_import = relationship('article_import', back_populates='article_import_logs')
     
 
 class Family(db.Model):
     __tablename__= "family"
-    codfam = db.Column(db.Integer, primary_key=True, nullable=False)
-    nomfam = db.Column(db.String(50), nullable=False)
-    hidden = db.Column(TINYINT(1), default=0, nullable=True)
+    codfam = Column(Integer, primary_key=True, nullable=False)
+    nomfam = Column(String(50), nullable=False)
+    hidden = Column(TINYINT(1), default=0, nullable=True)
     
     def to_dict(self):
         return {
@@ -84,11 +111,11 @@ class Family(db.Model):
         
 class User(UserMixin,db.Model):
     __tablename__ = "users"
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), index=True, unique=True, nullable=False)
-    password_hash = db.Column(db.String(255), nullable=False)
-    last_login = db.Column(db.DateTime, nullable=True)
-    date_created = db.Column(db.DateTime, default=datetime.now(pytz.timezone('Europe/Madrid')), nullable=False)
+    id = Column(Integer, primary_key=True)
+    username = Column(String(64), index=True, unique=True, nullable=False)
+    password_hash = Column(String(255), nullable=False)
+    last_login = Column(DateTime, nullable=True)
+    date_created = Column(DateTime, default=datetime.now(pytz.timezone('Europe/Madrid')), nullable=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -100,12 +127,12 @@ class User(UserMixin,db.Model):
 class OTPCode(db.Model):
     __tablename__ = 'otp_codes'
     
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), nullable=False)
-    otp_code = db.Column(db.String(6), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.now())
-    expires_at = db.Column(db.DateTime, nullable=False)
-    is_valid = db.Column(db.Boolean, default=True)
+    id = Column(db.Integer, primary_key=True)
+    username = Column(String(80), nullable=False)
+    otp_code = Column(String(6), nullable=False)
+    created_at = Column(DateTime, default=datetime.now())
+    expires_at = Column(DateTime, nullable=False)
+    is_valid = Column(Boolean, default=True)
 
     def __init__(self, username, otp_code):
         self.username = username
