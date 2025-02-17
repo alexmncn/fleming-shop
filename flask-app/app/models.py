@@ -71,13 +71,14 @@ class Article_import(db.Model):
     __tablename__="article_imports"
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = Column(Integer, db.ForeignKey('users.id'), index=True, nullable=True)
+    status = Column(TINYINT(1), default=1, nullable=True)
+    info = Column(Text, nullable=True)
     new_rows = Column(Integer, default=0)
     updated_rows = Column(Integer, default=0)
     deleted_rows = Column(Integer, default=0)
     duplicated_rows = Column(Integer, default=0)
     errors = Column(Integer, default=0)
-    status = Column(TINYINT(1), default=1, nullable=True)
-    info = Column(Text, nullable=True)
+    elapsed_time = Column(Float, nullable=True)
     date = Column(DateTime, default=datetime.now(pytz.timezone('Europe/Madrid')), nullable=False)
     
     logs = relationship('Article_import_log', back_populates='import_record')
