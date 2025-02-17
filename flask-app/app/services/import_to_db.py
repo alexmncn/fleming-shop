@@ -58,83 +58,101 @@ def articles_dbf_to_csv(articles_dbf):
     return filtered_csv_path
 
 
-def validate_and_clean_data(row):
+def validate_clean_article_data(row):
     """
     Valida y limpia los datos de una fila del artículo en formato pandas.Series.
     - Verifica que los valores cumplan con los tipos de datos y el formato.
-    - Retorna True si la fila es válida, o False con un mensaje de error si hay un conflicto.
+    - Si no son válidos, se intentan corregir
     """
+    
+    fixes = [] # Lista de erorres corregidos
+    errors = []
     
     # CCODEBAR: debe ser un entero positivo y único
     codebar = row.get('CCODEBAR')
-    if not isinstance(codebar, (int, str)):
-        return False, "El campo 'CCODEBAR' debe ser un entero positivo."
-
-    # Eliminar decimales (BUG de .0 a la derecha)
-    codebar = codebar.split('.')[0]
-
-    # Eliminar espacios y caracteres no numéricos
-    codebar = re.sub(r'\D', '', str(codebar)).strip()
-
-    # Verificar si después de limpiar hay un valor válido
-    if not codebar:
-        return False, "El campo 'CCODEBAR' debe ser un entero positivo."
-
-    try:
-        row['CCODEBAR'] = int(codebar)
-    except ValueError:
-        return False, "El campo 'CCODEBAR' debe ser un entero positivo."
     
+    if not isinstance(codebar, (int, str)): # Si no es valido lanzamos error
+        errors.append(f"El campo 'CCODEBAR' no es del tipo esperado (int, str): Type -> {type(codebar)}.")
+    else: # Si es valido...
+        try:
+            row['CCODEBAR'] = int(codebar) # Convertimos a entero y modificamos el valor original
+        except: # Intentamos limpieza
+            clean_codebar = codebar.split('.')[0] #  Eliminar decimales (BUG de .0 a la derecha)
+            clean_codebar = re.sub(r'\D', '', str(clean_codebar)).strip() # Eliminar espacios y caracteres no numéricos
+
+            # Verificar si después de limpiar hay un valor válido
+            if not clean_codebar:
+                errors.append("El campo 'CCODEBAR' debe ser un entero positivo.")
+            else:
+                # Si ha cambiado el valor original...
+                if codebar != clean_codebar:
+                    try:
+                        row['CCODEBAR'] = int(clean_codebar) # Convertimos a entero y modificamos el valor original
+                        
+                        fixes.append(f"Se ha corregido el campo 'CCODEBAR'") # Se añade la corrección a la lsita    
+                    except ValueError:
+                        errors.append("El campo 'CCODEBAR' debe ser un entero positivo.") # Se añade el error al la lista
+                        
     
     # CREF debe ser un entero positivo
     ref = row.get('CREF')
-    if not isinstance(ref, (int, str)):
-        return False, "El campo 'CREF' debe ser un entero positivo."
-
-    # Eliminar espacios y caracteres no numéricos
-    ref = re.sub(r'\D', '', str(ref)).strip()
-
-    # Verificar si después de limpiar hay un valor válido
-    if not ref:
-        return False, "El campo 'CREF' debe ser un entero positivo."
     
-    try:
-        row['CREF'] = int(ref)
-    except (ValueError, TypeError):
-        return False, "El campo 'CREF' debe ser un entero positivo."
-    
+    if not isinstance(ref, (int, str)): # Si no es valido lanzamos error
+        errors.append(f"El campo 'CREF' no es del tipo esperado (int, str): Type -> {type(ref)}.")
+    else: # Si es valido...
+        try:
+            row['CREF'] = int(ref) # Convertimos a entero y modificamos el valor original
+        except: # Intentamos limpieza
+            clean_ref = ref.split('.')[0] #  Eliminar decimales (BUG de .0 a la derecha)
+            clean_ref = re.sub(r'\D', '', str(clean_ref)).strip() # Eliminar espacios y caracteres no numéricos
+
+            # Verificar si después de limpiar hay un valor válido
+            if not clean_ref:
+                errors.append("El campo 'CREF' debe ser un entero positivo.")
+            else:
+                # Si ha cambiado el valor original...
+                if ref != clean_ref:
+                    try:
+                        row['CREF'] = int(clean_ref) # Convertimos a entero y modificamos el valor original
+                        
+                        fixes.append(f"Se ha corregido el campo 'CREF'") # Se añade la corrección a la lsita    
+                    except ValueError:
+                        errors.append("El campo 'CREF' debe ser un entero positivo.") # Se añade el error al la lista
+
     
     # CDETALLE: cadena de hasta 50 caracteres, puede contener cualquier carácter UTF-8
     detalle = row.get('CDETALLE')
     if detalle is not None and (not isinstance(detalle, str) or len(detalle) > 50):
-        return False, "El campo 'CDETALLE' debe ser una cadena de texto de máximo 50 caracteres."
+        errors.append("El campo 'CDETALLE' debe ser una cadena de texto de máximo 50 caracteres.")
     
     
     # CCODFAM: debe ser un entero, puede ser nulo
+    codfam = row.get('CCODFAM')
     try:
-        if row.get('CCODFAM') is not None:
-            row['CCODFAM'] = int(row['CCODFAM'])
+        if codfam is not None:
+            row['CCODFAM'] = int(codfam)
     except (ValueError, TypeError):
-        return False, "El campo 'CCODFAM' debe ser un entero o nulo."
+        errors.append("El campo 'CCODFAM' debe ser un entero o nulo.")
 
 
     # NCOSTEDIV y NPVP: deben ser flotantes y positivos
     for key in ['NCOSTEDIV', 'NPVP']:
         value = row.get(key)
         try:
-            if value is not None:
+            if value is not None and row[key] >= 0:
                 value = float(value)  # Convertir a float
-                row[key] = math.trunc(value * 100) / 100 # Truncar a 2 decimales
+                row[key] = math.trunc(value * 100) / 100 # Truncar a 2 decimales y actualizar
+            else:
+                errors.append(f"El campo '{key}' debe ser un número positivo.")
         except (ValueError, TypeError):
-            return False, f"El campo '{key}' debe ser un número positivo."
+            errors.append(f"Error desconocido. El campo '{key}' debe ser un número positivo.")
+            
+    # Si ha habido errores, devolver False y los errores encontrados
+    if len(errors) > 0:
+        return False, row, errors
 
-        # Verificar si es negativo
-        if value is not None and row[key] < 0:
-            return False, f"El campo '{key}' debe ser un número positivo."
-
-
-    # Si todo está bien, devolver True y los datos corregidos
-    return True, row
+    # Si todo está bien, devolver True, los datos corregidos y las correcciones realizadas
+    return True, row, fixes
 
 
 def update_articles(articles_dbf):
@@ -163,12 +181,16 @@ def update_articles(articles_dbf):
             continue
         
         # Validar y limpiar los datos de la fila
-        is_valid, clean_row = validate_and_clean_data(row)
+        is_valid, clean_row, logs_info = validate_clean_article_data(row)
         if not is_valid:
-            conflict_log.append({'Error': 'Datos inválidos', 'CREF': ref, 'CCODEBAR': codebar, 'CDETALLE': detalle, 'Info': clean_row})
+            for log_info in logs_info:
+                conflict_log.append({'Error': 'Datos inválidos', 'CREF': ref, 'CCODEBAR': codebar, 'CDETALLE': detalle, 'Info': log_info})
             continue
+        else:
+            for log_info in logs_info:
+                conflict_log.append({'Error': 'Datos corregidos', 'CREF': ref, 'CCODEBAR': codebar, 'CDETALLE': detalle, 'Info': log_info})
         
-        # Si se es valida se añade a la nueva lista
+        # Si es valida se añade a la nueva lista
         clean_rows.append(clean_row)
         
     # Crear un nuevo DataFrame con las filas limpias
@@ -178,10 +200,7 @@ def update_articles(articles_dbf):
     # Identificar filas duplicadas
     duplicated_rows = clean_articles_csv[clean_articles_csv.duplicated(subset=['CCODEBAR'], keep='first')]
     for _, row in duplicated_rows.iterrows():
-        codebar = row['CCODEBAR']
-        ref = row['CREF']
-        detalle = row['CDETALLE']
-        conflict_log.append({'Error': 'Duplicado', 'CREF': ref, 'CCODEBAR': codebar, 'CDETALLE': detalle, 'Info': 'Código de barras duplicado'})
+        conflict_log.append({'Error': 'Duplicado', 'CREF': row['CREF'], 'CCODEBAR': row['CCODEBAR'], 'CDETALLE': row['CDETALLE'], 'Info': 'Código de barras duplicado'})
         
     # Eliminar duplicados, manteniendo solo la primera ocurrencia
     clean_articles_csv = clean_articles_csv.drop_duplicates(subset=['CCODEBAR'], keep='first')
@@ -204,17 +223,18 @@ def update_articles(articles_dbf):
             deleted_articles.remove(codebar) # Eliminar de la lista de articulos a eliminar
             
             changes = {}
-            for col, attr in  {'CREF': 'ref', 'CDETALLE': 'detalle', 'CCODFAM': 'codfam', 'NCOSTEDIV': 'pcosto', 'NPVP': 'pvp', 'DACTUALIZA': 'factualizacion'}.items():
-                new_value = article_csv[col] # Valor 'nuevo' del CSV
-                db_value = getattr(article_db, attr) # Valor actual en la DB
-                
-                # Convertir la fecha a string sin la hora, para comparar con el CSV
-                if attr == 'factualizacion':
-                    db_value = db_value.strftime('%Y-%m-%d')
+            for col, attr in article_column_to_attribute_map.items():
+                if col != 'CCODEBAR': # Filtramos el codebar (simpre coincidirán)
+                    new_value = article_csv[col] # Valor 'nuevo' del CSV
+                    db_value = getattr(article_db, attr) # Valor actual en la DB
                     
-                # Si cambia el valor, se guarda en 'changes'
-                if new_value != db_value:
-                    changes[attr] = new_value
+                    # Convertir la fecha a string sin la hora, para comparar con el CSV
+                    if attr == 'factualizacion':
+                        db_value = db_value.strftime('%Y-%m-%d')
+                        
+                    # Si cambia el valor, se guarda en 'changes'
+                    if new_value != db_value:
+                        changes[attr] = new_value
                     
             # Si hay cambios, se actualiza el artículo y se guarda en la lista de actualizados
             if changes:
