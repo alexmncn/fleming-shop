@@ -1,5 +1,6 @@
 """Database models"""
 import pytz
+import uuid
 from datetime import datetime, timedelta
 from flask_login import UserMixin
 from sqlalchemy import Column, Integer, String, Boolean, Text, Float, DateTime, ForeignKey
@@ -64,22 +65,23 @@ class Article(db.Model):
         
 class Article_import(db.Model):
     __tablename__="article_imports"
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = Column(Integer, db.ForeignKey('users.id'), index=True, nullable=True)
     new_rows = Column(Integer, default=0)
     updated_rows = Column(Integer, default=0)
     deleted_rows = Column(Integer, default=0)
     duplicated_rows = Column(Integer, default=0)
-    errors = db.Column(Integer, default=0)
-    status = db.Column(TINYINT(1), default=1, nullable=True)
-    date = db.Column(DateTime, default=datetime.now(pytz.timezone('Europe/Madrid')), nullable=False)
+    errors = Column(Integer, default=0)
+    status = Column(TINYINT(1), default=1, nullable=True)
+    info = Column(Text, nullable=True)
+    date = Column(DateTime, default=datetime.now(pytz.timezone('Europe/Madrid')), nullable=False)
     
     Article_import_log = relationship('article_import_log', back_populates='article_imports')
     
 class Article_import_log(db.Model):
     __tablename__="article_import_logs"
     id = db.Column(Integer, primary_key=True, autoincrement=True)
-    import_id = Column(Integer, ForeignKey('article_imports.id'), nullable=False)
+    import_id = Column(String(36), ForeignKey('article_imports.id'), nullable=False)
     type = Column(Integer, nullable=False)
     ref = Column(String(50), nullable=True)
     codebar = Column(String(50), nullable=True)
