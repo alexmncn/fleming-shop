@@ -1,7 +1,7 @@
 import os, glob
 from datetime import datetime
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from app.services.import_to_db import update_articles, update_families, update_stocks
 
@@ -30,6 +30,8 @@ def upload_articles_():
         new_filename = f"{clean_filename}_{timestamp}{extension}"
         file_path = os.path.join(UPLOAD_ROUTE, new_filename)
         
+        username = get_jwt_identity()
+        
         try:
             file.save(file_path)
             
@@ -43,7 +45,7 @@ def upload_articles_():
         except Exception as e:
             return jsonify(error='Error saving file'), 500
         
-        update_articles(new_filename)
+        update_articles(new_filename, username)
         
         return jsonify(message='OK'), 200
     

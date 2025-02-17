@@ -23,9 +23,8 @@ def login():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
-    remote_host = request.headers.get('X-Real-IP')
     
-    user_authenticated = authenticate(username, password, remote_host)
+    user_authenticated = authenticate(username, password)
     
     if user_authenticated:
         expires_delta = timedelta(hours=1)

@@ -1,11 +1,11 @@
-import os, time, csv, glob, re, math
+import os, time, glob, re, math, uuid
 import pandas as pd
 from dbfread import DBF
 from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
-from app.models import Article, Family
+from app.models import Article, Family, Article_import_log, Article_import, User
 
 from app.config import UPLOAD_ROUTE, DATA_ROUTE, DATA_LOGS_ROUTE
 
@@ -155,11 +155,13 @@ def validate_clean_article_data(row):
     return True, row, fixes
 
 
-def update_articles(articles_dbf):
-    articles_csv_path = articles_dbf_to_csv(articles_dbf)
-    time.sleep(2)
+def update_articles(articles_dbf, username):
+    articles_csv_path = articles_dbf_to_csv(articles_dbf) # DBF to CSV
+    import_id = str(uuid.uuid4()) # Genera uuid de importación
+    
+    time.sleep(2) # Espera que el archivo csv generado este disponible !!!provisional!!!
 
-    # Leer los datos del CSV importado
+    # Leer los datos del CSV
     try:
         articles_csv = pd.read_csv(articles_csv_path)
     except Exception as e:
@@ -169,7 +171,7 @@ def update_articles(articles_dbf):
     
     # Limpiamos los datos del CSV
     clean_rows = []
-    conflict_log = []
+    conflict_logs = []
 
     for _, row in articles_csv.iterrows():
         codebar = row.get('CCODEBAR')
@@ -177,18 +179,25 @@ def update_articles(articles_dbf):
         detalle = row.get('CDETALLE')
         # Si no hay código de barras, se descarta directamente
         if pd.isna(codebar):
-            conflict_log.append({'Error': 'Código de barras faltante', 'CREF': ref, 'CCODEBAR': codebar, 'CDETALLE': detalle, 'Info': 'Código de barras ausente'})
+            log_type = 2 # No CODEBAR
+            log_info = 'Código de barras ausente'
+            article_import_log = Article_import_log(import_id=import_id, type=log_type, ref=ref, codebar=codebar, detalle=detalle, info='Código de barras ausente')
+            conflict_logs.append(article_import_log)
             continue
         
         # Validar y limpiar los datos de la fila
         is_valid, clean_row, logs_info = validate_clean_article_data(row)
         if not is_valid:
             for log_info in logs_info:
-                conflict_log.append({'Error': 'Datos inválidos', 'CREF': ref, 'CCODEBAR': codebar, 'CDETALLE': detalle, 'Info': log_info})
+                log_type = 1 # NO Válido
+                article_import_log = Article_import_log(import_id=import_id, type=log_type, ref=ref, codebar=codebar, detalle=detalle, info=log_info)
+                conflict_logs.append(article_import_log)
             continue
         else:
             for log_info in logs_info:
-                conflict_log.append({'Error': 'Datos corregidos', 'CREF': ref, 'CCODEBAR': codebar, 'CDETALLE': detalle, 'Info': log_info})
+                log_type = 0 # Válido
+                article_import_log = Article_import_log(import_id=import_id, type=log_type, ref=ref, codebar=codebar, detalle=detalle, info=log_info)
+                conflict_logs.append(article_import_log)
         
         # Si es valida se añade a la nueva lista
         clean_rows.append(clean_row)
@@ -200,7 +209,10 @@ def update_articles(articles_dbf):
     # Identificar filas duplicadas
     duplicated_rows = clean_articles_csv[clean_articles_csv.duplicated(subset=['CCODEBAR'], keep='first')]
     for _, row in duplicated_rows.iterrows():
-        conflict_log.append({'Error': 'Duplicado', 'CREF': row['CREF'], 'CCODEBAR': row['CCODEBAR'], 'CDETALLE': row['CDETALLE'], 'Info': 'Código de barras duplicado'})
+        log_type = 3 # DUPLICADO
+        log_info = 'Código de barras duplicado'
+        article_import_log = Article_import_log(import_id=import_id, type=log_type, ref=row['CREF'], codebar=row['CCODEBAR'], detalle=row['CDETALLE'], info=log_info)
+        conflict_logs.append(article_import_log)
         
     # Eliminar duplicados, manteniendo solo la primera ocurrencia
     clean_articles_csv = clean_articles_csv.drop_duplicates(subset=['CCODEBAR'], keep='first')
@@ -274,16 +286,30 @@ def update_articles(articles_dbf):
         session.close()
         
         
-    # Registrar los cambios y errores en un archivo de log
-    status_message = f"Nuevos: {len(new_articles)}, Actualizados: {len(updated_articles)}, Eliminados: {len(deleted_articles)}, Duplicados: {len(duplicated_rows)}, Errores: {len(conflict_log)}"
+    # LOGS
+    user_id = User.query(username=username).first().id
     
-    if conflict_log:
-        conflict_log.append({'Error': 'RESUMEN', 'CREF': '', 'CCODEBAR': '', 'CDETALLE': '', 'Info': status_message})
+    # Log temp
+    status_message = f"Nuevos: {len(new_articles)}, Actualizados: {len(updated_articles)}, Eliminados: {len(deleted_articles)}, Duplicados: {len(duplicated_rows)}, Errores: {len(conflict_logs)}"
+    
+    if conflict_logs:
+        # Instance article_import object with import info
+        article_import = Article_import(
+            id=import_id, 
+            user_id=user_id, 
+            ew_rows=len(new_articles), 
+            updates_rows=len(updated_articles), 
+            deleted_rows=len(deleted_articles), 
+            duplicated_rows=len(duplicated_rows), 
+            errors=len(conflict_logs), 
+            status=0, 
+            info='Exito'
+        )
         
         # Save conflict log csv
         log_file_path = os.path.join(DATA_LOGS_ROUTE, f"conflicts_{os.path.basename(articles_csv_path)}")
         with open(log_file_path, mode='w', newline='', encoding='utf-8') as log_file:
-            log_writer = pd.DataFrame(conflict_log)
+            log_writer = pd.DataFrame(conflict_logs)
             log_writer.to_csv(log_file, index=False)
             
         # Delete old conflict logs

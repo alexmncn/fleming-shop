@@ -5,7 +5,7 @@ from app.models import User, OTPCode
 
 from app.services.pushover_alerts import send_alert
 
-def authenticate(username, password, ip=None):
+def authenticate(username, password):
     user = User.query.filter_by(username=username).first()
     if user and user.check_password(password):
         send_alert(f'<b>{username}</b> ha iniciado sesión.', 0)
