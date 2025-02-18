@@ -154,6 +154,12 @@ def validate_clean_article_data(row):
     # Si todo está bien, devolver True, los datos corregidos y las correcciones realizadas
     return True, row, fixes
 
+# Para logs
+def clean_nan_value(value):
+    # pd.isna() retorna True para np.nan, None, etc.
+    if pd.isna(value):
+        return None
+    return value
 
 def update_articles(articles_dbf, user):
     start_time = time.perf_counter() # Inicializar contador de tiempo
@@ -203,7 +209,7 @@ def update_articles(articles_dbf, user):
                 if pd.isna(codebar):
                     log_type = 2 # No CODEBAR
                     log_info = 'Código de barras ausente'
-                    article_import_log = Article_import_log(import_id=import_id, type=log_type, ref=ref, codebar=None, detalle=detalle, info='Código de barras ausente')
+                    article_import_log = Article_import_log(import_id=import_id, type=log_type, ref=clean_nan_value(ref), codebar=None, detalle=clean_nan_value(detalle), info='Código de barras ausente')
                     conflict_logs.append(article_import_log)
                     continue
                 
@@ -212,13 +218,13 @@ def update_articles(articles_dbf, user):
                 if not is_valid:
                     for log_info in logs_info:
                         log_type = 1 # NO Válido
-                        article_import_log = Article_import_log(import_id=import_id, type=log_type, ref=ref, codebar=codebar, detalle=detalle, info=log_info)
+                        article_import_log = Article_import_log(import_id=import_id, type=log_type, ref=clean_nan_value(ref), codebar=clean_nan_value(codebar), detalle=clean_nan_value(detalle), info=log_info)
                         conflict_logs.append(article_import_log)
                     continue
                 else:
                     for log_info in logs_info:
                         log_type = 0 # Válido
-                        article_import_log = Article_import_log(import_id=import_id, type=log_type, ref=ref, codebar=codebar, detalle=detalle, info=log_info)
+                        article_import_log = Article_import_log(import_id=import_id, type=log_type, ref=clean_nan_value(ref), codebar=clean_nan_value(codebar), detalle=clean_nan_value(detalle), info=log_info)
                         conflict_logs.append(article_import_log)
                 
                 # Si es valida se añade a la nueva lista
@@ -233,7 +239,7 @@ def update_articles(articles_dbf, user):
             for _, row in duplicated_rows.iterrows():
                 log_type = 3 # DUPLICADO
                 log_info = 'Código de barras duplicado'
-                article_import_log = Article_import_log(import_id=import_id, type=log_type, ref=row['CREF'], codebar=row['CCODEBAR'], detalle=row['CDETALLE'], info=log_info)
+                article_import_log = Article_import_log(import_id=import_id, type=log_type, ref=clean_nan_value(row['CREF']), codebar=clean_nan_value(row['CCODEBAR']), detalle=clean_nan_value(row['CDETALLE']), info=log_info)
                 conflict_logs.append(article_import_log)
                 
             # Eliminar duplicados, manteniendo solo la primera ocurrencia
@@ -379,18 +385,32 @@ def save_article_import_log(import_id, user, status, info, n_new, n_updated, n_d
     
     # Save logs in CSV file
     log_file_path = os.path.join(DATA_LOGS_ROUTE, f"conflicts_{os.path.basename(articles_csv_path)}")
-    with open(log_file_path, mode='w', newline='', encoding='utf-8') as log_file:
-        log_writer = pd.DataFrame(conflict_logs)
-        log_writer.to_csv(log_file, index=False)
-        
+
+    # Extraer atributos de cada objeto Article_import_log y construir una lista de diccionarios
+    log_records = []
+    for log in conflict_logs:
+        log_records.append({
+            'import_id': log.import_id,
+            'type': log.type,
+            'ref': log.ref,
+            'codebar': log.codebar,
+            'detalle': log.detalle,
+            'info': log.info,
+        })
+
+    # Crear un DataFrame a partir de la lista de diccionarios
+    df_logs = pd.DataFrame(log_records)
+
+    # Guardar el DataFrame en un archivo CSV
+    df_logs.to_csv(log_file_path, index=False, encoding='utf-8')
+
     # Delete old conflict logs
-    pattern = os.path.join(f"{str.split(log_file_path,'_')[0]}_{str.split(log_file_path,'_')[1]}_*.csv") # Get old file versions
+    pattern = os.path.join(f"{str.split(log_file_path,'_')[0]}_{str.split(log_file_path,'_')[1]}_*.csv")  # Get old file versions
 
     for file_ in glob.glob(pattern):
         file_name = os.path.basename(file_)
         new_file_name = os.path.basename(log_file_path)
-
-        if file_name != new_file_name: # Remove all except the new one
+        if file_name != new_file_name:  # Remove all except the new one
             os.remove(file_)
             
     print(f"Conflictos guardados en {log_file_path}")
