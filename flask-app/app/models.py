@@ -79,7 +79,7 @@ class Article_import(db.Model):
     duplicated_rows = Column(Integer, default=0)
     errors = Column(Integer, default=0)
     elapsed_time = Column(Float, nullable=True)
-    date = Column(DateTime, default=datetime.now(pytz.timezone('Europe/Madrid')), nullable=False)
+    date = Column(DateTime, default=lambda: datetime.now(pytz.timezone('Europe/Madrid')), nullable=False)
     
     logs = relationship('Article_import_log', back_populates='import_record')
     
