@@ -162,17 +162,24 @@ def update_articles(articles_dbf, user):
     import_id = str(uuid.uuid4()) # Genera uuid de importación
     status = 0
     status_info = ''
-        
-    time.sleep(2) # Espera que el archivo csv generado este disponible !!!provisional!!!
 
     # Leer los datos del CSV
     articles_csv = None
     try:
+        timeout = 5 # 5 segundos
+        interval = 0.1 # 0.5 segundos
+        while True:
+            if os.path.exists(articles_csv_path) and os.path.getsize(articles_csv_path) > 0:
+                break
+            if time.perf_counter() - start_time > timeout:
+                raise TimeoutError(f"El archivo {articles_csv_path} no estuvo disponible en {timeout} segundos.")
+            time.sleep(interval)
+        
         articles_csv = pd.read_csv(articles_csv_path)
     except Exception as e:
         status = 1
         status_info = f"Error al leer el CSV: {str(e)}"
-        print(status_message)
+        print(status_info)
     
     # Inicializar las que sirven para el log 
     # (Aunque de error general y esten vacías, poder guardar el import_log general)
@@ -310,7 +317,7 @@ def update_articles(articles_dbf, user):
     end_time = time.perf_counter()
     elapsed_time = (end_time - start_time)
     
-    # Log temp
+    # Log general
     status_message = f"Nuevos: {len(new_articles)}, Actualizados: {len(updated_articles)}, Eliminados: {len(deleted_articles)}, Duplicados: {len(duplicated_rows)}, Errores: {len(conflict_logs)}"
     print(status_message)
     
