@@ -54,7 +54,7 @@ def upload_articles_():
         except:
             pass
         
-        if status:
+        if status == 0:
             return jsonify(message=info), 200
         else:
             return jsonify(error=info), 500
@@ -101,7 +101,7 @@ def upload_families_():
         except:
             pass
         
-        if status:
+        if status == 0:
             return jsonify(message=info), 200
         else:
             return jsonify(error=info), 500
@@ -149,7 +149,7 @@ def upload_stocks_():
         except:
             pass
         
-        if status:
+        if status == 0:
             return jsonify(message=info), 200
         else:
             return jsonify(error=info), 500
