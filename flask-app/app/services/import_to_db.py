@@ -1,7 +1,6 @@
 import os, time, glob, re, math, uuid
 import pandas as pd
 from dbfread import DBF
-from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
@@ -33,7 +32,14 @@ def articles_dbf_to_csv(articles_dbf):
     
     df = pd.read_csv(csv_path) # Read the csv data
     df.columns = df.columns.str.strip()
-    selected_columns = article_column_to_attribute_map.keys() # Set the needed columns from keys of defined map
+    
+    # Convertir a string y quitar ".0" para columnas específicas
+    columns_to_fix = ['CREF', 'CCODEBAR']
+    for col in columns_to_fix:
+        if col in df.columns:
+            df[col] = df[col].astype(str).str.replace(r'\.0$', '', regex=True)
+    
+    selected_columns = article_column_to_attribute_map.keys()  # Set the needed columns from keys of defined map
     
     try:
         df_filtered = df[selected_columns] # Get selected columns
@@ -51,7 +57,6 @@ def articles_dbf_to_csv(articles_dbf):
     for file_ in glob.glob(pattern):
         file_name = os.path.basename(file_)
         new_file_name = os.path.basename(filtered_csv_path)
-
         if file_name != new_file_name: # Remove all except the new one
             os.remove(file_)
     
@@ -173,7 +178,7 @@ def update_articles(articles_dbf, user):
     articles_csv = None
     try:
         timeout = 5 # 5 segundos
-        interval = 0.1 # 0.5 segundos
+        interval = 0.1 # 0.1 segundos
         while True:
             if os.path.exists(articles_csv_path) and os.path.getsize(articles_csv_path) > 0:
                 break
