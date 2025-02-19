@@ -190,7 +190,6 @@ def update_articles(articles_dbf, user):
     except Exception as e:
         status = 1
         status_info = f"Error al leer el CSV: {str(e)}"
-        print(status_info)
     
     # Inicializar las que sirven para el log 
     # (Aunque de error general y esten vacías, poder guardar el import_log general)
@@ -259,6 +258,7 @@ def update_articles(articles_dbf, user):
             new_articles = []
             updated_articles = []
             
+            # Recorrer los artículos del CSV
             for _, article_csv in clean_articles_csv.iterrows():
                 codebar = article_csv['CCODEBAR']
                 
@@ -328,9 +328,9 @@ def update_articles(articles_dbf, user):
     end_time = time.perf_counter()
     elapsed_time = (end_time - start_time)
     
-    # Log general
-    status_message = f"Nuevos: {len(new_articles)}, Actualizados: {len(updated_articles)}, Eliminados: {len(deleted_articles)}, Duplicados: {len(duplicated_rows)}, Errores: {len(conflict_logs)}"
-    print(status_message)
+    # Log resumen
+    import_resume = f"Nuevos: {len(new_articles)}, Actualizados: {len(updated_articles)}, Eliminados: {len(deleted_articles)}, Duplicados: {len(duplicated_rows)}, Errores: {len(conflict_logs)}"
+    print(status_info + f'Tiempo: {elapsed_time} seg.', import_resume)
     
     # Save LOGs
     save_article_import_log(
@@ -460,17 +460,92 @@ def families_dbf_to_csv(families_dbf):
 
     
 def update_families(families_dbf):
-    families_csv_path = families_dbf_to_csv(families_dbf)
-    time.sleep(2)
-    data = pd.read_csv(families_csv_path)
-    for index, row in data.iterrows():
-        family = Family(
-            codfam=row['CCODFAM'],
-            nomfam=row['CNOMFAM']  
-        )
-        db.session.add(family)
-    db.session.commit()
+    start_time = time.perf_counter() # Inicializar contador de tiempo
+    families_csv_path = families_dbf_to_csv(families_dbf) # DBF to CSV
     
+    status = 0
+    status_info = ''
+    
+    families_csv = None
+    try:
+        timeout = 5 # 5 segundos
+        interval = 0.1 # 0.1 segundos
+        while True:
+            if os.path.exists(families_csv_path) and os.path.getsize(families_csv_path) > 0:
+                break
+            if time.perf_counter() - start_time > timeout:
+                raise TimeoutError(f"El archivo {families_csv_path} no estuvo disponible en {timeout} segundos.")
+            time.sleep(interval)
+        
+        families_csv = pd.read_csv(families_csv_path) # Read CSV    
+    except Exception as e:
+        status = 1
+        status_info = f"Error al leer el CSV: {str(e)}"
+
+    new_families = []
+    updated_families = []
+    deleted_families = []
+
+    if families_csv is not None:
+        try:
+            # Cargamos todos los artículos existentes en la DB
+            db_families = {family.codfam: family for family in Family.query.all()}
+            deleted_families = set(db_families.keys()) # Inicializamos las familias a eliminar
+            
+            # Recorrer las familias del CSV
+            for _, row in families_csv.iterrows():
+                codfam = row['CCODFAM']
+                
+                # Si ya existe en la DB
+                if codfam in db_families:
+                    family_db = db_families[codfam]
+                    deleted_families.remove(codfam) # Eliminar de la lista a elimin
+                    
+                    # Si cambia el nombre, se actualiza                
+                    if row['CNOMFAM'] != family_db.nomfam:
+                        setattr(family_db, 'nomfam', row['CNOMFAM'])
+                        updated_families.append(family_db) # Guardar en la lista de actualizados
+                else:
+                    # Insertar como nueva familia
+                    family = Family(
+                        codfam=row['CCODFAM'], 
+                        nomfam=row['CNOMFAM']
+                    )
+                    new_families.append(family)
+                    
+            # Aplicar cambios en la base de datos
+            try:
+                session = db.session
+                session.add_all(new_families) # Insertar nuevas
+                session.add_all(updated_families) # Actualizar modificadas 
+
+                for codfam in deleted_families:
+                    session.delete(db_families[codfam]) # Eliminar las que ya no existen
+                    
+                session.commit() # Confirmar los cambios
+                
+                status_info = "Importación completada con éxito."
+            except SQLAlchemyError as e:
+                session.rollback()
+                status = 1
+                status_info = f"Error en la base de datos: {str(e)}"
+            finally:
+                session.close()
+        
+        except Exception as e:
+            status = 1
+            status_info = f"Error inesperado procesando los datos: {str(e)}"
+            
+            
+    # Calcular tiempo de ejecución
+    end_time = time.perf_counter()
+    elapsed_time = (end_time - start_time)
+    
+    # Log resumen
+    import_resume = f"Nuevas: {len(new_families)}, Actualizadas: {len(updated_families)}, Eliminadas: {len(deleted_families)}"
+    print(status_info + f'\nTiempo: {elapsed_time} seg.\n', import_resume)
+    
+    return status, status_info        
 
 
 def stocks_dbf_to_csv(stocks_dbf):
