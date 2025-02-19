@@ -583,39 +583,137 @@ def stocks_dbf_to_csv(stocks_dbf):
     
     return filtered_csv_path
 
+def validate_clean_stocks_data(row):
+    fixes = [] # Lista de erorres corregidos
+    errors = []                        
+    
+    # CREF debe ser un entero positivo
+    ref = row.get('CREF')
+    
+    if not isinstance(ref, (int, str)): # Si no es valido lanzamos error
+        errors.append(f"El campo 'CREF' no es del tipo esperado (int, str): Type -> {type(ref)}.")
+    else: # Si es valido...
+        try:
+            row['CREF'] = int(ref) # Convertimos a entero y modificamos el valor original
+        except: # Intentamos limpieza
+            clean_ref = ref.split('.')[0] #  Eliminar decimales (BUG de .0 a la derecha)
+            clean_ref = re.sub(r'\D', '', str(clean_ref)).strip() # Eliminar espacios y caracteres no numéricos
+
+            # Verificar si después de limpiar hay un valor válido
+            if not clean_ref:
+                errors.append("El campo 'CREF' debe ser un entero positivo.")
+            else:
+                # Si ha cambiado el valor original...
+                if ref != clean_ref:
+                    try:
+                        row['CREF'] = int(clean_ref) # Convertimos a entero y modificamos el valor original
+                        
+                        fixes.append(f"Se ha corregido el campo 'CREF'") # Se añade la corrección a la lsita    
+                    except ValueError:
+                        errors.append("El campo 'CREF' debe ser un entero positivo.") # Se añade el error al la lista
+                        
+    
+    # NSTOCK: debe ser un entero, puede ser nulo
+    stock = row.get('NSTOCK')
+    try:
+        if stock is not None:
+            row['NSTOCK'] = int(stock)
+    except (ValueError, TypeError):
+        errors.append("El campo 'NSTOCK' debe ser un entero o nulo.")
+
+
+    # Si ha habido errores, devolver False y los errores encontrados
+    if len(errors) > 0:
+        return False, row, errors
+
+    # Si todo está bien, devolver True, los datos corregidos y las correcciones realizadas
+    return True, row, fixes
 
 def update_stocks(stocks_dbf):
-    stocks_csv_path = stocks_dbf_to_csv(stocks_dbf)
-    time.sleep(2)
-    session = db.session
+    start_time = time.perf_counter() # Inicializar contador de tiempo
+    stocks_csv_path = stocks_dbf_to_csv(stocks_dbf) # DBF to CSV
     
-    article_stocks = session.query(Article).with_entities(Article.ref, Article.stock).all()
-    stocks_csv = pd.read_csv(stocks_csv_path)
+    status = 0
+    status_info = ''
+
+    # Leer los datos del CSV
+    stocks_csv = None
+    try:
+        timeout = 5 # 5 segundos
+        interval = 0.1 # 0.1 segundos
+        while True:
+            if os.path.exists(stocks_csv_path) and os.path.getsize(stocks_csv_path) > 0:
+                break
+            if time.perf_counter() - start_time > timeout:
+                raise TimeoutError(f"El archivo {stocks_csv_path} no estuvo disponible en {timeout} segundos.")
+            time.sleep(interval)
+        
+        stocks_csv = pd.read_csv(stocks_csv_path)
+    except Exception as e:
+        status = 1
+        status_info = f"Error al leer el CSV: {str(e)}"
     
-    article_stocks_dict = {ref: stock for ref, stock in article_stocks}
-    
-    updates = 0
+    updated_article_stocks = []
     errors = 0
-    for _, row in stocks_csv.iterrows():
-        if 'CREF' and 'NSTOCK' in row:
-            try:
-                ref = int(row['CREF'])
-                new_stock = row['NSTOCK']
-                
-                if ref in article_stocks_dict:
-                    current_stock = article_stocks_dict[ref]
-                    
-                    if current_stock != new_stock:
-                        article = session.query(Article).filter_by(ref=ref).first()
-                        article.stock = new_stock
-                        session.add(article)
-                        updates += 1
-                        print(f"Actualizado {ref}: Stock cambiado de {current_stock} a {new_stock}")
-            except Exception as e:
-                errors += 1
-                print(f'Error: {e}')
-            
-    print(f'\nSe han actualizado {updates} articulos.\nSe han encontrado {errors} errores.')
-                
     
-    session.commit()
+    if stocks_csv is not None:
+        try:
+            # Cargamos todos los artículos de la DB
+            db_articles = {article.ref: article for article in Article.query.all()}
+
+            # Recorremos todos los stocks del CSV
+            for _, row in stocks_csv.iterrows():
+                ref = row['CREF']
+                
+                # Si no hay referencia, se descarta directamente
+                if pd.isna(ref):
+                    errors += 1
+                    continue
+                
+                # Validar y limpiar los datos de la fila
+                is_valid, clean_row, logs_info = validate_clean_stocks_data(row)
+                if not is_valid:
+                    # Si no es valida se descarta
+                    print(logs_info)
+                    errors += 1
+                    continue
+                
+                ref = clean_row['CREF']
+                
+                # Si existe el articulo, se actualiza su stock
+                if ref in db_articles:
+                    article_db = db_articles[ref]
+                    if clean_row['NSTOCK'] != article_db.stock:
+                        setattr(article_db, 'stock', row['NSTOCK'])
+                        updated_article_stocks.append(article_db)
+            
+            
+            # Aplicar cambios en la base de datos
+            try:
+                session = db.session
+                session.add_all(updated_article_stocks) # Actualizar modificados 
+                    
+                session.commit() # Confirmar los cambios
+                
+                status_info = "Importación completada con éxito."
+            except SQLAlchemyError as e:
+                session.rollback()
+                status = 1
+                status_info = f"Error en la base de datos: {str(e)}"
+            finally:
+                session.close()
+        
+        except Exception as e:
+            status = 1
+            status_info = f"Error inesperado procesando los datos: {str(e)}"
+    
+    
+    # Calcular tiempo de ejecución
+    end_time = time.perf_counter()
+    elapsed_time = (end_time - start_time)
+    
+    # Log resumen
+    import_resume = f"Actualizados: {len(updated_article_stocks)}, Errores: {errors}"
+    print(status_info + f'\nTiempo: {elapsed_time} seg.\n', import_resume)
+    
+    return status, status_info 
