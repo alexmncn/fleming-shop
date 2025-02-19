@@ -326,11 +326,12 @@ def update_articles(articles_dbf, user):
         
     # Calcular tiempo de ejecución
     end_time = time.perf_counter()
-    elapsed_time = (end_time - start_time)
+    elapsed_time = round((end_time - start_time), 2)
     
     # Log resumen
-    import_resume = f"Nuevos: {len(new_articles)}, Actualizados: {len(updated_articles)}, Eliminados: {len(deleted_articles)}, Duplicados: {len(duplicated_rows)}, Errores: {len(conflict_logs)}"
-    print(status_info + f'Tiempo: {elapsed_time} seg.', import_resume)
+    import_resume = f'Tiempo: {elapsed_time}s.\nNuevos: {len(new_articles)}, Actualizados: {len(updated_articles)}, Eliminados: {len(deleted_articles)}, Duplicados: {len(duplicated_rows)}, Errores: {len(conflict_logs)}'
+    print(status_info)
+    print(import_resume)
     
     # Save LOGs
     save_article_import_log(
@@ -347,7 +348,7 @@ def update_articles(articles_dbf, user):
         articles_csv_path
     ) 
         
-    return status, status_info
+    return status, status_info, import_resume
         
         
 def save_article_import_log(import_id, user, status, info, n_new, n_updated, n_deleted, n_duplicated, conflict_logs, elapsed_time, articles_csv_path):
@@ -539,13 +540,14 @@ def update_families(families_dbf):
             
     # Calcular tiempo de ejecución
     end_time = time.perf_counter()
-    elapsed_time = (end_time - start_time)
+    elapsed_time = round((end_time - start_time), 2)
     
     # Log resumen
-    import_resume = f"Nuevas: {len(new_families)}, Actualizadas: {len(updated_families)}, Eliminadas: {len(deleted_families)}"
-    print(status_info + f'\nTiempo: {elapsed_time} seg.\n', import_resume)
+    import_resume = f'Tiempo: {elapsed_time}s.\nNuevas: {len(new_families)}, Actualizadas: {len(updated_families)}, Eliminadas: {len(deleted_families)}'
+    print(status_info)
+    print(import_resume)
     
-    return status, status_info        
+    return status, status_info, import_resume        
 
 
 def stocks_dbf_to_csv(stocks_dbf):
@@ -710,10 +712,11 @@ def update_stocks(stocks_dbf):
     
     # Calcular tiempo de ejecución
     end_time = time.perf_counter()
-    elapsed_time = (end_time - start_time)
+    elapsed_time = round((end_time - start_time), 2)
     
     # Log resumen
-    import_resume = f"Actualizados: {len(updated_article_stocks)}, Errores: {errors}"
-    print(status_info + f'\nTiempo: {elapsed_time} seg.\n', import_resume)
+    import_resume = f'Tiempo: {elapsed_time}s.\nActualizados: {len(updated_article_stocks)}, Errores: {errors}.'
+    print(status_info)
+    print(import_resume)
     
-    return status, status_info 
+    return status, status_info, import_resume 

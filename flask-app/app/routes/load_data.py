@@ -4,6 +4,7 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from app.services.import_to_db import update_articles, update_families, update_stocks
+from app.services.pushover_alerts import send_alert
 
 from app.config import UPLOAD_ROUTE
 
@@ -45,9 +46,18 @@ def upload_articles_():
         except Exception as e:
             return jsonify(error='Error saving file'), 500
         
-        update_articles(new_filename, username)
+        status, info, resume = update_articles(new_filename, username)
         
-        return jsonify(message='OK'), 200
+        try:
+            message = f'<b>Importación de Artículos:</b>\n {resume}'
+            send_alert(message, 0)
+        except:
+            pass
+        
+        if status:
+            return jsonify(message=info), 200
+        else:
+            return jsonify(error=info), 500
     
     return jsonify(error='Request error'), 400
 
@@ -83,9 +93,18 @@ def upload_families_():
         except Exception as e:
             return jsonify(error='Error saving file'), 500
         
-        update_families(new_filename)
+        status, info, resume = update_families(new_filename)
         
-        return jsonify(message='OK'), 200
+        try:
+            message = f'<b>Importación de Familias:</b>\n {resume}'
+            send_alert(message, 0)
+        except:
+            pass
+        
+        if status:
+            return jsonify(message=info), 200
+        else:
+            return jsonify(error=info), 500
     
     return jsonify(error='Request error'), 400
 
@@ -122,8 +141,17 @@ def upload_stocks_():
         except Exception as e:
             return jsonify(error='Error saving file'), 500
         
-        update_stocks(new_filename)
+        status, info, resume = update_stocks(new_filename)
         
-        return jsonify(message='OK'), 200
+        try:
+            message = f'<b>Importación de Stocks:</b>\n {resume}'
+            send_alert(message, 0)
+        except:
+            pass
+        
+        if status:
+            return jsonify(message=info), 200
+        else:
+            return jsonify(error=info), 500
     
     return jsonify(error='Request error'), 400
