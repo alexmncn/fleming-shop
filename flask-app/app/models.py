@@ -78,6 +78,7 @@ class Article_import(db.Model):
     deleted_rows = Column(Integer, default=0)
     duplicated_rows = Column(Integer, default=0)
     errors = Column(Integer, default=0)
+    corrected = Column(Integer, default=0)
     elapsed_time = Column(Float, nullable=True)
     date = Column(DateTime, default=lambda: datetime.now(pytz.timezone('Europe/Madrid')), nullable=False)
     

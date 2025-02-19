@@ -367,6 +367,7 @@ def save_article_import_log(import_id, user, status, info, n_new, n_updated, n_d
             deleted_rows=n_deleted, 
             duplicated_rows=n_duplicated,
             errors=len(conflict_logs),
+            corrected=len([log for log in conflict_logs if log.type == 0]), # Count corrected logs
             elapsed_time=elapsed_time
         )
         
