@@ -161,32 +161,42 @@ def featured_articles(page, per_page):
 @jwt_required(optional=True)
 def new_articles_total():
     time_threshold = datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=new_articles_range)
+    no_articles_limit = 20
     
     jwt = get_jwt()
     if jwt:
-        return Article.query.filter(Article.factualizacion>=time_threshold).order_by(desc(Article.factualizacion)).count()
+        articles_count = Article.query.filter(Article.date_created>=time_threshold).order_by(desc(Article.date_created)).count()
+        
+        if articles_count is None:
+            return no_articles_limit
+        
+    articles_count = Article.query.filter(*def_article_filter, Article.date_created>=time_threshold).order_by(desc(Article.date_created)).count()
     
-    return Article.query.filter(*def_article_filter, Article.factualizacion>=time_threshold).order_by(desc(Article.factualizacion)).count()
+    if articles_count is None:
+        return no_articles_limit
 
+    return articles_count    
+    
 
 @jwt_required(optional=True)
 def new_articles(page, per_page):
     offset = (page - 1) * per_page
     time_threshold = datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=new_articles_range)
+    no_articles_limit = 20
     
     jwt = get_jwt()
     if jwt:
-        articles = Article.query.filter(Article.factualizacion>=time_threshold).order_by(desc(Article.factualizacion)).limit(per_page).offset(offset)
+        articles = Article.query.filter(Article.date_created>=time_threshold).order_by(desc(Article.date_created)).limit(per_page).offset(offset)
     
         if articles is None:
-            articles = Article.query.all().order_by(desc(Article.factualizacion)).limit(per_page)
+            articles = Article.query.all().order_by(desc(Article.date_created)).limit(no_articles_limit)
         
         return [article.to_dict() for article in articles]
             
-    articles = Article.query.filter(*def_article_filter, Article.factualizacion>=time_threshold).order_by(desc(Article.factualizacion)).limit(per_page).offset(offset)
+    articles = Article.query.filter(*def_article_filter, Article.date_created>=time_threshold).order_by(desc(Article.date_created)).limit(per_page).offset(offset)
     
     if articles is None:
-        articles = Article.query.filter(*def_article_filter).all().order_by(desc(Article.factualizacion)).limit(per_page)
+        articles = Article.query.filter(*def_article_filter).all().order_by(desc(Article.date_created)).limit(no_articles_limit)
     
     return [article.to_dict_reduced() for article in articles]
     

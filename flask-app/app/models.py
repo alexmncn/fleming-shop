@@ -21,6 +21,7 @@ class Article(db.Model):
     codebar = Column(BIGINT, primary_key=True, autoincrement=False, nullable=False)
     stock = Column(Integer, default=0, nullable=True)
     factualizacion = Column(DateTime, nullable=True)
+    date_created = Column(DateTime, default=lambda: datetime.now(pytz.timezone('Europe/Madrid')), nullable=True)
     destacado = Column(TINYINT(1), default=0, nullable=True)
     hidden = Column(TINYINT(1), default=0, nullable=True)
     

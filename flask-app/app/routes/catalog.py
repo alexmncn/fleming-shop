@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 
 from app.services import catalog_data
 
+def_per_page = 20
 
 catalog_bp = Blueprint('catalog', __name__)
 
@@ -26,7 +27,7 @@ def all_articles_codebars():
 @catalog_bp.route('/articles/all', methods=['GET'])
 def all_articles():
     page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 20, type=int)
+    per_page = request.args.get('per_page', def_per_page, type=int)
     
     articles = catalog_data.all_articles(page, per_page)
     
@@ -41,7 +42,7 @@ def search_articles():
     search = request.args.get('search', None)
     filter = request.args.get('filter', 'detalle')
     page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 20, type=int)
+    per_page = request.args.get('per_page', def_per_page, type=int)
     
     articles = catalog_data.search_articles(search, filter, page, per_page)
     
@@ -75,7 +76,7 @@ def featured_articles_total():
 @catalog_bp.route('/articles/featured', methods=['GET'])
 def featured_articles():
     page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 20, type=int)
+    per_page = request.args.get('per_page', def_per_page, type=int)
     
     articles = catalog_data.featured_articles(page, per_page)
     
@@ -94,7 +95,7 @@ def new_articles_total():
 @catalog_bp.route('/articles/new', methods=['GET'])
 def new_articles():
     page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 20, type=int)
+    per_page = request.args.get('per_page', def_per_page, type=int)
     
     articles = catalog_data.new_articles(page, per_page)
     
@@ -109,7 +110,7 @@ def new_articles():
 def families_articles(family_id=None):
     if family_id:
         page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('per_page', 20, type=int)
+        per_page = request.args.get('per_page', def_per_page, type=int)
         
         families = catalog_data.family_articles(family_id, page, per_page)
         
