@@ -68,9 +68,9 @@ def upload_article_images():
         # Subir el archivo a S3 en la ruta "images/articles/<new_filename>"
         s3_route = f'images/articles/{new_filename}'
         try:
-            s3.upload_file(file_path, S3_BUCKET, s3_route, ExtraArgs={"ACL": "public-read"})
+            s3.upload_file(file_path, S3_BUCKET, s3_route)
         except Exception as e:
-            print(e)
+            send_alert(f'Error subiendo la imagen a S3 para el articulo con <b>codebar: {codebar}</b>. Error: {str(e)}', 1)
             return jsonify(error='Error uploading image to S3.'), 500
 
         # Eliminamos la imagen localmente
