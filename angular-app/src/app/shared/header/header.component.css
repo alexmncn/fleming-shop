@@ -16,12 +16,10 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    
 }
 
 img {
     height: 2.5rem;
-    
     cursor: pointer;
 }
 
@@ -41,32 +39,32 @@ img {
     }
 }
 
-p {
-    font-size: clamp(0.7rem, 2vw, 1rem);
-    margin: 0;
-    white-space: nowrap;
-}
-
 .admin-menu {
     display: flex;
-    align-items: center;
-    justify-content: end;
-    width: 100%;
-    gap: 2rem;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: clamp(0.1rem, 1vw, 0.5rem);
 }
 
-.admin-menu .links {
-    display: flex;
-    align-items: center;
-}
-
-.admin-menu .links p {
-    padding: 0 1rem;
-    font-weight: 600;
-    color: var(--primary-accent-500);
+.admin-menu:hover {
     cursor: pointer;
 }
 
-.admin-menu .links p:hover {
+.admin-menu mat-icon {
+    display: flex;
+    font-size: clamp(0.8rem, 3vw, 1.3rem);
+    width: clamp(0.8rem, 3vw, 1.3rem);
+    height: clamp(0.8rem, 3vw, 1.3rem);
+    font-variation-settings: 'FILL' 0, 'wght' 400;
+}
+
+
+.admin-menu p {
+    font-size: clamp(0.5rem, 2.5vw, 1rem);
+    margin: 0;
+    font-variation-settings: 'wght' 500;
+}
+
+.admin-menu p:hover {
     text-decoration: underline;
 }

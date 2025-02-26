@@ -1,13 +1,9 @@
 <header>
     <div class="container" [class.extended]="isAuth">
         <img [routerLink]="['/auth/login']"  src="assets/logos/fleming_logo.webp" alt="Fleming Logo">
-        <section *ngIf="isAuth" class="admin-menu">
-            <section class="links">
-                <p [routerLink]="['/admin']">Panel</p>
-            </section>
-            <aside class="greeting">
-                <p>Bienvenido admin:  <strong>{{ username }}</strong></p>
-            </aside>
+        <section *ngIf="isAuth" class="admin-menu" [routerLink]="['/admin']">
+            <mat-icon class="material-symbols-outlined">person</mat-icon>
+            <p>{{ username }}</p>
         </section>
     </div>
 </header>
