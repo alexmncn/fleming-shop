@@ -1,13 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700&display=swap');
 
-@font-face {
-  font-family: 'Lemon Milk';
-  src: url('/assets/fonts/LEMONMILK-Light.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-}
-
 :root {
   --background-white: #f8fafc;
 
