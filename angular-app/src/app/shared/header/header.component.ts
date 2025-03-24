@@ -6,11 +6,10 @@ import { MatIcon } from '@angular/material/icon';
 import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
-  selector: 'app-header',
-  standalone: true,
-  imports: [RouterLink, CommonModule, MatIcon],
-  templateUrl: './header.component.html',
-  styleUrl: './header.component.css'
+    selector: 'app-header',
+    imports: [RouterLink, CommonModule, MatIcon],
+    templateUrl: './header.component.html',
+    styleUrl: './header.component.css'
 })
 export class HeaderComponent implements OnInit {
   isAuth: boolean = false;

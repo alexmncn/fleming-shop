@@ -7,11 +7,10 @@ import { NavBarComponent } from "./shared/nav-bar/nav-bar.component";
 import { FooterComponent } from "./shared/footer/footer.component";
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, FloatingMessageComponent, HeaderComponent, NavBarComponent, FooterComponent],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+    selector: 'app-root',
+    imports: [RouterOutlet, FloatingMessageComponent, HeaderComponent, NavBarComponent, FooterComponent],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.css'
 })
 export class AppComponent {
   title = 'Fleming Shop';

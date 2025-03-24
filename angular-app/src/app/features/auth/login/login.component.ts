@@ -9,34 +9,33 @@ import { AuthService } from '../../../services/auth/auth.service';
 import { MessageService } from '../../../services/message/message.service';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [RouterOutlet, CommonModule, ReactiveFormsModule],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.css',
-  animations: [
-    trigger('errorAnimation', [
-      transition(':enter', [
-        style({ opacity: 0 }),
-        animate('150ms ease-in', style({ height: '*', opacity: 1 }))
-      ]),
-      transition(':leave', [
-        animate('0ms ease-out', style({ height: '0', opacity: 0 }))
-      ])
-    ]),
-    trigger('slideInDown', [
-      state('void', style({
-        transform: 'translateY(-25%)',
-        opacity: 0
-      })),
-      transition(':enter', [
-        animate('0.5s ease-out', style({
-          transform: 'translateY(0)',
-          opacity: 1
-        }))
-      ])
-    ])
-  ]
+    selector: 'app-login',
+    imports: [RouterOutlet, CommonModule, ReactiveFormsModule],
+    templateUrl: './login.component.html',
+    styleUrl: './login.component.css',
+    animations: [
+        trigger('errorAnimation', [
+            transition(':enter', [
+                style({ opacity: 0 }),
+                animate('150ms ease-in', style({ height: '*', opacity: 1 }))
+            ]),
+            transition(':leave', [
+                animate('0ms ease-out', style({ height: '0', opacity: 0 }))
+            ])
+        ]),
+        trigger('slideInDown', [
+            state('void', style({
+                transform: 'translateY(-25%)',
+                opacity: 0
+            })),
+            transition(':enter', [
+                animate('0.5s ease-out', style({
+                    transform: 'translateY(0)',
+                    opacity: 1
+                }))
+            ])
+        ])
+    ]
 })
 export class LoginComponent {
   loginForm: FormGroup;

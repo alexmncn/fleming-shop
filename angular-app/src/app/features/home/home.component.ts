@@ -11,11 +11,10 @@ import { FamiliesComponent } from "../../shared/families/families.component";
 import { SearchBarComponent } from "../../shared/search-bar/search-bar.component";
 
 @Component({
-  selector: 'app-home',
-  standalone: true,
-  imports: [CommonModule, ArticlesComponent, FamiliesComponent, SearchBarComponent],
-  templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+    selector: 'app-home',
+    imports: [CommonModule, ArticlesComponent, FamiliesComponent, SearchBarComponent],
+    templateUrl: './home.component.html',
+    styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit {
   per_page: number = 20;

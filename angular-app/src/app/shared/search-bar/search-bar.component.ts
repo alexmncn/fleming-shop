@@ -9,11 +9,10 @@ import { InputTextModule } from 'primeng/inputtext';
 import { environment } from '../../../environments/environment';
 
 @Component({
-  selector: 'app-search-bar',
-  standalone: true,
-  imports: [FormsModule, IconFieldModule, InputIconModule, InputTextModule],
-  templateUrl: './search-bar.component.html',
-  styleUrl: './search-bar.component.css'
+    selector: 'app-search-bar',
+    imports: [FormsModule, IconFieldModule, InputIconModule, InputTextModule],
+    templateUrl: './search-bar.component.html',
+    styleUrl: './search-bar.component.css'
 })
 export class SearchBarComponent implements OnInit {
   @Output() search = new EventEmitter<string>();

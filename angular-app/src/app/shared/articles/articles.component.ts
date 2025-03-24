@@ -12,11 +12,10 @@ interface SortByOption {
 }
 
 @Component({
-  selector: 'app-articles',
-  standalone: true,
-  imports: [CommonModule, ArticleComponent, FormsModule, DropdownModule], 
-  templateUrl: './articles.component.html',
-  styleUrl: './articles.component.css'
+    selector: 'app-articles',
+    imports: [CommonModule, ArticleComponent, FormsModule, DropdownModule],
+    templateUrl: './articles.component.html',
+    styleUrl: './articles.component.css'
 })
 export class ArticlesComponent {
   @Output() loadArticles = new EventEmitter();

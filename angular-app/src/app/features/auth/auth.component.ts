@@ -4,11 +4,10 @@ import { Router, RouterOutlet, RouterLink } from '@angular/router';
 import { MatDivider } from '@angular/material/divider';
 
 @Component({
-  selector: 'app-auth',
-  standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, MatDivider],
-  templateUrl: './auth.component.html',
-  styleUrl: './auth.component.css'
+    selector: 'app-auth',
+    imports: [CommonModule, RouterOutlet, RouterLink, MatDivider],
+    templateUrl: './auth.component.html',
+    styleUrl: './auth.component.css'
 })
 export class AuthComponent implements OnInit{
   loginActive: boolean = true;

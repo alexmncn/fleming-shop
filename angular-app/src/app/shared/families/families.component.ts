@@ -12,43 +12,42 @@ import { environment } from '../../../environments/environment';
 import { catchError, of, throwError, timeout } from 'rxjs';
 
 @Component({
-  selector: 'app-families',
-  standalone: true,
-  imports: [CommonModule, MatIcon, SkeletonModule, CapitalizePipe],
-  templateUrl: './families.component.html',
-  styleUrl: './families.component.css',
-  animations:[
-    trigger('arrowRotateLeft', [
-      state('void', style({
-        transform: 'rotate(180deg)',
-      })),
-      transition(':enter', [
-        animate('0.25s ease-out', style({
-          transform: 'rotate(0deg)',
-        }))
-      ]),
-      transition(':leave', [
-        animate('0s ease-in', style({
-          opacity: 0
-        }))
-      ])
-    ]),
-    trigger('arrowRotateRight', [
-      state('void', style({
-        transform: 'rotate(-180deg)',
-      })),
-      transition(':enter', [
-        animate('0.25s ease-out', style({
-          transform: 'rotate(0deg)',
-        }))
-      ]),
-      transition(':leave', [
-        animate('0s ease-in', style({
-          opacity: 0
-        }))
-      ])
-    ])
-  ]
+    selector: 'app-families',
+    imports: [CommonModule, MatIcon, SkeletonModule, CapitalizePipe],
+    templateUrl: './families.component.html',
+    styleUrl: './families.component.css',
+    animations: [
+        trigger('arrowRotateLeft', [
+            state('void', style({
+                transform: 'rotate(180deg)',
+            })),
+            transition(':enter', [
+                animate('0.25s ease-out', style({
+                    transform: 'rotate(0deg)',
+                }))
+            ]),
+            transition(':leave', [
+                animate('0s ease-in', style({
+                    opacity: 0
+                }))
+            ])
+        ]),
+        trigger('arrowRotateRight', [
+            state('void', style({
+                transform: 'rotate(-180deg)',
+            })),
+            transition(':enter', [
+                animate('0.25s ease-out', style({
+                    transform: 'rotate(0deg)',
+                }))
+            ]),
+            transition(':leave', [
+                animate('0s ease-in', style({
+                    opacity: 0
+                }))
+            ])
+        ])
+    ]
 })
 export class FamiliesComponent implements OnInit {
   families: any[] = [];

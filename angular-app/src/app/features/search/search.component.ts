@@ -11,11 +11,10 @@ import { SearchBarComponent } from "../../shared/search-bar/search-bar.component
 import { ArticlesComponent } from "../../shared/articles/articles.component";
 
 @Component({
-  selector: 'app-search',
-  standalone: true,
-  imports: [CommonModule, SearchBarComponent, ArticlesComponent],
-  templateUrl: './search.component.html',
-  styleUrl: './search.component.css'
+    selector: 'app-search',
+    imports: [CommonModule, SearchBarComponent, ArticlesComponent],
+    templateUrl: './search.component.html',
+    styleUrl: './search.component.css'
 })
 export class SearchComponent {
   searchURL: string = environment.apiUrl + '/articles/search';

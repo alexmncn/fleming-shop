@@ -10,16 +10,16 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^18.2.5",
+    "@angular/animations": "^19.2.3",
     "@angular/cdk": "^18.1.4",
-    "@angular/common": "^18.2.5",
-    "@angular/compiler": "^18.2.5",
-    "@angular/core": "^18.2.5",
-    "@angular/forms": "^18.2.5",
+    "@angular/common": "^19.2.3",
+    "@angular/compiler": "^19.2.3",
+    "@angular/core": "^19.2.3",
+    "@angular/forms": "^19.2.3",
     "@angular/material": "^18.1.4",
-    "@angular/platform-browser": "^18.2.5",
-    "@angular/platform-browser-dynamic": "^18.2.5",
-    "@angular/router": "^18.2.5",
+    "@angular/platform-browser": "^19.2.3",
+    "@angular/platform-browser-dynamic": "^19.2.3",
+    "@angular/router": "^19.2.3",
     "ngx-cookie-service": "^18.0.0",
     "ngx-select-dropdown": "^3.3.2",
     "primeflex": "^3.3.1",
@@ -27,13 +27,13 @@
     "primeng": "^17.18.8",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.14.10"
+    "zone.js": "~0.15.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^18.1.4",
-    "@angular/build": "^18.1.4",
-    "@angular/cli": "^18.2.4",
-    "@angular/compiler-cli": "^18.2.5",
+    "@angular/build": "^19.2.4",
+    "@angular/cli": "^19.2.4",
+    "@angular/compiler-cli": "^19.2.3",
     "@types/jasmine": "~5.1.0",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",
@@ -42,6 +42,6 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "5.5",
-    "vite": "^5.4.6"
+    "vite": "^6.2.2"
   }
 }

@@ -10,11 +10,10 @@ import { environment } from '../../../environments/environment';
 import { ArticlesComponent } from "../../shared/articles/articles.component";
 
 @Component({
-  selector: 'app-family',
-  standalone: true,
-  imports: [CommonModule, ArticlesComponent],
-  templateUrl: './family.component.html',
-  styleUrl: './family.component.css'
+    selector: 'app-family',
+    imports: [CommonModule, ArticlesComponent],
+    templateUrl: './family.component.html',
+    styleUrl: './family.component.css'
 })
 export class FamilyComponent {
   familiesURL: string = environment.apiUrl + '/articles/families'
