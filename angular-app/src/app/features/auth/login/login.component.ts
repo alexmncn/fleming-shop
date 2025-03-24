@@ -4,13 +4,14 @@ import { RouterOutlet } from '@angular/router';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import { NgxTurnstileModule } from 'ngx-turnstile';
 
 import { AuthService } from '../../../services/auth/auth.service';
 import { MessageService } from '../../../services/message/message.service';
 
 @Component({
     selector: 'app-login',
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule, NgxTurnstileModule],
     templateUrl: './login.component.html',
     styleUrl: './login.component.css',
     animations: [
@@ -44,10 +45,12 @@ export class LoginComponent {
 
   defaultRedirectRoute: string = '/home';
 
-  // loading overlay
-  isLoading: boolean = false;
-  loadingInfo: string = '';
+  // Turnstile captcha
+  turnstileSiteKey: string = '0x4AAAAAABCNsBv9TuGNBJQn';
+  turnstileResolved: boolean = false;
+  turnstileResponse: string | null = null;
 
+  isLoading: boolean = false;
 
 
   constructor(private messageService: MessageService, private authService: AuthService, private router: Router, private fb: FormBuilder) { 
@@ -58,10 +61,10 @@ export class LoginComponent {
   }
 
   sendLogin() {
-    if (this.loginForm.valid) {
+    if (this.loginForm.valid && this.turnstileResolved) {
       this.isLoading = true;
 
-      this.authService.login(this.loginForm.value.username, this.loginForm.value.password)
+      this.authService.login(this.loginForm.value.username, this.loginForm.value.password, this.turnstileResponse)
         .subscribe({
           next: (response) => {
             this.isLoading = false;
@@ -73,8 +76,10 @@ export class LoginComponent {
             this.router.navigate([redirectUrl]);
           },
           error: (error) => {
-            if (error.status == 401) {
-              this.messageService.showMessage('error', 'Credenciales incorrectas');
+            if (error.status == 400) {
+              this.messageService.showMessage('error', 'Error en el captcha');
+            } else if (error.status == 401) {
+              this.messageService.showMessage('error', 'Error de autenticación');
               this.credentialsError = true;
             } else if (error.status == 0 || error.status == 500) {
               this.messageService.showMessage('error', 'Error del servidor. Inténtalo de nuevo mas tarde');
@@ -84,8 +89,23 @@ export class LoginComponent {
           }
         });
     } else {
-      this.messageService.showMessage('error', 'Los datos introducidos no son válidos');
-      document.querySelectorAll('input').forEach(input => { input.classList.add('error');})
+      if (!this.turnstileResolved) {
+        this.messageService.showMessage('warn', 'Debes completar el captcha');
+      } else {
+        this.messageService.showMessage('error', 'Los datos introducidos no son válidos');
+        document.querySelectorAll('input').forEach(input => { input.classList.add('error');})
+      }
+    }
+  }
+
+  handleTurnstileResolved(response: string | null): void {
+    if (response) {
+      this.turnstileResponse = response;
+      this.turnstileResolved  = true;
+    } else {
+      this.turnstileResponse = null;
+      this.turnstileResolved = false;
+      console.log('Captcha no resuelto o inválido.');
     }
   }
 }

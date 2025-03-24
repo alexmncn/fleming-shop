@@ -28,14 +28,14 @@ export class AuthService {
   constructor(private http: HttpClient, private cookieService: CookieService) { }
 
 
-  register(username: string, password: string, OTPcode: string = ''): Observable<any> {
-    return OTPcode === '' 
-      ? this.http.post<any>(this.registerUrl, { username, password }) 
+  register(username: string, password: string,  turnstileResponse: string | null, OTPcode: string | null): Observable<any> {
+    return OTPcode === null 
+      ? this.http.post<any>(this.registerUrl, { username, password, turnstileResponse }) 
       : this.http.post<any>(this.registerUrl, { username, password, OTPcode });
   }
 
-  login(username: string, password: string): Observable<any> {
-    return this.http.post<any>(this.loginUrl, { username, password }).pipe(
+  login(username: string, password: string, turnstileResponse: string | null): Observable<any> {
+    return this.http.post<any>(this.loginUrl, { username, password, turnstileResponse }).pipe(
       tap((response: any) => {
         this.storeToken(response.token, response.expires_at);
         this.setUsername(username);

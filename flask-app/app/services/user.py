@@ -1,9 +1,11 @@
-import secrets, string, pytz
+import secrets, string, pytz, requests
 from datetime import datetime
+
 from app.extensions import db
 from app.models import User, OTPCode
-
 from app.services.pushover_alerts import send_alert
+
+from app.config import TURNSTILE_VERIFY_URL, TURNSTILE_SECRET_KEY
 
 def authenticate(username, password):
     user = User.query.filter_by(username=username).first()
@@ -88,3 +90,11 @@ def verify_otp(username, otp):
     db.session.commit()
 
     return True, 200
+
+
+def verify_turnstile(f_turnstile_response):
+    verify_response = requests.post(TURNSTILE_VERIFY_URL, { 'secret': TURNSTILE_SECRET_KEY, 'response': f_turnstile_response })
+
+    verified = verify_response.json().get('success')
+    
+    return verified

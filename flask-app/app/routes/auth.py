@@ -5,7 +5,7 @@ import pytz
 
 
 from app.extensions import jwt
-from app.services.user import authenticate, register
+from app.services.user import authenticate, register, verify_turnstile
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -23,7 +23,17 @@ def login():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
+    f_turnstile_response = data.get('turnstileResponse', None)
     
+    # Verify Turnstile
+    if f_turnstile_response is None:
+        return jsonify(message='Missing Turnstile response'), 400
+    else:
+        turnstile_verified = verify_turnstile(f_turnstile_response)
+        if turnstile_verified is False:
+            return jsonify(message='Invalid Turnstile response'), 401
+    
+    # Authenticate user
     user_authenticated = authenticate(username, password)
     
     if user_authenticated:
@@ -58,6 +68,17 @@ def register_():
     username = data.get('username')
     password = data.get('password')
     otp_code = data.get('OTPcode', None)
+    f_turnstile_response = data.get('turnstileResponse', None)
+    
+    # Verify Turnstile
+    if otp_code is None:
+        print('NO OTP')
+        if f_turnstile_response is None:
+            return jsonify(message='Missing Turnstile response'), 400
+        else:
+            turnstile_verified = verify_turnstile(f_turnstile_response)
+            if turnstile_verified is False:
+                return jsonify(message='Invalid Turnstile response'), 401
     
     status = register(username, password, otp_code)
     

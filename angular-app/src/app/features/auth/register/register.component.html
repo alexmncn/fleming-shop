@@ -37,6 +37,12 @@
         </button>
     </form>
 
+    <div *ngIf="registerStep==0" class="turnstile-container">
+        <div class="turnstile-wrapper">
+            <ngx-turnstile [siteKey]="turnstileSiteKey" (resolved)="handleTurnstileResolved($event)" theme="light" [tabIndex]="0"></ngx-turnstile>
+        </div>
+    </div>
+
     <form @slideInDown *ngIf="registerStep == 1" [formGroup]="otpForm" (ngSubmit)="sendRegister()" class="register-form">
         <div class="form-group">
             <label form="confirm-password">Código de confirmación</label>
@@ -56,4 +62,6 @@
             </ng-template>
         </button>
     </form>
+
+    
 </section>

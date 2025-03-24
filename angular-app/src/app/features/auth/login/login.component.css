@@ -94,7 +94,7 @@ button {
     background-color: var(--primary-accent-500);
     border-radius: 8px;
     font-weight: 600;
-    font-size: clamp(0.7rem, 2.5vw, 1rem);
+    font-size: clamp(0.7rem, 2vw, 1rem);
     cursor: pointer;
     transition: background-color 0.2s ease-out;
 }
@@ -113,4 +113,16 @@ button:active {
     button {
         padding: 0.5rem 1.5rem;
     }
+}
+
+.turnstile-container {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.turnstile-wrapper {
+    margin-top: 2rem;
+    position: absolute;
 }

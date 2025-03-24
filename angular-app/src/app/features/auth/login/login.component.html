@@ -27,4 +27,10 @@
       </ng-template>
     </button>
   </form>
+
+  <div class="turnstile-container">
+    <div class="turnstile-wrapper">
+      <ngx-turnstile [siteKey]="turnstileSiteKey" (resolved)="handleTurnstileResolved($event)" theme="light" [tabIndex]="0"></ngx-turnstile>
+    </div>
+  </div>
 </section>
