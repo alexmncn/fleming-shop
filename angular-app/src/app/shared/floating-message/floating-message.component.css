@@ -17,7 +17,7 @@ section {
 }
 
 .info {
-    background-color: var(--gray-800);
+    background-color: var(--p-neutral-800);
 }
 
 .success {
@@ -38,7 +38,7 @@ mat-icon {
 
 mat-icon.close {
     cursor: pointer;
-    color: var(--gray-100); 
+    color: var(--p-neutral-100); 
     transform: scale(0.75);
 }
 

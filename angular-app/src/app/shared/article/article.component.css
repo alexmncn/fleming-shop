@@ -147,7 +147,7 @@ section.list .hidden-info {
     padding: 0.5rem;
     border-radius: 50%;
     color: white;
-    background-color: var(--gray-800);
+    background-color: var(--p-neutral-800);
     box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.075);
     font-size: clamp(0.6rem, 2.5vw, 1rem);
 }
@@ -171,7 +171,7 @@ section.list .hidden-info {
 
 section .info {
     border-radius: 8px;
-    background-color: var(--gray-50);
+    background-color: var(--p-neutral-50);
     border: var(--border-1-2);
     padding: 0.75rem 1rem;
 }
@@ -213,7 +213,7 @@ p.detalle {
 }
 
 p.ref {
-    color: var(--gray-600);
+    color: var(--p-neutral-600);
     font-size: clamp(0.65rem, 2.5vw, 0.9rem);
 }
 
@@ -392,7 +392,7 @@ section.list .info-placeholder {
 }
 
 .admin-menu .options-card .option:hover {
-    background-color: var(--gray-200);
+    background-color: var(--p-neutral-200);
 }
 
 .admin-menu .options-card .option:active {
@@ -441,7 +441,7 @@ section.list .info-placeholder {
     display: flex;
     align-items: center;
     gap: 0.2rem;
-    color: var(--gray-600);
+    color: var(--p-neutral-600);
     font-size: clamp(0.8rem, 2vw, 1rem);
 }
 
@@ -456,7 +456,7 @@ section.list .info-placeholder {
 }
 
 .article-overlay p.pcosto {
-    color: var(--gray-500);
+    color: var(--p-neutral-500);
     font-size: clamp(0.9rem, 2.5vw, 1.2rem);
 }
 
@@ -536,9 +536,9 @@ section.list .info-placeholder {
     gap: 1rem;
     height: 100%;
     width: 100%;
-    color: var(--gray-600);
-    background-color: var(--gray-100);
-    border: 2px dashed var(--gray-300);
+    color: var(--p-neutral-600);
+    background-color: var(--p-neutral-100);
+    border: 2px dashed var(--p-neutral-300);
     border-radius: 8px;
     cursor: pointer;
     font-size: clamp(0.90rem, 2.5vw, 1.2rem);

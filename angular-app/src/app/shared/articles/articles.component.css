@@ -59,7 +59,7 @@ h2 {
 
 .info h4 {
     margin: 0;
-    color: var(--gray-700);
+    color: var(--p-neutral-700);
     font-size: clamp(0.75rem, 2.5vw, 1rem);
     white-space: nowrap;
 }
@@ -139,7 +139,7 @@ h2 {
 
 .display .pattern-buttons {
     padding: 0.2rem;
-    border: 1px solid var(--gray-300);
+    border: 1px solid var(--p-neutral-300);
     border-radius: 8px;
     background-color: white;
 }
@@ -163,7 +163,7 @@ h2 {
 }
 
 .display .pattern-buttons i:active {
-    background-color: var(--gray-300);
+    background-color: var(--p-neutral-300);
 }
 
 .display .pattern-buttons i.selected {
@@ -243,7 +243,7 @@ progress {
     margin: 0 auto 1rem;
     width: 12.5rem;
     border-radius: 12px;
-    background-color: var(--gray-300);
+    background-color: var(--p-neutral-300);
     border-radius: 12px;
 }
 
@@ -254,7 +254,7 @@ progress[value]::-webkit-progress-bar {
     height: .2rem;
     margin: 0 auto 1rem;
     width: 12.5rem;
-    background-color: var(--gray-300);
+    background-color: var(--p-neutral-300);
     border-radius: 12px;
 }
 
@@ -329,8 +329,8 @@ progress::-ms-fill {
     border: var(--border-1-3);
     border-radius: 8px;
     box-shadow: inset 0 4px 8px 1px rgba(0, 0, 0, 0.1);
-    background-color: var(--gray-100);
-    color: var(--gray-600);
+    background-color: var(--p-neutral-100);
+    color: var(--p-neutral-600);
     font-size: clamp(0.75rem, 2.5vw, 1rem);
 }
 

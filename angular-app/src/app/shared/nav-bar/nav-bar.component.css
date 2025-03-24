@@ -34,7 +34,7 @@ nav .button {
 }
 
 .button:hover {
-    background-color: var(--gray-200) !important;
+    background-color: var(--p-neutral-200) !important;
 }
 
 .button:active {

@@ -48,10 +48,11 @@ h2.active {
 .separator p {
     font-size: clamp(1rem, 2vw, 1.3rem);
     font-weight: 600;
-    color: var(--gray-300);
+    color: var(--p-neutral-400);
 }
 
 .mat-divider {
     width: 3rem;
-    color: var(--gray-200);
+    border-width: 2px;
+    color: var(--p-neutral-200);
 }
