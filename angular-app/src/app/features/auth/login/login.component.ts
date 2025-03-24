@@ -10,7 +10,7 @@ import { MessageService } from '../../../services/message/message.service';
 
 @Component({
     selector: 'app-login',
-    imports: [RouterOutlet, CommonModule, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule],
     templateUrl: './login.component.html',
     styleUrl: './login.component.css',
     animations: [

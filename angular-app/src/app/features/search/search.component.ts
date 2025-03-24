@@ -7,12 +7,11 @@ import { of, throwError } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 
-import { SearchBarComponent } from "../../shared/search-bar/search-bar.component";
 import { ArticlesComponent } from "../../shared/articles/articles.component";
 
 @Component({
     selector: 'app-search',
-    imports: [CommonModule, SearchBarComponent, ArticlesComponent],
+    imports: [CommonModule, ArticlesComponent],
     templateUrl: './search.component.html',
     styleUrl: './search.component.css'
 })

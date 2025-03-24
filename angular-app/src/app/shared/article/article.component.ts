@@ -5,7 +5,6 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { trigger, style, transition, animate, state} from '@angular/animations';
 import { Observable } from 'rxjs';
 import { SkeletonModule } from 'primeng/skeleton';
-import { MatIcon } from '@angular/material/icon';
 
 import { Article } from '../../models/article.model';
 
@@ -18,7 +17,7 @@ import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-article',
-    imports: [CommonModule, SkeletonModule, CapitalizePipe, MatIcon],
+    imports: [CommonModule, SkeletonModule, CapitalizePipe],
     templateUrl: './article.component.html',
     styleUrl: './article.component.css',
     animations: [

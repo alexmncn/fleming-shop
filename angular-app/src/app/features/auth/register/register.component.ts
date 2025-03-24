@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { trigger, style, transition, animate, state } from '@angular/animations';
@@ -10,7 +9,7 @@ import { MessageService } from '../../../services/message/message.service';
 
 @Component({
     selector: 'app-register',
-    imports: [RouterOutlet, CommonModule, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule],
     templateUrl: './register.component.html',
     styleUrl: './register.component.css',
     animations: [

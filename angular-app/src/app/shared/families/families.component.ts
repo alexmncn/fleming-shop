@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Router, NavigationExtras  } from '@angular/router';
-import { MatIcon } from '@angular/material/icon';
+import { Router, NavigationExtras } from '@angular/router';
 import { SkeletonModule } from 'primeng/skeleton';
 import { trigger, style, transition, animate, state } from '@angular/animations';
 
@@ -13,7 +12,7 @@ import { catchError, of, throwError, timeout } from 'rxjs';
 
 @Component({
     selector: 'app-families',
-    imports: [CommonModule, MatIcon, SkeletonModule, CapitalizePipe],
+    imports: [CommonModule, SkeletonModule, CapitalizePipe],
     templateUrl: './families.component.html',
     styleUrl: './families.component.css',
     animations: [

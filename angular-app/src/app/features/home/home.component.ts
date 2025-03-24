@@ -8,11 +8,10 @@ import { environment } from '../../../environments/environment';
 
 import { ArticlesComponent } from '../../shared/articles/articles.component';
 import { FamiliesComponent } from "../../shared/families/families.component";
-import { SearchBarComponent } from "../../shared/search-bar/search-bar.component";
 
 @Component({
     selector: 'app-home',
-    imports: [CommonModule, ArticlesComponent, FamiliesComponent, SearchBarComponent],
+    imports: [CommonModule, ArticlesComponent, FamiliesComponent],
     templateUrl: './home.component.html',
     styleUrl: './home.component.css'
 })
