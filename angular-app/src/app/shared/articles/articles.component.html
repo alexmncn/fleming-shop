@@ -33,9 +33,10 @@
         </section>
 
         <div class="footer">
-            <p>{{ articles.length }} de {{ totalArticles }} artículos</p>
-        
-            <progress [max]="totalArticles" [value]="articles.length"></progress>
+            <div class="progress-info">
+                <p>{{ articles.length }} de {{ totalArticles }} artículos</p>
+                <progress [max]="totalArticles" [value]="articles.length"></progress>
+            </div>
         
             <button *ngIf="!allArticlesLoaded || totalArticles == 0" (click)="load()" [disabled]="loadingArticles">
                 <ng-container *ngIf="!loadingArticles; else loadingTemplate">

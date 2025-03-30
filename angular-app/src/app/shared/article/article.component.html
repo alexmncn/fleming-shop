@@ -2,8 +2,11 @@
     <ng-container *ngIf="!loading; else loadingTemplate">
         <section class="img" [class.placeholder]="imgError">
             <img *ngIf="!imgError" [src]="imgURL" (error)="imgError=true" loading="lazy">
-            <div *ngIf="imgError" class="placeholder-img">
-                <p-skeleton  height="100%" styleClass="mb-2" borderRadius="4px"/>
+            <div *ngIf="imgError" class="placeholder-no-img">
+                <div class="content">
+                    <i class="pi pi-image"></i>
+                    <p>Sin imagen</p>
+                </div>
             </div>
         </section>
         <section class="info">
@@ -84,9 +87,11 @@
             </div>
             <section class="img">
                 <img *ngIf="!imgError" [src]="imgURL" (error)="imgError=true">
-                
-                <div *ngIf="imgError" class="placeholder-img">
-                    <p-skeleton class="placeholder-img" height="100%" styleClass="mb-2" borderRadius="4px"/>
+                <div *ngIf="imgError" class="placeholder-no-img">
+                    <div class="content">
+                        <i class="pi pi-image"></i>
+                        <p>Sin imagen</p>
+                    </div>
                 </div>
             </section>
             <section class="info">
