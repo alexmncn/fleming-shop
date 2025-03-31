@@ -92,42 +92,43 @@ h2 {
 }
 
 ::ng-deep .p-select .p-select-label {
-    font-family: 'Montserrat';
     font-size: clamp(0.75rem, 2.5vw, 1rem);
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
 }
 
-::ng-deep .p-select-panel {
+::ng-deep .p-select-overlay {
     border-radius: 8px;
     border: var(--border-1-3);
     font-family: 'Montserrat';
-    padding: 0.25rem;
     font-size: clamp(0.75rem, 2.5vw, 1rem);
 }
 
-::ng-deep .p-select-items-wrapper ul {
-    padding: 0;
+::ng-deep .p-select-list {
+    padding: 0.25rem;
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
 }
 
-::ng-deep .p-select-item {
+::ng-deep p-selectitem {
     border-radius: 6px;
 }
 
-::ng-deep .p-element li {
+::ng-deep p-selectitem li {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     color: black;
 }
 
-::ng-deep .p-element li.p-focus {
-    background-color: #d0e1fd;
-    color: #1d4ed8;
+::ng-deep .p-select-option.p-focus {
+    background-color: var(--primary-accent-50) !important;
+    color: var(--primary-accent-500) !important;
 }
+
+::ng-deep p-selectitem .p-select-option .p-icon {
+    color: var(--primary-accent-500) !important;
+}
+
 @media (max-width: 600px) {
     
     ::ng-deep .p-select .p-select-label {

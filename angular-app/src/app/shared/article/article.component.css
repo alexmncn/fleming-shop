@@ -20,6 +20,7 @@ section.article-card.grid {
     position: relative;
     flex-direction: column;
     justify-content: space-between;
+    gap: 0.75rem;
 }
 
 section.article-card.list {
@@ -39,13 +40,32 @@ section.article-card.list {
     }
 }
 
+.img{
+    flex: 1 1 auto;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
 section .placeholder-no-img {
     background-color: var(--p-slate-100);
     border-radius: 4px;
     width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+section.grid .placeholder-no-img {
+    min-height: 200px;
+}
+
+section.list .placeholder-no-img {
+    height: 100%;
+    align-self: center;
 }
 
 section .placeholder-no-img .content {
@@ -56,41 +76,25 @@ section .placeholder-no-img .content {
     font-size: clamp(0.75rem, 2.5vw, 1rem);
 }
 
-section.grid .placeholder-no-img {
-    height: 200px;
-    margin-bottom: 1rem;
+@media (max-width: 600px) {
+    section.grid .placeholder-no-img {
+        min-height: 100px;
+    }
 }
 
-section.list .placeholder-no-img {
-    height: 100px;
-    margin-right: 1rem;
-    align-self: center;
-}
-
-
-section.list .img:not(.placeholder){
-    align-self: center;
-}
-
-section.list .img {
-    flex: 1 1 auto;
-}
 
 img {
     object-fit: contain;
-    border-radius: 8px;
+    border-radius: 4px;
 }
-
 
 .grid img {
     width: 100%;
     height: 200px;
-    margin-bottom: 1rem;
 }
 
 .list img {
     height: 100px;
-    margin-right: 1rem;  
 }
 
 
@@ -102,9 +106,9 @@ img {
 
     .list img {
         height: 75px;
-        margin-right: 0.5rem;
     }
 }
+
 
 .stock-info {
     width: min-content;
@@ -168,6 +172,7 @@ section.list .stock-info {
     }
 }
 
+
 .hidden-info {
     position: absolute;
 }
@@ -210,6 +215,7 @@ section.list .hidden-info {
 
 }
 
+
 section .info {
     border-radius: 4px;
     background-color: var(--p-slate-50);
@@ -227,6 +233,7 @@ section.list .info {
     flex-direction: column;
     justify-content: space-between;
     width: 50%;
+    height: 100%;
 }
 
 @media (max-width: 600px) {
@@ -278,6 +285,7 @@ p.pvp {
         margin-bottom: 0.5rem;
     }
 }
+
 
 section.list .info-placeholder {
     width: 50%;
@@ -332,6 +340,7 @@ section.list .info-placeholder {
         margin-top: 0.5rem;
     }
 }
+
 
 .overlay-back {
     position: fixed;
