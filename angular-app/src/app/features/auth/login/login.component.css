@@ -58,6 +58,10 @@ input {
     background-color: var(--background-white);
 }
 
+input::placeholder {
+    color: var(--p-slate-400);
+}
+
 @media (max-width: 600px) { 
     label {
         margin-bottom: 0.3rem;

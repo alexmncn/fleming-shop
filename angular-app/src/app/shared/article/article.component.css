@@ -31,7 +31,7 @@ section.article-card.list {
 
 @media (max-width: 600px) {
     section.article-card {
-        padding: 0.5rem;
+        padding: 0.3rem;
     }
 
     section.article-card.list {
@@ -40,8 +40,8 @@ section.article-card.list {
 }
 
 section .placeholder-no-img {
-    background-color: var(--p-neutral-100);
-    border-radius: 8px;
+    background-color: var(--p-slate-100);
+    border-radius: 4px;
     width: 100%;
     display: flex;
     justify-content: center;
@@ -49,7 +49,7 @@ section .placeholder-no-img {
 }
 
 section .placeholder-no-img .content {
-    color: var(--p-neutral-400);
+    color: var(--p-slate-400);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -188,7 +188,7 @@ section.list .hidden-info {
     padding: 0.5rem;
     border-radius: 50%;
     color: white;
-    background-color: var(--p-neutral-800);
+    background-color: var(--p-slate-900);
     box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.075);
     font-size: clamp(0.6rem, 2.5vw, 1rem);
 }
@@ -211,8 +211,8 @@ section.list .hidden-info {
 }
 
 section .info {
-    border-radius: 8px;
-    background-color: var(--p-neutral-50);
+    border-radius: 4px;
+    background-color: var(--p-slate-50);
     border: var(--border-1-2);
     padding: 0.75rem 1rem;
 }
@@ -254,7 +254,7 @@ p.detalle {
 }
 
 p.ref {
-    color: var(--p-neutral-500);
+    color: var(--p-slate-500);
     font-size: clamp(0.65rem, 2.5vw, 0.9rem);
 }
 
@@ -433,7 +433,7 @@ section.list .info-placeholder {
 }
 
 .admin-menu .options-card .option:hover {
-    background-color: var(--p-neutral-200);
+    background-color: var(--p-slate-200);
 }
 
 .admin-menu .options-card .option:active {
@@ -489,7 +489,7 @@ section.list .info-placeholder {
     display: flex;
     align-items: center;
     gap: 0.2rem;
-    color: var(--p-neutral-500);
+    color: var(--p-slate-500);
     font-size: clamp(0.8rem, 2vw, 1rem);
 }
 
@@ -504,7 +504,7 @@ section.list .info-placeholder {
 }
 
 .article-overlay p.pcosto {
-    color: var(--p-neutral-400);
+    color: var(--p-slate-400);
     font-size: clamp(0.9rem, 3vw, 1.2rem);
 }
 
@@ -584,9 +584,9 @@ section.list .info-placeholder {
     gap: 1rem;
     height: 100%;
     width: 100%;
-    color: var(--p-neutral-500);
-    background-color: var(--p-neutral-100);
-    border: 2px dashed var(--p-neutral-200);
+    color: var(--p-slate-400);
+    background-color: var(--p-slate-100);
+    border: 2px dashed var(--p-slate-200);
     border-radius: 8px;
     cursor: pointer;
     font-size: clamp(0.90rem, 2.5vw, 1.2rem);

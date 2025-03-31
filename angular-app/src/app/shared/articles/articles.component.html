@@ -9,14 +9,15 @@
                 </div>
                 
                 <div class="display">
-                    <p-dropdown class="sort-by"
-                        [options]="sortOptions" 
+                    <p-select class="sort-by"
+                        [options]="sortOptions"
                         [(ngModel)]="selectedSort"
                         (onChange)="sortArticles()"
-                        [checkmark]="true" 
+                        [checkmark]="true"
+                        [showClear]="true"
                         optionLabel="name"
-                        placeholder="Ordenar por" >
-                    </p-dropdown>
+                        placeholder="Ordenar por">
+                    </p-select>
                     
                     <div class="pattern-buttons">
                         <i title="Cuadrícula" class="pi pi-th-large" [class.selected]="gridDisplay" (click)="setGridDisplay()"></i>

@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 
 import { ArticleComponent } from '../article/article.component';
 import { Article } from '../../models/article.model';
@@ -13,7 +14,7 @@ interface SortByOption {
 
 @Component({
     selector: 'app-articles',
-    imports: [CommonModule, ArticleComponent, FormsModule, DropdownModule],
+    imports: [CommonModule, ArticleComponent, FormsModule, DropdownModule, SelectModule],
     templateUrl: './articles.component.html',
     styleUrl: './articles.component.css'
 })

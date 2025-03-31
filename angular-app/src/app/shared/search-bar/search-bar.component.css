@@ -6,7 +6,7 @@ section {
 i {
     position: absolute;
     padding-left: 1.1rem;
-    color: var(--p-neutral-500);
+    color: var(--p-slate-400);
     font-size: clamp(0.75rem, 2.5vw, 1rem);
 }
 
@@ -17,6 +17,7 @@ i {
 }
 
 input {
+    color: var(--p-slate-900);
     width: 100%;
     padding: 1rem;
     border-radius: 8px;
@@ -25,9 +26,14 @@ input {
     font-size: clamp(0.75rem, 2.5vw, 1rem);
     transition: border-color 0.2s ease;
 }
+
+input::placeholder {
+    color: var(--p-slate-400);
+}
+
 @media (min-width: 768px) {
     input:hover {
-        border-color: var(--p-neutral-400);
+        border-color: var(--p-slate-400);
     }    
 }
 
