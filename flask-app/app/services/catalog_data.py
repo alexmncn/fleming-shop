@@ -1,12 +1,14 @@
 import datetime
 from sqlalchemy import desc, text
 from sqlalchemy.dialects import mysql
-from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt
 
 from app.extensions import db
 from app.models import Article, Family
+from app.utils import query_helpers
 
-new_articles_range = 30 # in days
+new_articles_range = 15 # in days
+no_articles_limit = 20
 
 def_article_filter = [Article.hidden == False]
 def_family_filter = [Family.hidden == False]
@@ -15,34 +17,30 @@ def_family_filter = [Family.hidden == False]
 @jwt_required(optional=True)
 def all_articles_total():
     jwt = get_jwt()
-    if jwt:
-        return Article.query.count()
-        
-    return Article.query.filter(*def_article_filter).count()
+    query = Article.query
+    query = query_helpers.apply_articles_auth_filter(query, jwt)
+    return query.count()
 
 
 @jwt_required(optional=True)
 def all_articles_codebars():
     jwt = get_jwt()
-    if jwt:
-        codebars = db.session.query(Article.codebar).all()
-    else:
-        codebars = db.session.query(Article.codebar).filter(*def_article_filter).all()
+    query = db.session.query(Article.codebar)
+    query = query_helpers.apply_articles_auth_filter(query, jwt)
+    query = query_helpers.apply_articles_ordering(query)
     
-    return [codebar[0] for codebar in codebars]
+    return [codebar[0] for codebar in query.all()]
     
 
 @jwt_required(optional=True)
-def all_articles(page, per_page):
-    offset = (page - 1) * per_page
-    
+def all_articles(page, per_page, order_by, direction):
     jwt = get_jwt()
-    if jwt:
-        articles = Article.query.limit(per_page).offset(offset).all()
-        return [article.to_dict() for article in articles]
+    query = Article.query
+    query = query_helpers.apply_articles_auth_filter(query, jwt)
+    query = query_helpers.apply_articles_ordering(query, order_by, direction)
+    query = query_helpers.apply_pagination(query, page, per_page)
     
-    articles = Article.query.filter(*def_article_filter).limit(per_page).offset(offset).all()
-    return [article.to_dict_reduced() for article in articles]
+    return [article.to_dict() if jwt else article.to_dict_reduced() for article in query.all()]
 
 
 @jwt_required(optional=True)

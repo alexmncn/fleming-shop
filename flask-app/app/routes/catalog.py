@@ -28,8 +28,10 @@ def all_articles_codebars():
 def all_articles():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', def_per_page, type=int)
+    order_by = request.args.get('order_by')
+    direction = request.args.get('direction', 'asc')
     
-    articles = catalog_data.all_articles(page, per_page)
+    articles = catalog_data.all_articles(page, per_page, order_by, direction)
     
     if len(articles) == 0:
         return jsonify(error='Not found'), 404

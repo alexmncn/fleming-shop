@@ -39,6 +39,7 @@ class Article(db.Model):
             'codebar': self.codebar, 
             'stock': self.stock, 
             'factualizacion': self.factualizacion,
+            'date_created': self.date_created,
             'destacado': bool(self.destacado),
             'hidden': bool(self.hidden)
         }
@@ -64,6 +65,7 @@ class Article(db.Model):
             'CCODEBAR': self.codebar, 
             'NSTOCKMIN': self.stock, 
             'DACTUALIZA': self.factualizacion,
+            'date_created': self.date_created,
             'destacado': bool(self.destacado),
             'hidden': bool(self.hidden)
         }
