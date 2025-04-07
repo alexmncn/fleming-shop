@@ -3,9 +3,11 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt, get_j
 from datetime import datetime, timedelta
 import pytz
 
-
 from app.extensions import jwt
 from app.services.user import authenticate, register, verify_turnstile
+
+from app.config import INTERNAL_API_KEY
+
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -25,13 +27,18 @@ def login():
     password = data.get('password')
     f_turnstile_response = data.get('turnstileResponse', None)
     
-    # Verify Turnstile
-    if f_turnstile_response is None:
-        return jsonify(message='Missing Turnstile response'), 400
-    else:
-        turnstile_verified = verify_turnstile(f_turnstile_response)
-        if turnstile_verified is False:
-            return jsonify(message='Invalid Turnstile response'), 401
+    # Check if the request is internal
+    api_key = request.headers.get('X-Internal-API-Key')
+    is_internal = api_key == INTERNAL_API_KEY
+    
+    if not is_internal:
+        # Verify Turnstile
+        if f_turnstile_response is None:
+            return jsonify(message='Missing Turnstile response'), 400
+        else:
+            turnstile_verified = verify_turnstile(f_turnstile_response)
+            if turnstile_verified is False:
+                return jsonify(message='Invalid Turnstile response'), 401
     
     # Authenticate user
     user_authenticated = authenticate(username, password)
