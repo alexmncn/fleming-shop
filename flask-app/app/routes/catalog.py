@@ -43,8 +43,10 @@ def all_articles():
 def search_articles_total():
     search = request.args.get('search', None)
     filter = request.args.get('filter', 'detalle')
+    context_filter = request.args.get('context_filter')
+    context_value = request.args.get('context_value', None, type=int)
     
-    total = catalog_data.search_articles_total(search, filter)
+    total = catalog_data.search_articles_total(search, filter, context_filter, context_value)
     
     if total is None:
         return jsonify(error='Error with filter or search value.'), 400
@@ -60,8 +62,10 @@ def search_articles():
     per_page = request.args.get('per_page', def_per_page, type=int)
     order_by = request.args.get('order_by')
     direction = request.args.get('direction', 'asc')
+    context_filter = request.args.get('context_filter')
+    context_value = request.args.get('context_value', None, type=int)
     
-    articles = catalog_data.search_articles(search, filter, page, per_page, order_by, direction)
+    articles = catalog_data.search_articles(search, filter, page, per_page, order_by, direction, context_filter, context_value)
     
     if articles is None:
         return jsonify(error='Error with filter or search value.'), 400

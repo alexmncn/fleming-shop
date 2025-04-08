@@ -1,3 +1,4 @@
+import datetime
 from sqlalchemy import asc, desc
 from sqlalchemy.dialects import mysql
 
@@ -5,6 +6,7 @@ from app.models import Article, Family
 
 def_article_filter = [Article.hidden == False]
 def_family_filter = [Family.hidden == False]
+
 
 def apply_articles_auth_filter(query, jwt):
     if jwt:

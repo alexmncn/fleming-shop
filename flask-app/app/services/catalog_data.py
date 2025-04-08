@@ -45,7 +45,7 @@ def all_articles(page, per_page, order_by, direction):
 
 
 @jwt_required(optional=True)
-def search_articles_total(search, filter):
+def search_articles_total(search, filter, context_filter=None, context_value=None):
     jwt = get_jwt()
 
     if filter == 'detalle':
@@ -56,8 +56,22 @@ def search_articles_total(search, filter):
 
         # Auth filter
         if not jwt:
-            sql_conditions = query_helpers.get_raw_sql_articles_auth_filter()
-            base_query += f" AND {sql_conditions}"
+            sql_auth_conditions = query_helpers.get_raw_sql_articles_auth_filter()
+            base_query += f" AND {sql_auth_conditions}"
+            
+        # Context filter
+        if context_filter:
+            if context_filter == 'featured':
+                base_query += f" AND destacado = 1"
+            elif context_filter == 'new':
+                time_threshold = datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=new_articles_range)
+                base_query += f" AND date_created >= '{time_threshold}'"
+            elif context_filter == 'family':
+                try:
+                    codfam = int(context_value)
+                    base_query += f" AND codfam = {codfam}"
+                except TypeError:
+                    return None
 
         query = db.session.execute(text(base_query),{'search': search})
         
@@ -68,13 +82,27 @@ def search_articles_total(search, filter):
             codebar = int(search)
             query = Article.query.filter_by(codebar=codebar)
             query = query_helpers.apply_articles_auth_filter(query, jwt)
+            
+            if context_filter:
+                if context_filter == 'featured':
+                    query = query.filter_by(destacado=1)
+                elif context_filter == 'new':
+                    time_threshold = datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=new_articles_range)
+                    query = query.filter(Article.date_created >= time_threshold)
+                elif context_filter == 'family':
+                    try:
+                        codfam = int(context_value)
+                        query = query.filter_by(codfam=codfam)
+                    except TypeError:
+                        return None
+                    
             return query.count()
         except ValueError:
             return None
 
 
 @jwt_required(optional=True)
-def search_articles(search, filter, page, per_page, order_by, direction):
+def search_articles(search, filter, page, per_page, order_by, direction, context_filter=None, context_value=None):
     jwt = get_jwt()
 
     if filter == 'detalle':
@@ -88,6 +116,20 @@ def search_articles(search, filter, page, per_page, order_by, direction):
             sql_conditions = query_helpers.get_raw_sql_articles_auth_filter()
             base_query += f" AND {sql_conditions}"
 
+        # Context filter
+        if context_filter:
+            if context_filter == 'featured':
+                base_query += f" AND destacado = 1"
+            elif context_filter == 'new':
+                time_threshold = datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=new_articles_range)
+                base_query += f" AND date_created >= '{time_threshold}'"
+            elif context_filter == 'family':
+                try:
+                    codfam = int(context_value)
+                    base_query += f" AND codfam = {codfam}"
+                except TypeError:
+                    return None
+                
         # Ordering
         order_clause = query_helpers.get_raw_sql_articles_ordering(order_by, direction)
         base_query += f" {order_clause}"
@@ -107,6 +149,20 @@ def search_articles(search, filter, page, per_page, order_by, direction):
             codebar = int(search)
             query = Article.query.filter_by(codebar=codebar)
             query = query_helpers.apply_articles_auth_filter(query, jwt)
+            
+            if context_filter:
+                if context_filter == 'featured':
+                    query = query.filter_by(destacado=1)
+                elif context_filter == 'new':
+                    time_threshold = datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=new_articles_range)
+                    query = query.filter(Article.date_created >= time_threshold)
+                elif context_filter == 'family':
+                    try:
+                        codfam = int(context_value)
+                        query = query.filter_by(codfam=codfam)
+                    except TypeError:
+                        return None
+            
             query = query_helpers.apply_articles_ordering(query, order_by, direction)
             query = query_helpers.apply_pagination(query, page, per_page)
 
