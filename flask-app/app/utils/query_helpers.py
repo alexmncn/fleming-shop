@@ -1,5 +1,5 @@
 from sqlalchemy import asc, desc
-from flask_jwt_extended import get_jwt
+from sqlalchemy.dialects import mysql
 
 from app.models import Article, Family
 
@@ -11,10 +11,19 @@ def apply_articles_auth_filter(query, jwt):
         return query
     return query.filter(*def_article_filter)
 
+
+def get_raw_sql_articles_auth_filter():
+    return ' AND '.join([str(condition.compile(dialect=mysql.dialect())) for condition in def_article_filter])
+
+
 def apply_families_auth_filter(query, jwt):
     if jwt:
         return query
     return query.filter(*def_family_filter)
+
+
+def get_raw_sql_families_auth_filter():
+    return ' AND '.join([str(condition.compile(dialect=mysql.dialect())) for condition in def_family_filter])
 
 
 def apply_articles_ordering(query, order_by='codebar', direction='asc'):
@@ -34,8 +43,33 @@ def apply_articles_ordering(query, order_by='codebar', direction='asc'):
     return query 
 
 
+def get_raw_sql_articles_ordering(order_by, direction):
+    valid_fields = {
+        'pvp': 'pvp',
+        'detalle': 'detalle',
+        'date': 'date_created',
+        'codebar': 'codebar',
+    }
+    
+    direction = direction.lower()
+    if direction not in ['asc', 'desc']:
+        direction = 'asc'
+
+    column = valid_fields.get(order_by, None)
+    if column:
+        return f"ORDER BY {column} {direction.upper()}"
+    else:
+        return ""
+
+
 def apply_pagination(query, page, per_page):
     if page is not None and per_page is not None:
         offset = (page - 1) * per_page
         return query.limit(per_page).offset(offset)
     return query
+
+
+def get_pagination_values(page, per_page):
+    limit = per_page
+    offset = (page - 1) * per_page
+    return limit, offset
