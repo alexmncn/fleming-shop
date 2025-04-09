@@ -65,7 +65,7 @@
                 </div>
                 <div class="admin-menu">
                     <div *ngIf="adminMenuActive" @slideInDown class="options-card">
-                        <div class="option featured" (click)="toggleFeaturedCheckbox($event)">
+                        <div class="option featured" (click)="toggleFeatureArticle($event)">
                             <p>{{ isFeatured ? 'Destacado' : 'Destacar'}}</p>
                             <input type="checkbox" [checked]="isFeatured">
                         </div>

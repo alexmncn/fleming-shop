@@ -108,7 +108,7 @@ export class ArticleComponent implements OnInit {
     this.adminMenuActive = !this.adminMenuActive;
   }
 
-  toggleFeaturedCheckbox(event: Event): void {
+  toggleFeatureArticle(event: Event): void {
     event.preventDefault();
 
     const checkbox = event.target as HTMLInputElement;
