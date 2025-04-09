@@ -6,6 +6,8 @@ import { of, throwError } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 
+import { ArticlesService } from '../../services/catalog/articles/articles.service';
+
 import { ArticlesComponent } from '../../shared/articles/articles.component';
 import { FamiliesComponent } from "../../shared/families/families.component";
 
@@ -16,12 +18,13 @@ import { FamiliesComponent } from "../../shared/families/families.component";
     styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit {
-  per_page: number = 20;
+  perPage: number = 20;
 
-  featuredArticlesURL: string = environment.apiUrl + '/articles/featured';
   featuredArticles: any[] = [];
   featuredHeaderTitle: string = 'Destacado';
   featuredArticlesPage: number = 1;
+  featuredArticlesOrderBy: string = 'detalle';
+  featuredArticlesDirection: string = 'asc';
   totalFeaturedArticles: number = 0;
   loadingFeaturedArticles: boolean = false;
   featuredStatusCode: number = 0;
@@ -30,105 +33,105 @@ export class HomeComponent implements OnInit {
   newHeaderTitle: string = 'Novedades';
   newArticles: any[] = [];
   newArticlesPage: number = 1;
+  newArticlesOrderBy: string = 'detalle';
+  newArticlesDirection: string = 'asc';
   totalNewArticles: number = 0;
   loadingNewArticles: boolean = false;
   newStatusCode: number = 0;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private articlesService: ArticlesService) { }
 
   ngOnInit(): void {
-    this.getTotalFeaturedArticles()
-    this.getTotalNewArticles()
+    this.loadTotalFeaturedArticles();
+    this.loadFeaturedArticles();
 
-    this.loadFeaturedArticles()
+    this.loadTotalNewArticles()
     this.loadNewArticles()
   }
 
-  getTotalFeaturedArticles(): void {
-    this.http.get<any>(this.featuredArticlesURL + '/total')
-      .subscribe((data) => {
-        this.totalFeaturedArticles = data.total;
-      });
+
+  loadTotalFeaturedArticles(): void {
+    this.articlesService.getTotalFeaturedArticles().subscribe({
+      next: (res) => this.totalFeaturedArticles = res.total,
+      error: (err) => {
+        this.featuredStatusCode = err.status || 500;
+        console.error('Error fetching total:', err);
+      }
+    });
   }
 
   loadFeaturedArticles(): void {
     this.loadingFeaturedArticles = true;
-    this.http.get(this.featuredArticlesURL, {params: {'page': this.featuredArticlesPage, 'per_page': this.per_page}})
+    this.articlesService.getFeaturedArticles(this.featuredArticlesPage, this.perPage, this.featuredArticlesOrderBy, this.featuredArticlesDirection)
       .pipe(
         timeout(10000),
-        catchError(error => {
+        catchError(err => {
           this.loadingFeaturedArticles = false;
-          if (error.name === 'TimeoutError') {
-            console.error('Request timed out');
-            this.featuredStatusCode = 408;
-            return of([]);
-          }
-          const status = error.status || 500;
-          const message = error.message || 'An unknown error occurred';
-
-          return throwError(() => ({
-            status,
-            message
-          }));
+          this.featuredStatusCode = err.status || 500;
+          return of([]);
         })
       )
       .subscribe({
-        next: (response) => {
-          this.featuredArticles = this.featuredArticles.concat(response);
+        next: (articles) => {
+          this.featuredArticles = [...this.featuredArticles, ...articles];
           this.featuredArticlesPage++;
-
           this.loadingFeaturedArticles = false;
         },
-        error: (error) => {
+        error: (err) => {
           this.loadingFeaturedArticles = false;
-          this.featuredStatusCode = error.status;
-        },
-        complete: () => {
+          this.featuredStatusCode = err.status;
         }
       });
   }
+
+  onSortChangeFeaturedArticles(order_by: string, direction: string): void {
+    this.featuredArticlesOrderBy = order_by;
+    this.featuredArticlesDirection = direction;
+    this.featuredArticlesPage = 1;
+    this.featuredArticles = [];
+    this.loadFeaturedArticles();
+  }
   
-  getTotalNewArticles(): void {
-    this.http.get<any>(this.newArticlesURL + '/total')
-      .subscribe((data) => {
-        this.totalNewArticles = data.total;
-      });
+
+  loadTotalNewArticles(): void {
+    this.articlesService.getTotalNewArticles().subscribe({
+      next: (res) => this.totalNewArticles = res.total,
+      error: (err) => {
+        this.newStatusCode = err.status || 500;
+        console.error('Error fetching total:', err);
+      }
+    });
   }
 
   loadNewArticles(): void {
-  this.loadingNewArticles = true;
-    this.http.get(this.newArticlesURL, {params: {'page': this.newArticlesPage, 'per_page': this.per_page}})
+    this.loadingNewArticles = true;
+    this.articlesService.getNewArticles(this.newArticlesPage, this.perPage, this.newArticlesOrderBy, this.newArticlesDirection)
       .pipe(
         timeout(10000),
-        catchError(error => {
+        catchError(err => {
           this.loadingNewArticles = false;
-          if (error.name === 'TimeoutError') {
-            console.error('Request timed out');
-            this.newStatusCode = 408;
-            return of([]);
-          }
-          const status = error.status || 500;
-          const message = error.message || 'An unknown error occurred';
-
-          return throwError(() => ({
-            status,
-            message
-          }));
+          this.newStatusCode = err.status || 500;
+          return of([]);
         })
       )
       .subscribe({
-        next: (response) => {
-          this.newArticles = this.newArticles.concat(response);
+        next: (articles) => {
+          this.newArticles = [...this.newArticles, ...articles];
           this.newArticlesPage++;
-
           this.loadingNewArticles = false;
         },
-        error: (error) => {
+        error: (err) => {
           this.loadingNewArticles = false;
-          this.newStatusCode = error.status;
-        },
-        complete: () => {
+          this.newStatusCode = err.status;
         }
       });
+  }
+
+  onSortChangeNewArticles(order_by: string, direction: string): void {
+    this.newArticlesOrderBy = order_by;
+    this.newArticlesDirection = direction;
+    this.newArticlesPage = 1;
+    this.newArticles = [];
+    this.loadNewArticles();
   }
 }

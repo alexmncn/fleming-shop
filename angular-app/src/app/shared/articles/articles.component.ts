@@ -20,6 +20,7 @@ interface SortByOption {
 })
 export class ArticlesComponent {
   @Output() loadArticles = new EventEmitter();
+  @Output() sortChanged = new EventEmitter<{ order_by: string, direction: string }>();
   @Input() articles: any[]= [];
   @Input() headerTitle: string = '';
   @Input() totalArticles: number = 0;
@@ -30,22 +31,20 @@ export class ArticlesComponent {
   listDisplay: boolean = false;
   placeholders: Article[] = new Array(this.per_page).fill('');
 
-  sortOptions: SortByOption[] = [
-    { name: 'Precio: de menor a mayor', code: 0 },
-    { name: 'Precio: de mayor a menor', code: 1 },
-    { name: 'Nombre: A a Z', code: 2 },
-    { name: 'Nombre: Z a A', code: 3 }
+  sortOptions = [
+    { name: 'Nombre: A a Z', order_by: 'detalle', direction: 'asc' },
+    { name: 'Nombre: Z a A', order_by: 'detalle', direction: 'desc' },
+    { name: 'Precio: de menor a mayor', order_by: 'pvp', direction: 'asc' },
+    { name: 'Precio: de mayor a menor', order_by: 'pvp', direction: 'desc' },
   ];
 
-  selectedSort: SortByOption | undefined;
+  selectedSort = this.sortOptions[0];
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if(changes["loadingArticles"])
-
-
-    if (changes["articles"]) {
-      this.sortArticles();
-    }
+  onSortChange(): void {
+    this.sortChanged.emit({
+      order_by: this.selectedSort.order_by,
+      direction: this.selectedSort.direction
+    });
   }
 
   load(): void {
@@ -67,25 +66,6 @@ export class ArticlesComponent {
     if (this.listDisplay == false) {
       this.listDisplay = true;
       this.gridDisplay = false;
-    }
-  }
-
-  sortArticles() {
-    switch (this.selectedSort?.code) {
-      case 0:
-        this.articles.sort((a, b) => a.pvp - b.pvp);
-        break;
-      case 1:
-        this.articles.sort((a, b) => b.pvp - a.pvp);
-        break; 
-      case 2:
-        this.articles.sort((a, b) => a.detalle.localeCompare(b.detalle));
-        break;
-      case 3:
-        this.articles.sort((a, b) => b.detalle.localeCompare(a.detalle));
-        break;
-      default:
-        break;
     }
   }
 

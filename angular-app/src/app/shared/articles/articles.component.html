@@ -12,7 +12,7 @@
                     <p-select class="sort-by"
                         [options]="sortOptions"
                         [(ngModel)]="selectedSort"
-                        (onChange)="sortArticles()"
+                        (onChange)="onSortChange()"
                         [checkmark]="true"
                         [showClear]="true"
                         optionLabel="name"
