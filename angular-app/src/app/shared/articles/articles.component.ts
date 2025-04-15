@@ -35,7 +35,7 @@ export class ArticlesComponent {
 
   selectedSort = this.sortOptions[0];
 
-  onSortChange(): void {
+  onSortChange(clear: boolean): void {
     this.sortChanged.emit({
       order_by: this.selectedSort.order_by,
       direction: this.selectedSort.direction

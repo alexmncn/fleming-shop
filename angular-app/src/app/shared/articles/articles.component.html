@@ -12,9 +12,8 @@
                     <p-select class="sort-by"
                         [options]="sortOptions"
                         [(ngModel)]="selectedSort"
-                        (onChange)="onSortChange()"
+                        (onChange)="onSortChange(false)"
                         [checkmark]="true"
-                        [showClear]="true"
                         optionLabel="name"
                         placeholder="Ordenar por">
                     </p-select>
