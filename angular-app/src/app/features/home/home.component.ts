@@ -1,10 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { catchError, timeout } from 'rxjs/operators';
-import { of, throwError } from 'rxjs';
-
-import { environment } from '../../../environments/environment';
+import { of } from 'rxjs';
 
 import { ArticlesService } from '../../services/catalog/articles/articles.service';
 
@@ -29,7 +26,6 @@ export class HomeComponent implements OnInit {
   loadingFeaturedArticles: boolean = false;
   featuredStatusCode: number = 0;
 
-  newArticlesURL: string = environment.apiUrl + '/articles/new';
   newHeaderTitle: string = 'Novedades';
   newArticles: any[] = [];
   newArticlesPage: number = 1;
@@ -39,7 +35,7 @@ export class HomeComponent implements OnInit {
   loadingNewArticles: boolean = false;
   newStatusCode: number = 0;
 
-  constructor(private http: HttpClient, private articlesService: ArticlesService) { }
+  constructor(private articlesService: ArticlesService) { }
 
   ngOnInit(): void {
     this.loadTotalFeaturedArticles();
@@ -84,8 +80,8 @@ export class HomeComponent implements OnInit {
       });
   }
 
-  onSortChangeFeaturedArticles(order_by: string, direction: string): void {
-    this.featuredArticlesOrderBy = order_by;
+  onSortChangeFeaturedArticles(orderBy: string, direction: string): void {
+    this.featuredArticlesOrderBy = orderBy;
     this.featuredArticlesDirection = direction;
     this.featuredArticlesPage = 1;
     this.featuredArticles = [];

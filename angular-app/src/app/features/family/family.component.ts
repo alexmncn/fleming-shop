@@ -1,11 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { catchError, timeout } from 'rxjs/operators';
 import { of, throwError } from 'rxjs';
-
-import { environment } from '../../../environments/environment';
+import { ArticlesService } from '../../services/catalog/articles/articles.service';
 
 import { ArticlesComponent } from "../../shared/articles/articles.component";
 
@@ -16,70 +14,69 @@ import { ArticlesComponent } from "../../shared/articles/articles.component";
     styleUrl: './family.component.css'
 })
 export class FamilyComponent {
-  familiesURL: string = environment.apiUrl + '/articles/families'
   nomfam: string = '';
   codfam: number = 0;
   articles: any[] = [];
   totalArticles: number = 0;
-  per_page: number = 30;
+  perPage: number = 30;
   articlesPage: number = 1;
+  articlesOrderBy: string = 'detalle';
+  articlesDirection: string = 'asc';
   loadingArticles: boolean = false;
   statusCode: number = -1;
 
-  constructor(private http: HttpClient, private route: ActivatedRoute) { }
+  constructor(private route: ActivatedRoute, private articlesService: ArticlesService) { }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       this.nomfam = params['nomfam'];
       this.codfam = params['codfam'];
       if (this.nomfam) {
-        this.getTotalFamilyArticles();
+        this.loadTotalFamilyArticles();
         this.loadFamilyArticles();
       }
     });
   }
 
-  getTotalFamilyArticles(): void {
-    this.http.get<any>(this.familiesURL + '/' + this.codfam + '/total')
-      .subscribe((data) => {
-        this.totalArticles = data.total;
-      });
+  loadTotalFamilyArticles(): void {
+    this.articlesService.getTotalFamilyArticles(this.codfam).subscribe({
+      next: (res) => this.totalArticles = res.total,
+      error: (err) => {
+        this.statusCode = err.status || 500;
+        console.error('Error fetching total:', err);
+      }
+    });
   }
 
   loadFamilyArticles(): void {
     this.loadingArticles = true;
-    this.http.get(this.familiesURL + '/' + this.codfam, {params: {'page': this.articlesPage, 'per_page': this.per_page}})
+    this.articlesService.getFamilyArticles(this.codfam, this.articlesPage, this.perPage, this.articlesOrderBy, this.articlesDirection)
       .pipe(
         timeout(10000),
-        catchError(error => {
+        catchError(err => {
           this.loadingArticles = false;
-          if (error.name === 'TimeoutError') {
-            console.error('Request timed out');
-            this.statusCode = 408;
-            return of([]);
-          }
-          const status = error.status || 500;
-          const message = error.message || 'An unknown error occurred';
-
-          return throwError(() => ({
-            status,
-            message
-          }));
+          this.statusCode = err.status || 500;
+          return of([]);
         })
       )
       .subscribe({
-        next: (response) => {
-          this.articles = this.articles.concat(response);
+        next: (articles) => {
+          this.articles = [...this.articles, ...articles];
           this.articlesPage++;
-        
           this.loadingArticles = false;
         },
-        error: (error) => {
+        error: (err) => {
           this.loadingArticles = false;
-          this.statusCode = error.status;
-        },
-        complete: () => {
+          this.statusCode = err.status;
         }
       });
+  }
+
+  onSortChangeArticles(order_by: string, direction: string): void {
+    this.articlesOrderBy = order_by;
+    this.articlesDirection = direction;
+    this.articlesPage = 1;
+    this.articles = [];
+    this.loadFamilyArticles();
   }
 }

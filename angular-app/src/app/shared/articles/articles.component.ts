@@ -7,11 +7,6 @@ import { SelectModule } from 'primeng/select';
 import { ArticleComponent } from '../article/article.component';
 import { Article } from '../../models/article.model';
 
-interface SortByOption {
-  name: string;
-  code: number;
-}
-
 @Component({
     selector: 'app-articles',
     imports: [CommonModule, ArticleComponent, FormsModule, DropdownModule, SelectModule],
@@ -24,12 +19,12 @@ export class ArticlesComponent {
   @Input() articles: any[]= [];
   @Input() headerTitle: string = '';
   @Input() totalArticles: number = 0;
-  @Input() per_page: number = 20;
+  @Input() perPage: number = 20;
   @Input() loadingArticles: boolean = false;
   @Input() statusCode: number = -1;
   gridDisplay: boolean = true;
   listDisplay: boolean = false;
-  placeholders: Article[] = new Array(this.per_page).fill('');
+  placeholders: Article[] = new Array(this.perPage).fill('');
 
   sortOptions = [
     { name: 'Nombre: A a Z', order_by: 'detalle', direction: 'asc' },

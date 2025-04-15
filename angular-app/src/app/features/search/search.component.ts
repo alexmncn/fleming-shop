@@ -3,11 +3,10 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { catchError, timeout } from 'rxjs/operators';
-import { of, throwError } from 'rxjs';
-
-import { environment } from '../../../environments/environment';
+import { of } from 'rxjs';
 
 import { ArticlesComponent } from "../../shared/articles/articles.component";
+import { ArticlesService } from '../../services/catalog/articles/articles.service';
 
 @Component({
     selector: 'app-search',
@@ -16,18 +15,23 @@ import { ArticlesComponent } from "../../shared/articles/articles.component";
     styleUrl: './search.component.css'
 })
 export class SearchComponent {
-  searchURL: string = environment.apiUrl + '/articles/search';
   articles: any[] = [];
   totalArticles: number = 0;
-  per_page: number = 30;
-  searchParam: string = '';
-  lastSearchParam: string = 'none';
+  perPage: number = 30;
   articlesPage: number = 1;
   loadingArticles: boolean = false;
   statusCode: number = -1;
 
+  searchParam: string = '';
+  lastSearchParam: string = 'none';
+  filter: string = 'detalle';
+  contextFilter: string = '';
+  contextValue: string = '';
+  orderBy: string = 'detalle';
+  direction: string = 'asc';
 
-  constructor(private http: HttpClient, private route: ActivatedRoute) { }
+
+  constructor(private articlesService: ArticlesService, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
@@ -38,65 +42,59 @@ export class SearchComponent {
     });
   }
 
-  getTotalSearchArticles(): void {
-    this.http.get<any>(this.searchURL + '/total', {params: {'search': this.searchParam}})
-      .subscribe((data) => {
-        this.totalArticles = data.total;
-      });
-  }
-
   onSearch(param: string = ''): void {
     this.loadingArticles = true;
     this.searchParam = param;
     if (this.searchParam === this.lastSearchParam) {
-      this.http.get(this.searchURL, {params: {'search': this.searchParam, 'page': this.articlesPage, 'per_page': this.per_page}})
-      .subscribe((data) => {
-        this.articles = this.articles.concat(data);
-        this.articlesPage++;
-        this.lastSearchParam = this.searchParam;
-
-        this.loadingArticles = false;
-      });
+      this.loadSearchArticles();
     } else {
       this.articlesPage = 1;
       this.articles = [];
       this.getTotalSearchArticles();
-      this.http.get(this.searchURL, {params: {'search': this.searchParam, 'page': this.articlesPage, 'per_page': this.per_page}})
-        .pipe(
-          timeout(10000),
-          catchError(error => {
-            this.loadingArticles = false;
-            if (error.name === 'TimeoutError') {
-              console.error('Request timed out');
-              this.statusCode = 408;
-              return of([]);
-            }
-            const status = error.status || 500;
-            const message = error.message || 'An unknown error occurred';
-
-            return throwError(() => ({
-              status,
-              message
-            }));
-          })
-        )
-        .subscribe({
-          next: (response) => {
-            this.articles = this.articles.concat(response);
-            this.articlesPage++;
-            this.lastSearchParam = this.searchParam;
-            
-            this.loadingArticles = false;
-          },
-          error: (error) => {
-            console.log(error.status)
-            this.loadingArticles = false;
-            this.statusCode = error.status;
-          },
-          complete: () => {
-          }
-        });
+      this.loadSearchArticles();
     }
+  }
+
+  getTotalSearchArticles(): void {
+    this.articlesService.getTotalSearchArticles(this.searchParam, this.filter, this.contextFilter, this.contextValue).subscribe({
+      next: (res) => this.totalArticles = res.total,
+      error: (err) => {
+        this.statusCode = err.status || 500;
+        console.error('Error fetching total:', err);
+      }
+    });
+  }
+
+  loadSearchArticles(): void {
+    this.articlesService.getSearchArticles(this.searchParam, this.filter, this.contextFilter, this.contextValue, this.articlesPage, this.perPage, this.orderBy, this.direction)
+      .pipe(
+        timeout(10000),
+        catchError(err => {
+          this.loadingArticles = false;
+          this.statusCode = err.status || 500;
+          return of([]);
+        })
+      )
+      .subscribe({
+        next: (articles) => {
+          this.articles = [...this.articles, ...articles];
+          this.articlesPage++;
+          this.lastSearchParam = this.searchParam;
+          this.loadingArticles = false;
+        },
+        error: (err) => {
+          this.loadingArticles = false;
+          this.statusCode = err.status;
+        }
+      });
+  }
+
+  onSortChange(orderBy: string, direction: string): void {
+    this.orderBy = orderBy;
+    this.direction = direction;
+    this.articlesPage = 1;
+    this.articles = [];
+    this.loadSearchArticles();
   }
 
 }
