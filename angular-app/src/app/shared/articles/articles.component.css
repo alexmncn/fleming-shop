@@ -2,7 +2,7 @@ main {
     padding: 1rem;
     border: var(--border-1-2);
     border-radius: 12px;
-    box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.05);
     background-color: white;
 }
 

@@ -69,7 +69,7 @@ export class LoginComponent {
           next: (response) => {
             this.isLoading = false;
 
-            this.messageService.showMessage('success', 'Has iniciado sesión', 5);
+            this.messageService.showMessage('success', 'Has iniciado sesión', 0);
             
             // Redirect
             const redirectUrl = this.authService.redirectUrl || this.defaultRedirectRoute;

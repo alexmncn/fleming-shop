@@ -22,7 +22,7 @@ input {
     padding: 1rem;
     border-radius: 8px;
     border: var(--border-1-2);
-    box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.05);
     font-size: clamp(0.75rem, 2.5vw, 1rem);
     transition: border-color 0.2s ease;
 }
