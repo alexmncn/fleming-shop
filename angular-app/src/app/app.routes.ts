@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
 
 import { CatalogComponent } from './features/catalog/catalog.component';
-import { HomeComponent } from './features/home/home.component';
-import { SearchComponent } from './features/search/search.component';
-import { FamilyComponent } from './features/family/family.component';
+import { HomeComponent } from './features/catalog/home/home.component';
+import { SearchComponent } from './features/catalog/search/search.component';
+import { FamilyComponent } from './features/catalog/family/family.component';
 import { AuthComponent } from './features/auth/auth.component';
 import { LoginComponent } from './features/auth/login/login.component';
 import { RegisterComponent } from './features/auth/register/register.component';

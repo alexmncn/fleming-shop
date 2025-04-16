@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { catchError, timeout } from 'rxjs/operators';
 import { of } from 'rxjs';
 
-import { ArticlesService } from '../../services/catalog/articles/articles.service';
+import { ArticlesService } from '../../../services/catalog/articles/articles.service';
 
-import { ArticlesComponent } from '../../shared/articles/articles.component';
-import { FamiliesComponent } from "../../shared/families/families.component";
+import { ArticlesComponent } from '../../../shared/articles/articles.component';
+import { FamiliesComponent } from "../../../shared/families/families.component";
 
 @Component({
     selector: 'app-home',

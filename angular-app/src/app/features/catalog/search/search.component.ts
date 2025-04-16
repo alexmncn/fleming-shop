@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { catchError, timeout } from 'rxjs/operators';
 import { of } from 'rxjs';
 
-import { ArticlesComponent } from "../../shared/articles/articles.component";
-import { ArticlesService } from '../../services/catalog/articles/articles.service';
+import { ArticlesComponent } from "../../../shared/articles/articles.component";
+import { ArticlesService } from '../../../services/catalog/articles/articles.service';
 
 @Component({
     selector: 'app-search',

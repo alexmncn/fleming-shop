@@ -103,6 +103,7 @@ export class ArticlesService {
       })
     );
   }
+  
 
   getTotalSearchArticles(search: string, filter: string, contextFilter: string, contextValue: string) {
     const rawParams: any = {
