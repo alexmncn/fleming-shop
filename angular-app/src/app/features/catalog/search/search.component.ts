@@ -42,15 +42,17 @@ export class SearchComponent {
   }
 
   onSearch(param: string = ''): void {
-    this.loadingArticles = true;
-    this.searchParam = param;
-    if (this.searchParam === this.lastSearchParam) {
-      this.loadSearchArticles();
-    } else {
-      this.articlesPage = 1;
-      this.articles = [];
-      this.getTotalSearchArticles();
-      this.loadSearchArticles();
+    if (param !== '') {
+      this.loadingArticles = true;
+      this.searchParam = param;
+      if (this.searchParam === this.lastSearchParam) {
+        this.loadSearchArticles();
+      } else {
+        this.articlesPage = 1;
+        this.articles = [];
+        this.getTotalSearchArticles();
+        this.loadSearchArticles();
+      }
     }
   }
 
