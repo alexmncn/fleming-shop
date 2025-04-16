@@ -21,7 +21,7 @@ nav .button {
     background-color: white;
     border: var(--border-1-2);
     border-radius: 12px;
-    box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.05);
     cursor: pointer;
     font-size: clamp(0.75rem, 2.5vw, 1.1rem);
 }
@@ -34,7 +34,7 @@ nav .button {
 }
 
 .button:hover {
-    background-color: var(--p-neutral-200) !important;
+    background-color: var(--p-slate-50) !important;
 }
 
 .button:active {
