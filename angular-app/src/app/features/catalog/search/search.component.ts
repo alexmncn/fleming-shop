@@ -5,7 +5,9 @@ import { catchError, timeout } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 import { ArticlesComponent } from "../../../shared/articles/articles.component";
+
 import { ArticlesService } from '../../../services/catalog/articles/articles.service';
+import { MessageService } from '../../../services/message/message.service';
 
 @Component({
     selector: 'app-search',
@@ -30,29 +32,30 @@ export class SearchComponent {
   direction: string = 'asc';
 
 
-  constructor(private articlesService: ArticlesService, private route: ActivatedRoute) { }
+  constructor(private articlesService: ArticlesService, private messageService: MessageService, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       this.searchParam = params['q'] || '';
+      console.log('1')
+      console.log(this.searchParam)
       if (this.searchParam) {
+        console.log('2')
         this.onSearch(this.searchParam);
       }
     });
   }
 
   onSearch(param: string = ''): void {
-    if (param !== '') {
-      this.loadingArticles = true;
-      this.searchParam = param;
-      if (this.searchParam === this.lastSearchParam) {
-        this.loadSearchArticles();
-      } else {
-        this.articlesPage = 1;
-        this.articles = [];
-        this.getTotalSearchArticles();
-        this.loadSearchArticles();
-      }
+    this.loadingArticles = true;
+    this.searchParam = param;
+    if (this.searchParam === this.lastSearchParam) {
+      this.loadSearchArticles();
+    } else {
+      this.articlesPage = 1;
+      this.articles = [];
+      this.getTotalSearchArticles();
+      this.loadSearchArticles();
     }
   }
 

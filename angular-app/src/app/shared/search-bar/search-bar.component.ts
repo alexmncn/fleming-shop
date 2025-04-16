@@ -1,12 +1,13 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { Router, NavigationExtras } from '@angular/router';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 
 import { environment } from '../../../environments/environment';
+import { ArticlesService } from '../../services/catalog/articles/articles.service';
+import { MessageService } from '../../services/message/message.service';
 
 @Component({
     selector: 'app-search-bar',
@@ -15,25 +16,25 @@ import { environment } from '../../../environments/environment';
     styleUrl: './search-bar.component.css'
 })
 export class SearchBarComponent implements OnInit {
-  @Output() search = new EventEmitter<string>();
   @Output() isFocused = new EventEmitter<boolean>();
   searchParam: string = '';
   isInputFocused: boolean = false;
 
-  totalArticlesURL: string = environment.apiUrl + '/articles/total';
   totalArticles: any = 'todos los'; 
 
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(private articlesService: ArticlesService, private messageService: MessageService, private router: Router) { }
 
   ngOnInit(): void {
-    this.getTotalArticles();
+    this.loadTotalArticles();
   }
 
-  getTotalArticles(): void {
-    this.http.get<any>(this.totalArticlesURL)
-      .subscribe((data) => {
-        this.totalArticles = data.total;
-      });
+  loadTotalArticles(): void {
+    this.articlesService.getTotalArticles().subscribe({
+      next: (res) => this.totalArticles = res.total,
+      error: (err) => {
+        console.error('Error fetching total:', err);
+      }
+    });
   }
 
   get placeholder(): string {
@@ -42,14 +43,14 @@ export class SearchBarComponent implements OnInit {
 
   onSearch(): void {
     this.onBlur();
-    if (this.router.url !== '/catalog/search') {
+    if (this.searchParam !== '') {
       const navigationExtras: NavigationExtras = {
         queryParams: { 'q': this.searchParam }
       };
 
       this.router.navigate(['/catalog/search'], navigationExtras);;
     } else {
-      this.search.emit(this.searchParam);
+      this.messageService.showMessage('info', 'Introduce un término de búsqueda', 5);
     }
   }
 

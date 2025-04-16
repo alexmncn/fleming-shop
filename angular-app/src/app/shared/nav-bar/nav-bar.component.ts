@@ -13,20 +13,17 @@ import { SearchBarComponent } from "../search-bar/search-bar.component";
     styleUrl: './nav-bar.component.css',
     animations: [
       trigger('buttonIn', [
-        // ENTRADA
         transition(':enter', [
           style({ width: '0px', transform: 'translateX(-50%)', opacity: 0 }),
           sequence([
-            animate('200ms ease-out', style({ width: '*' })), // Expandir ancho
-            animate('200ms ease-out', style({ transform: 'translateX(0%)', opacity: 1 })) // Deslizar y aparecer
+            animate('200ms ease-out', style({ width: '*' })),
+            animate('200ms ease-out', style({ transform: 'translateX(0%)', opacity: 1 }))
           ])
         ]),
-    
-        // SALIDA
         transition(':leave', [
           sequence([
-            animate('200ms ease-in', style({ transform: 'translateX(-50%)', opacity: 0 })), // Deslizar hacia fuera
-            animate('200ms ease-in', style({ width: '0px' })) // Colapsar ancho
+            animate('200ms ease-in', style({ transform: 'translateX(-50%)', opacity: 0 })),
+            animate('200ms ease-in', style({ width: '0px' }))
           ])
         ])
       ])

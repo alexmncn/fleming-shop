@@ -7,16 +7,21 @@ import { Article } from '../../../models/article.model';
 @Injectable({ providedIn: 'root' })
 export class ArticlesService {
   private baseUrl = environment.apiUrl;
-  private featuredArticlesUrl = this.baseUrl + '/articles/featured';
-  private featuredArticlesTotalUrl = this.featuredArticlesUrl + '/total';
-  private newArticlesUrl = this.baseUrl + '/articles/new';
-  private newArticlesTotalUrl = this.newArticlesUrl + '/total';
-  private familiesUrl = this.baseUrl + '/articles/families';
+  private totalArticlesUrl: string = environment.apiUrl + '/articles/total';
+  private featuredArticlesUrl: string = this.baseUrl + '/articles/featured';
+  private featuredArticlesTotalUrl: string = this.featuredArticlesUrl + '/total';
+  private newArticlesUrl: string = this.baseUrl + '/articles/new';
+  private newArticlesTotalUrl: string = this.newArticlesUrl + '/total';
+  private familiesUrl: string = this.baseUrl + '/articles/families';
   private searchUrl: string = environment.apiUrl + '/articles/search';
   private searchTotalUrl: string = this.searchUrl + '/total';
 
   constructor(private http: HttpClient) {}
 
+
+  getTotalArticles() {
+    return this.http.get<{ total: number }>(this.totalArticlesUrl);
+  }
 
   getTotalFeaturedArticles() {
     return this.http.get<{ total: number }>(this.featuredArticlesTotalUrl);
