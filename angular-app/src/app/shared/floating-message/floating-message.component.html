@@ -1,11 +1,18 @@
-<main @slideInRight *ngIf="message.text">
-    <section [ngClass]="message.type" *ngIf="message?.type">
-        <mat-icon class="material-symbols-outlined" *ngIf="message?.type === 'info' || message?.type === 'warn'">info</mat-icon>
-        <mat-icon class="material-symbols-outlined" *ngIf="message?.type === 'success'">check_circle</mat-icon>
-        <mat-icon class="material-symbols-outlined" *ngIf="message?.type === 'error'">error</mat-icon>
+<main *ngIf="messages.length > 0">
+    <ng-container *ngFor="let message of messages">
+      <section [ngClass]="message.type" @slideInRight>
+        <!-- Íconos condicionales -->
+        <mat-icon class="material-symbols-outlined" *ngIf="message.type === 'info' || message.type === 'warn'">info</mat-icon>
+        <mat-icon class="material-symbols-outlined" *ngIf="message.type === 'success'">check_circle</mat-icon>
+        <mat-icon class="material-symbols-outlined" *ngIf="message.type === 'error'">error</mat-icon>
         <div class="message">
-            <p>{{ message.text }}</p>
+          <p>{{ message.text }}</p>
         </div>
-        <mat-icon class="material-symbols-outlined close" (click)="closeMessage()">close</mat-icon>
-    </section>
+        <mat-icon class="material-symbols-outlined close" (click)="closeMessage(message.id)">close</mat-icon>
+        
+        <!-- Barra de progreso, por ejemplo, para mostrar el tiempo restante -->
+        <div class="progress-bar" [ngStyle]="{ 'animation-duration': message.duration * 1000 + 'ms' }"></div>
+      </section>
+    </ng-container>
 </main>
+  

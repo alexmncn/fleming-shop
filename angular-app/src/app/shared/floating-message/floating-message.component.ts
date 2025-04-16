@@ -1,9 +1,9 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { trigger, style, transition, animate, sequence } from '@angular/animations';
 
-import { MessageService } from '../../services/message/message.service';
+import { MessageService, Message } from '../../services/message/message.service';
 
 @Component({
     selector: 'app-floating-message',
@@ -28,16 +28,19 @@ import { MessageService } from '../../services/message/message.service';
         ])
     ]
 })
-export class FloatingMessageComponent {
-  message: { type: string, text: string } = { type: '', text: '' };
-
-  constructor(private messageService: MessageService) {}
-
-  ngOnInit(): void {
-    this.messageService.currentMessage.subscribe(message => this.message = message);
+export class FloatingMessageComponent implements OnInit {
+    messages: Message[] = [];
+    
+    constructor(private messageService: MessageService) { }
+  
+    ngOnInit(): void {
+      this.messageService.currentMessages.subscribe((msgs) => {
+        this.messages = msgs;
+      });
+    }
+  
+    // Método para cerrar un mensaje manualmente
+    closeMessage(id: number): void {
+      this.messageService.removeMessage(id);
+    }
   }
-
-  closeMessage() {
-    this.messageService.clearMessage();
-  }
-}
