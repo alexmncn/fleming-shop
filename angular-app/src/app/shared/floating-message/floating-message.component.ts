@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
-import { trigger, style, transition, animate, state } from '@angular/animations';
+import { trigger, style, transition, animate, sequence } from '@angular/animations';
 
 import { MessageService } from '../../services/message/message.service';
 
@@ -11,22 +11,19 @@ import { MessageService } from '../../services/message/message.service';
     templateUrl: './floating-message.component.html',
     styleUrl: './floating-message.component.css',
     animations: [
-        trigger('slideInDown', [
-            state('void', style({
-                transform: 'translateY(-100%)',
-                opacity: 0
-            })),
+        trigger('slideInRight', [
             transition(':enter', [
-                animate('0.5s ease-out', style({
-                    transform: 'translateY(0)',
-                    opacity: 1
-                }))
+                style({ height: '0px', opacity: 0, transform: 'translateX(-100%)' }),
+                sequence([
+                    animate('200ms ease-out', style({ height: '*' })),
+                    animate('300ms ease-out', style({ transform: 'translateX(0)', opacity: 1 }))
+                ])
             ]),
             transition(':leave', [
-                animate('0.3s ease-in', style({
-                    transform: 'translateY(-100%)',
-                    opacity: 0
-                }))
+                sequence([
+                    animate('200ms ease-in', style({ transform: 'translateX(100%)', opacity: 0 })),
+                    animate('200ms ease-in', style({ height: '0px' }))
+                ])
             ])
         ])
     ]

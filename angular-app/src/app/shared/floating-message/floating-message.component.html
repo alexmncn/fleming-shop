@@ -1,4 +1,4 @@
-<main @slideInDown *ngIf="message.text">
+<main @slideInRight *ngIf="message.text">
     <section [ngClass]="message.type" *ngIf="message?.type">
         <mat-icon class="material-symbols-outlined" *ngIf="message?.type === 'info' || message?.type === 'warn'">info</mat-icon>
         <mat-icon class="material-symbols-outlined" *ngIf="message?.type === 'success'">check_circle</mat-icon>

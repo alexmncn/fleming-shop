@@ -19,7 +19,7 @@ export class AdminComponent {
     this.authService.logout()
       .subscribe({
         next: (response) => {
-          this.messageService.showMessage('info', 'Has cerrado sesión correctamente')
+          this.messageService.showMessage('info', 'Has cerrado sesión correctamente', 5)
           this.router.navigate(['/catalog'])
         },
         error: (error) => {
