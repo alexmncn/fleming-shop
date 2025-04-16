@@ -1,7 +1,7 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { Router, RouterLink,  NavigationEnd } from '@angular/router';
-import { trigger, style, transition, animate, state } from '@angular/animations';
+import { trigger, style, transition, animate, sequence } from '@angular/animations';
 import { MatIcon } from '@angular/material/icon';
 
 import { SearchBarComponent } from "../search-bar/search-bar.component";
@@ -12,24 +12,24 @@ import { SearchBarComponent } from "../search-bar/search-bar.component";
     templateUrl: './nav-bar.component.html',
     styleUrl: './nav-bar.component.css',
     animations: [
-        trigger('buttonOut', [
-            state('void', style({
-                transform: 'translateX(-50%)',
-                opacity: 0
-            })),
-            transition(':enter', [
-                animate('0.3s ease-out', style({
-                    transform: 'translateX(0%)',
-                    opacity: 1
-                }))
-            ]),
-            transition(':leave', [
-                animate('0.3s ease-out', style({
-                    transform: 'translateX(-50%)',
-                    opacity: 0
-                }))
-            ])
+      trigger('buttonIn', [
+        // ENTRADA
+        transition(':enter', [
+          style({ width: '0px', transform: 'translateX(-50%)', opacity: 0 }),
+          sequence([
+            animate('200ms ease-out', style({ width: '*' })), // Expandir ancho
+            animate('200ms ease-out', style({ transform: 'translateX(0%)', opacity: 1 })) // Deslizar y aparecer
+          ])
+        ]),
+    
+        // SALIDA
+        transition(':leave', [
+          sequence([
+            animate('200ms ease-in', style({ transform: 'translateX(-50%)', opacity: 0 })), // Deslizar hacia fuera
+            animate('200ms ease-in', style({ width: '0px' })) // Colapsar ancho
+          ])
         ])
+      ])
     ]
 })
 export class NavBarComponent {

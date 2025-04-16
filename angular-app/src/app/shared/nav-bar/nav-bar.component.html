@@ -1,9 +1,9 @@
 <nav>
-    <div @buttonOut *ngIf="!atHome && !hideButtons" class="button home" [routerLink]="['/home']">
+    <div @buttonIn *ngIf="!atHome && !hideButtons" class="button home" [routerLink]="['/home']">
         <mat-icon class="material-symbols-outlined">home</mat-icon>
         <p>Inicio</p>
     </div>
-    <div @buttonOut *ngIf="!atHome && !hideButtons" class="button arrow" (click)="goBack()">
+    <div @buttonIn *ngIf="!atHome && !hideButtons" class="button arrow" (click)="goBack()">
         <mat-icon class="material-symbols-outlined">arrow_back_ios</mat-icon>
         <p>Atrás</p>
     </div>
