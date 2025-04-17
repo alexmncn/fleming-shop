@@ -38,8 +38,9 @@ nav .button {
 }
 
 .button:active {
-    background-color: var(--primary-accent-500) !important;
-    color: white !important;
+    background-color: var(--p-slate-100) !important;
+    border-color: var(--primary-accent-500) !important;
+    color: black !important;
 }
 
 .button mat-icon {

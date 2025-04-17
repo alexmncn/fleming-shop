@@ -163,8 +163,12 @@ h2 {
     }
 }
 
+.display .pattern-buttons i:hover {
+    background-color: var(--p-slate-50);
+}
+
 .display .pattern-buttons i:active {
-    background-color: var(--p-neutral-300);
+    background-color: var(--p-slate-100);
 }
 
 .display .pattern-buttons i.selected {
