@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 export interface Message {
-  id: number;        // identificador único
+  id: number;
   type: string;
   text: string;
-  duration: number;  // duración en segundos
+  duration: number;
 }
 
 @Injectable({
