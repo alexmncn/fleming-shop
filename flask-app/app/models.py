@@ -124,6 +124,7 @@ class DailySales(db.Model):
     __tablename__ = 'daily_sales'
 
     date = Column(Date, primary_key=True)
+    counter = Column(Integer, primary_key=True)
     time = Column(Time, nullable=True)
     first_ticket = Column(Integer, nullable=False)
     last_ticket = Column(Integer, nullable=False)
