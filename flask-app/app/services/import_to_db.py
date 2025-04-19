@@ -4,7 +4,7 @@ from dbfread import DBF
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
-from app.models import Article, Family, Article_import_log, Article_import, User
+from app.models import Article, Family, Article_import_log, Article_import, DailySales, User
 
 from app.config import UPLOAD_ROUTE, DATA_ROUTE, DATA_LOGS_ROUTE
 
@@ -676,7 +676,6 @@ def update_stocks(stocks_dbf):
                 is_valid, clean_row, logs_info = validate_clean_stocks_data(row)
                 if not is_valid:
                     # Si no es valida se descarta
-                    print(logs_info)
                     errors += 1
                     continue
                 
@@ -719,4 +718,120 @@ def update_stocks(stocks_dbf):
     print(status_info)
     print(import_resume)
     
-    return status, status_info, import_resume 
+    return status, status_info, import_resume
+
+
+def cierre_dbf_to_csv(cierre_dbf):
+    dbf_table = DBF(UPLOAD_ROUTE + cierre_dbf, encoding='latin1')
+    df = pd.DataFrame(iter(dbf_table))
+    
+    cierre_dbf_name, extension = os.path.splitext(cierre_dbf) # Clean (with date) filename and extension
+    clean_cierre_dbf_name = str.split(cierre_dbf_name,'_')[0]
+    csv_path = DATA_ROUTE + 'no_filtered_' + cierre_dbf_name + '.csv'
+    df.to_csv(csv_path, index=False)
+    
+    df = pd.read_csv(csv_path)
+    df.columns = df.columns.str.strip()
+    selected_columns = ['DFECHA', 'NCONTADOR', 'CHORA', 'NTICKINI', 'NTICKFIN', 'NTOTAL', 'NSALDOANT', 'NSALDOACT']
+    
+    try:
+        df_filtered = df[selected_columns]
+    except KeyError as e:
+        missing_cols = list(set(selected_columns) - set(df.columns))
+        raise KeyError(f"Las siguientes columnas faltan en el DataFrame: {missing_cols}") from e
+    
+    filtered_csv_path = DATA_ROUTE + cierre_dbf_name + '.csv'
+    df_filtered.to_csv(filtered_csv_path, index=False)
+    
+    os.remove(csv_path) # Remove no filtered csv file
+    
+    pattern = os.path.join(DATA_ROUTE, f"{clean_cierre_dbf_name}_*.csv") # Get old file versions
+
+    for file_ in glob.glob(pattern):
+        file_name = os.path.basename(file_)
+        new_file_name = os.path.basename(filtered_csv_path)
+
+        if file_name != new_file_name: # Remove all except the new one
+            os.remove(file_)
+    
+    return filtered_csv_path
+
+def update_cierre(cierre_dbf):
+    start_time = time.perf_counter()
+    cierre_csv_path = cierre_dbf_to_csv(cierre_dbf)
+
+    timeout = 5.0   # segundos
+    interval = 0.1  # segundos
+    while True:
+        if os.path.exists(cierre_csv_path) and os.path.getsize(cierre_csv_path) > 0:
+            break
+        if time.perf_counter() - start_time > timeout:
+            raise TimeoutError(f"El CSV {cierre_csv_path} no estuvo disponible en {timeout}s")
+        time.sleep(interval)
+
+    df = pd.read_csv(cierre_csv_path)
+
+    # Inicializamos estado
+    status = 0
+    status_info = ''
+    inserted = 0
+    errors = 0
+
+    # Recogemos las fechas ya insertadas
+    existing_dates = { row.date for row in DailySales.query.with_entities(DailySales.date).all() }
+
+    new_records = []
+    for _, row in df.iterrows():
+        try:
+            # Parsear fecha y hora
+            date_ = pd.to_datetime(row['DFECHA']).date()
+            time_ = pd.to_datetime(row['CHORA']).time()
+
+            if date_ in existing_dates:
+                continue
+
+            record = DailySales(
+                date=date_,
+                counter=int(row['NCONTADOR']),
+                time=time_,
+                first_ticket=int(row['NTICKINI']),
+                last_ticket=int(row['NTICKFIN']),
+                total_sold=float(row['NTOTAL']),
+                previous_balance=float(row['NSALDOANT']),
+                current_balance=float(row['NSALDOACT'])
+            )
+            new_records.append(record)
+        except Exception as e:
+            errors += 1
+
+    session = db.session
+    try:
+        session.add_all(new_records)
+        session.commit()
+        inserted = len(new_records)
+        status_info = f"Importación completada con éxito"
+    except SQLAlchemyError as e:
+        session.rollback()
+        status = 1
+        status_info = f"Error en base de datos: {e}"
+    finally:
+        session.close()
+
+    elapsed = round(time.perf_counter() - start_time, 2)
+    resume = f"Tiempo: {elapsed}s. Insertados: {inserted}. Errores: {errors}."
+
+    return status, status_info, resume
+
+
+def movimt_dbf_to_csv(movimt_dbf):
+    return None
+
+def update_movimt(movimt_dbf):
+    return 0, "Función aún no implementada", "Sin resumen"
+
+
+def hticketl_dbf_to_csv(hticketl_dbf):
+    return None
+
+def update_hticketl(hticketl_dbf):
+    return 0, "Función aún no implementada", "Sin resumen"
