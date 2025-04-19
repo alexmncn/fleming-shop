@@ -3,7 +3,7 @@ import pytz
 import uuid
 from datetime import datetime, timedelta
 from flask_login import UserMixin
-from sqlalchemy import Column, Integer, String, Boolean, Text, Float, DateTime, ForeignKey, Index
+from sqlalchemy import Column, Integer, String, Boolean, Text, Float, DateTime, Date, Time, ForeignKey, Index
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.dialects.mysql import TINYINT, BIGINT
@@ -14,7 +14,7 @@ from .extensions import db
 class Article(db.Model):
     __tablename__ = "article"
     ref = Column(BIGINT, nullable=False)
-    detalle = Column(String(50), nullable=True)
+    detalle = Column(String(100), nullable=True)
     codfam = Column(Integer, ForeignKey('family.codfam'), index=True, nullable=True)
     pcosto = Column(Float, nullable=True)
     pvp = Column(Float, nullable=False)
@@ -70,6 +70,26 @@ class Article(db.Model):
             'hidden': bool(self.hidden)
         }
         
+class Family(db.Model):
+    __tablename__= "family"
+    codfam = Column(Integer, primary_key=True, nullable=False)
+    nomfam = Column(String(50), nullable=False)
+    hidden = Column(TINYINT(1), default=0, nullable=True)
+    
+    def to_dict(self):
+        return {
+            'codfam': self.codfam,
+            'nomfam': self.nomfam,
+            'hidden': bool(self.hidden)
+        }
+
+    def to_dict_reduced(self):
+        return {
+            'codfam': self.codfam,
+            'nomfam': self.nomfam
+        }
+
+        
 class Article_import(db.Model):
     __tablename__="article_imports"
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
@@ -98,27 +118,47 @@ class Article_import_log(db.Model):
     info = Column(Text, nullable=True)
     
     import_record = relationship('Article_import', back_populates='logs')
-    
+        
+        
+class DailySales(db.Model):
+    __tablename__ = 'daily_sales'
 
-class Family(db.Model):
-    __tablename__= "family"
-    codfam = Column(Integer, primary_key=True, nullable=False)
-    nomfam = Column(String(50), nullable=False)
-    hidden = Column(TINYINT(1), default=0, nullable=True)
-    
-    def to_dict(self):
-        return {
-            'codfam': self.codfam,
-            'nomfam': self.nomfam,
-            'hidden': bool(self.hidden)
-        }
+    date = Column(Date, primary_key=True)
+    time = Column(Time, nullable=True)
+    first_ticket = Column(Integer, nullable=False)
+    last_ticket = Column(Integer, nullable=False)
+    total_sold = Column(Float, nullable=False)
+    previous_balance = Column(Float, nullable=False)
+    current_balance = Column(Float, nullable=False)
 
-    def to_dict_reduced(self):
-        return {
-            'codfam': self.codfam,
-            'nomfam': self.nomfam
-        }
-    
+    tickets = relationship("Ticket", back_populates="daily_summary")
+
+
+class Ticket(db.Model):
+    __tablename__ = 'tickets'
+
+    number = Column(Integer, primary_key=True)
+    date = Column(Date, ForeignKey('daily_sales.date'), nullable=False)
+    amount = Column(Float, nullable=False)
+    closed_at = Column(Date, nullable=True)
+
+    daily_summary = relationship("DailySales", back_populates="tickets")
+    items = relationship("TicketItem", back_populates="ticket")
+
+
+class TicketItem(db.Model):
+    __tablename__ = 'ticket_items'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    ticket_number = Column(Integer, ForeignKey('tickets.number'), nullable=False)
+    ref = Column(String(50), nullable=True)
+    codebar = Column(String(50), nullable=True)
+    detalle = Column(String(50), nullable=True)
+    quantity = Column(Integer, nullable=False)
+    unit_price = Column(Float, nullable=False)
+
+    ticket = relationship("Ticket", back_populates="items")
+
         
 class User(UserMixin,db.Model):
     __tablename__ = "users"
