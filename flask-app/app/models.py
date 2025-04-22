@@ -154,7 +154,7 @@ class TicketItem(db.Model):
     ticket_number = Column(Integer, ForeignKey('tickets.number'), nullable=False)
     ref = Column(String(50), nullable=True)
     codebar = Column(String(50), nullable=True)
-    detalle = Column(String(50), nullable=True)
+    detalle = Column(String(100), nullable=True)
     quantity = Column(Integer, nullable=False)
     unit_price = Column(Float, nullable=False)
 

@@ -4,7 +4,7 @@ from dbfread import DBF
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
-from app.models import Article, Family, Article_import_log, Article_import, DailySales, User, Ticket
+from app.models import Article, Family, Article_import_log, Article_import, DailySales, Ticket, TicketItem, User
 
 from app.config import UPLOAD_ROUTE, DATA_ROUTE, DATA_LOGS_ROUTE
 
@@ -983,5 +983,170 @@ def hticketl_dbf_to_csv(hticketl_dbf):
     
     return filtered_csv_path
 
+def validate_clean_hticketl_data(row):    
+    fixes = [] # Lista de erorres corregidos
+    errors = []
+    
+    # CCODEBAR: debe ser un entero positivo y único
+    codebar = row.get('CCODEBAR')
+    
+    if not isinstance(codebar, (int, str)): # Si no es valido lanzamos error
+        errors.append(f"El campo 'CCODEBAR' no es del tipo esperado (int, str): Type -> {type(codebar)}.")
+    else: # Si es valido...
+        try:
+            row['CCODEBAR'] = int(codebar) # Convertimos a entero y modificamos el valor original
+        except: # Intentamos limpieza
+            clean_codebar = codebar.split('.')[0] #  Eliminar decimales (BUG de .0 a la derecha)
+            clean_codebar = re.sub(r'\D', '', str(clean_codebar)).strip() # Eliminar espacios y caracteres no numéricos
+
+            # Verificar si después de limpiar hay un valor válido
+            if not clean_codebar:
+                errors.append("El campo 'CCODEBAR' debe ser un entero positivo.")
+            else:
+                # Si ha cambiado el valor original...
+                if codebar != clean_codebar:
+                    try:
+                        row['CCODEBAR'] = int(clean_codebar) # Convertimos a entero y modificamos el valor original
+                        
+                        fixes.append(f"Se ha corregido el campo 'CCODEBAR'") # Se añade la corrección a la lsita    
+                    except ValueError:
+                        errors.append("El campo 'CCODEBAR' debe ser un entero positivo.") # Se añade el error al la lista
+                        
+    
+    # CREF debe ser un entero positivo
+    ref = row.get('CREF')
+    
+    if not isinstance(ref, (int, str)): # Si no es valido lanzamos error
+        errors.append(f"El campo 'CREF' no es del tipo esperado (int, str): Type -> {type(ref)}.")
+    else: # Si es valido...
+        try:
+            row['CREF'] = int(ref) # Convertimos a entero y modificamos el valor original
+        except: # Intentamos limpieza
+            clean_ref = ref.split('.')[0] #  Eliminar decimales (BUG de .0 a la derecha)
+            clean_ref = re.sub(r'\D', '', str(clean_ref)).strip() # Eliminar espacios y caracteres no numéricos
+
+            # Verificar si después de limpiar hay un valor válido
+            if not clean_ref:
+                errors.append("El campo 'CREF' debe ser un entero positivo.")
+            else:
+                # Si ha cambiado el valor original...
+                if ref != clean_ref:
+                    try:
+                        row['CREF'] = int(clean_ref) # Convertimos a entero y modificamos el valor original
+                        
+                        fixes.append(f"Se ha corregido el campo 'CREF'") # Se añade la corrección a la lsita    
+                    except ValueError:
+                        errors.append("El campo 'CREF' debe ser un entero positivo.") # Se añade el error al la lista
+
+    
+    # CDETALLE: cadena de hasta 50 caracteres, puede contener cualquier carácter UTF-8
+    detalle = row.get('CDETALLE')
+    if detalle is not None and (not isinstance(detalle, str) or len(detalle) > 50):
+        errors.append("El campo 'CDETALLE' debe ser una cadena de texto de máximo 50 caracteres.")
+        
+    return True, row, fixes
+
 def update_hticketl(hticketl_dbf):
-    return 0, "Función aún no implementada", "Sin resumen"
+    start_time = time.perf_counter()
+    hticketl_csv_path = hticketl_dbf_to_csv(hticketl_dbf)
+
+    status = 0
+    status_info = ''
+    import_resume = ''
+
+    hticketl_csv = None
+    try:
+        timeout = 5
+        interval = 0.1
+        while True:
+            if os.path.exists(hticketl_csv_path) and os.path.getsize(hticketl_csv_path) > 0:
+                break
+            if time.perf_counter() - start_time > timeout:
+                raise TimeoutError(f"El archivo {hticketl_csv_path} no estuvo disponible en {timeout} segundos.")
+            time.sleep(interval)
+
+        hticketl_csv = pd.read_csv(hticketl_csv_path)
+    except Exception as e:
+        status = 1
+        status_info = f"Error al leer el CSV: {str(e)}"
+        return status, status_info, import_resume
+
+    new_items = []
+    errors = 0
+    format_errors = 0
+    unprocessed_ticket_items = 0
+    total_inserted = 0
+
+    try:
+        clean_rows = []
+            
+        # Limpiamos los datos del CSV
+        for _, row in hticketl_csv.iterrows():
+            # Validar y limpiar los datos de la fila
+            is_valid, clean_row, logs_info = validate_clean_hticketl_data(row)
+            if not is_valid:
+                format_errors += 1
+                continue
+            else:
+                # Si es valida se añade a la nueva lista
+                clean_rows.append(clean_row)
+            
+        # Crear un nuevo DataFrame con las filas limpias
+        clean_hticketl_csv = pd.DataFrame(clean_rows, columns=hticketl_csv.columns)
+        
+        # Obtener tickets válidos
+        existing_tickets = {ticket_item.number for ticket_item in TicketItem.query.with_entities(Ticket.number).all()}
+
+        # Obtener combinaciones existentes (ticket_number, codebar)
+        existing_items = set(
+            TicketItem.query.with_entities(TicketItem.ticket_number, TicketItem.codebar).all()
+        )
+
+        for _, row in clean_hticketl_csv.iterrows():
+            
+            try:
+                ticket_number = int(row['NNUMTICKET'])
+                codebar = str(row['CCODBAR']).strip() if not pd.isna(row['CCODBAR']) else None
+
+                if ticket_number not in existing_tickets or codebar is None:
+                    unprocessed_ticket_items += 1
+                    continue
+
+                key = (ticket_number, codebar)
+                if key in existing_items:
+                    continue  # Ya existe, no lo insertamos
+
+                item = TicketItem(
+                    ticket_number=ticket_number,
+                    codebar=codebar,
+                    ref=str(row['CREF']).strip() if not pd.isna(row['CREF']) else None,
+                    detalle=str(row['CDETALLE']).strip() if not pd.isna(row['CDETALLE']) else None,
+                    quantity=int(row['NCANT']),
+                    unit_price=float(row['NPREUNIT'])
+                )
+
+                new_items.append(item)
+                existing_items.add(key)
+                total_inserted += 1
+
+            except Exception:
+                errors += 1
+                continue
+
+        session = db.session
+        session.add_all(new_items)
+        session.commit()
+
+        status_info = "Artículos de tickets actualizados correctamente."
+    except SQLAlchemyError as e:
+        session.rollback()
+        status = 1
+        status_info = f"Error en la base de datos: {str(e)}"
+    finally:
+        session.close()
+
+    end_time = time.perf_counter()
+    elapsed = round(end_time - start_time, 2)
+    import_resume = f"Tiempo: {elapsed}s.\n Insertados: {total_inserted}, No procesados: {unprocessed_ticket_items}, Errores: {errors}, Errores de formato: {format_errors}."
+
+    return status, status_info, import_resume
