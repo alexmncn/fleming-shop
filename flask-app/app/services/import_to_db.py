@@ -4,7 +4,7 @@ from dbfread import DBF
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
-from app.models import Article, Family, Article_import_log, Article_import, DailySales, User
+from app.models import Article, Family, Article_import_log, Article_import, DailySales, User, Ticket
 
 from app.config import UPLOAD_ROUTE, DATA_ROUTE, DATA_LOGS_ROUTE
 
@@ -421,7 +421,7 @@ def save_article_import_log(import_id, user, status, info, n_new, n_updated, n_d
             os.remove(file_)
             
     print(f"Conflictos guardados en {log_file_path}")
-            
+        
     
 
 def families_dbf_to_csv(families_dbf):
@@ -824,14 +824,164 @@ def update_cierre(cierre_dbf):
 
 
 def movimt_dbf_to_csv(movimt_dbf):
-    return None
+    dbf_table = DBF(UPLOAD_ROUTE + movimt_dbf, encoding='latin1')
+    df = pd.DataFrame(iter(dbf_table))
+    
+    movimt_dbf_name, extension = os.path.splitext(movimt_dbf) # Clean (with date) filename and extension
+    clean_movimt_dbf_name = str.split(movimt_dbf_name,'_')[0]
+    csv_path = DATA_ROUTE + 'no_filtered_' + movimt_dbf_name + '.csv'
+    df.to_csv(csv_path, index=False)
+    
+    df = pd.read_csv(csv_path)
+    df.columns = df.columns.str.strip()
+    selected_columns = ['NNUMTICKET', 'DFECHA', 'NIMPORTE', 'DFECCIERRE']
+    
+    try:
+        df_filtered = df[selected_columns]
+    except KeyError as e:
+        missing_cols = list(set(selected_columns) - set(df.columns))
+        raise KeyError(f"Las siguientes columnas faltan en el DataFrame: {missing_cols}") from e
+    
+    filtered_csv_path = DATA_ROUTE + movimt_dbf_name + '.csv'
+    df_filtered.to_csv(filtered_csv_path, index=False)
+    
+    os.remove(csv_path) # Remove no filtered csv file
+    
+    pattern = os.path.join(DATA_ROUTE, f"{clean_movimt_dbf_name}_*.csv") # Get old file versions
+
+    for file_ in glob.glob(pattern):
+        file_name = os.path.basename(file_)
+        new_file_name = os.path.basename(filtered_csv_path)
+
+        if file_name != new_file_name: # Remove all except the new one
+            os.remove(file_)
+    
+    return filtered_csv_path
 
 def update_movimt(movimt_dbf):
-    return 0, "Función aún no implementada", "Sin resumen"
+    start_time = time.perf_counter()
+    movimt_csv_path = movimt_dbf_to_csv(movimt_dbf)  # Esta función debe existir
+
+    status = 0
+    status_info = ''
+    import_resume = ''
+
+    new_tickets = []
+    unprocessed_tickets = 0
+    errors = 0
+
+    try:
+        timeout = 5
+        interval = 0.1
+        while True:
+            if os.path.exists(movimt_csv_path) and os.path.getsize(movimt_csv_path) > 0:
+                break
+            if time.perf_counter() - start_time > timeout:
+                raise TimeoutError(f"El archivo {movimt_csv_path} no estuvo disponible en {timeout} segundos.")
+            time.sleep(interval)
+
+        movimt_csv = pd.read_csv(movimt_csv_path)
+
+        # Convertimos la columna NNUMTICKET a int y eliminamos nulos
+        movimt_csv = movimt_csv.dropna(subset=['NNUMTICKET'])
+
+        # Obtenemos los tickets que ya existen
+        existing_tickets = {
+            ticket.number for ticket in Ticket.query.with_entities(Ticket.number).all()
+        }
+                
+        # Agrupar por número de ticket y fecha (por si hay duplicados por día)
+        movimt_csv = movimt_csv.groupby(['NNUMTICKET', 'DFECHA'], as_index=False).agg({
+            'NIMPORTE': 'sum',
+            'DFECCIERRE': 'first'
+        })
+        
+        for _, row in movimt_csv.iterrows():
+            try:
+                ticket_number = int(row['NNUMTICKET'])
+
+                if ticket_number in existing_tickets:
+                    continue  # Ya está en la base de datos
+                
+                # Si la fecha de cierre no está definida, lo dejamos para la próxima
+                if pd.notna(row['DFECCIERRE']):
+                    closed_at = pd.to_datetime(row['DFECCIERRE']).date()
+                else:
+                    unprocessed_tickets += 1
+                    continue
+
+                new_ticket = Ticket(
+                    number=ticket_number,
+                    date=pd.to_datetime(row['DFECHA']).date(),
+                    amount=float(row['NIMPORTE']),
+                    closed_at=closed_at,
+                )
+
+                new_tickets.append(new_ticket)
+
+            except Exception as e:
+                print(f"Error procesando fila: {row}. Error: {str(e)}")
+                errors += 1
+                continue
+
+        # Insertar nuevos tickets
+        try:
+            session = db.session
+            session.add_all(new_tickets)
+            session.commit()
+            status_info = "Importación de tickets completada con éxito."
+        except SQLAlchemyError as e:
+            session.rollback()
+            status = 1
+            status_info = f"Error en la base de datos: {str(e)}"
+        finally:
+            session.close()
+
+    except Exception as e:
+        status = 1
+        status_info = f"Error inesperado al procesar el archivo: {str(e)}"
+
+    end_time = time.perf_counter()
+    elapsed_time = round(end_time - start_time, 2)
+    import_resume = f'Tiempo: {elapsed_time}s.\nInsertados: {len(new_tickets)}, No procesados: {unprocessed_tickets}, Errores: {errors}.'
+    
+    return status, status_info, import_resume
 
 
 def hticketl_dbf_to_csv(hticketl_dbf):
-    return None
+    dbf_table = DBF(UPLOAD_ROUTE + hticketl_dbf, encoding='latin1')
+    df = pd.DataFrame(iter(dbf_table))
+    
+    hticketl_dbf_name, extension = os.path.splitext(hticketl_dbf) # Clean (with date) filename and extension
+    clean_hticketl_dbf_name = str.split(hticketl_dbf_name,'_')[0]
+    csv_path = DATA_ROUTE + 'no_filtered_' + hticketl_dbf_name + '.csv'
+    df.to_csv(csv_path, index=False)
+    
+    df = pd.read_csv(csv_path)
+    df.columns = df.columns.str.strip()
+    selected_columns = ['NNUMTICKET', 'CCODBAR', 'CREF', 'CDETALLE', 'NCANT', 'NPREUNIT']
+    
+    try:
+        df_filtered = df[selected_columns]
+    except KeyError as e:
+        missing_cols = list(set(selected_columns) - set(df.columns))
+        raise KeyError(f"Las siguientes columnas faltan en el DataFrame: {missing_cols}") from e
+    
+    filtered_csv_path = DATA_ROUTE + hticketl_dbf_name + '.csv'
+    df_filtered.to_csv(filtered_csv_path, index=False)
+    
+    os.remove(csv_path) # Remove no filtered csv file
+    
+    pattern = os.path.join(DATA_ROUTE, f"{clean_hticketl_dbf_name}_*.csv") # Get old file versions
+
+    for file_ in glob.glob(pattern):
+        file_name = os.path.basename(file_)
+        new_file_name = os.path.basename(filtered_csv_path)
+
+        if file_name != new_file_name: # Remove all except the new one
+            os.remove(file_)
+    
+    return filtered_csv_path
 
 def update_hticketl(hticketl_dbf):
     return 0, "Función aún no implementada", "Sin resumen"

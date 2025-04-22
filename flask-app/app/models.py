@@ -139,9 +139,9 @@ class Ticket(db.Model):
     __tablename__ = 'tickets'
 
     number = Column(Integer, primary_key=True)
-    date = Column(Date, ForeignKey('daily_sales.date'), nullable=False)
+    date = Column(Date, nullable=False)
     amount = Column(Float, nullable=False)
-    closed_at = Column(Date, nullable=True)
+    closed_at = Column(Date, ForeignKey('daily_sales.date'), nullable=True)
 
     daily_summary = relationship("DailySales", back_populates="tickets")
     items = relationship("TicketItem", back_populates="ticket")
