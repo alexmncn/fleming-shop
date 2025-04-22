@@ -125,10 +125,10 @@ def validate_clean_article_data(row):
                         errors.append("El campo 'CREF' debe ser un entero positivo.") # Se añade el error al la lista
 
     
-    # CDETALLE: cadena de hasta 50 caracteres, puede contener cualquier carácter UTF-8
+    # CDETALLE: cadena de hasta 100 caracteres, puede contener cualquier carácter UTF-8
     detalle = row.get('CDETALLE')
-    if detalle is not None and (not isinstance(detalle, str) or len(detalle) > 50):
-        errors.append("El campo 'CDETALLE' debe ser una cadena de texto de máximo 50 caracteres.")
+    if detalle is not None and (not isinstance(detalle, str) or len(detalle) > 100):
+        errors.append("El campo 'CDETALLE' debe ser una cadena de texto de máximo 100 caracteres.")
     
     
     # CCODFAM: debe ser un entero, puede ser nulo
@@ -959,6 +959,13 @@ def hticketl_dbf_to_csv(hticketl_dbf):
     
     df = pd.read_csv(csv_path)
     df.columns = df.columns.str.strip()
+    
+    # Convertir a string y quitar ".0" para columnas específicas
+    columns_to_fix = ['CCODBAR','CREF']
+    for col in columns_to_fix:
+        if col in df.columns:
+            df[col] = df[col].astype(str).str.replace(r'\.0$', '', regex=True)
+    
     selected_columns = ['NNUMTICKET', 'CCODBAR', 'CREF', 'CDETALLE', 'NCANT', 'NPREUNIT']
     
     try:
@@ -988,29 +995,29 @@ def validate_clean_hticketl_data(row):
     errors = []
     
     # CCODEBAR: debe ser un entero positivo y único
-    codebar = row.get('CCODEBAR')
+    codebar = row.get('CCODBAR')
     
     if not isinstance(codebar, (int, str)): # Si no es valido lanzamos error
-        errors.append(f"El campo 'CCODEBAR' no es del tipo esperado (int, str): Type -> {type(codebar)}.")
+        errors.append(f"El campo 'CCODBAR' no es del tipo esperado (int, str): Type -> {type(codebar)}.")
     else: # Si es valido...
         try:
-            row['CCODEBAR'] = int(codebar) # Convertimos a entero y modificamos el valor original
+            row['CCODBAR'] = int(codebar) # Convertimos a entero y modificamos el valor original
         except: # Intentamos limpieza
             clean_codebar = codebar.split('.')[0] #  Eliminar decimales (BUG de .0 a la derecha)
             clean_codebar = re.sub(r'\D', '', str(clean_codebar)).strip() # Eliminar espacios y caracteres no numéricos
 
             # Verificar si después de limpiar hay un valor válido
             if not clean_codebar:
-                errors.append("El campo 'CCODEBAR' debe ser un entero positivo.")
+                errors.append("El campo 'CCODBAR' debe ser un entero positivo.")
             else:
                 # Si ha cambiado el valor original...
                 if codebar != clean_codebar:
                     try:
-                        row['CCODEBAR'] = int(clean_codebar) # Convertimos a entero y modificamos el valor original
+                        row['CCODBAR'] = int(clean_codebar) # Convertimos a entero y modificamos el valor original
                         
-                        fixes.append(f"Se ha corregido el campo 'CCODEBAR'") # Se añade la corrección a la lsita    
+                        fixes.append(f"Se ha corregido el campo 'CCODBAR'") # Se añade la corrección a la lsita    
                     except ValueError:
-                        errors.append("El campo 'CCODEBAR' debe ser un entero positivo.") # Se añade el error al la lista
+                        errors.append("El campo 'CCODBAR' debe ser un entero positivo.") # Se añade el error al la lista
                         
     
     # CREF debe ser un entero positivo
@@ -1039,10 +1046,10 @@ def validate_clean_hticketl_data(row):
                         errors.append("El campo 'CREF' debe ser un entero positivo.") # Se añade el error al la lista
 
     
-    # CDETALLE: cadena de hasta 50 caracteres, puede contener cualquier carácter UTF-8
+    # CDETALLE: cadena de hasta 100 caracteres, puede contener cualquier carácter UTF-8
     detalle = row.get('CDETALLE')
-    if detalle is not None and (not isinstance(detalle, str) or len(detalle) > 50):
-        errors.append("El campo 'CDETALLE' debe ser una cadena de texto de máximo 50 caracteres.")
+    if detalle is not None and (not isinstance(detalle, str) or len(detalle) > 100):
+        errors.append("El campo 'CDETALLE' debe ser una cadena de texto de máximo 100 caracteres.")
         
     return True, row, fixes
 
@@ -1106,7 +1113,7 @@ def update_hticketl(hticketl_dbf):
             
             try:
                 ticket_number = int(row['NNUMTICKET'])
-                codebar = str(row['CCODBAR']).strip() if not pd.isna(row['CCODBAR']) else None
+                codebar = row['CCODBAR'] if not pd.isna(row['CCODBAR']) else None
 
                 if ticket_number not in existing_tickets or codebar is None:
                     unprocessed_ticket_items += 1
@@ -1119,7 +1126,7 @@ def update_hticketl(hticketl_dbf):
                 item = TicketItem(
                     ticket_number=ticket_number,
                     codebar=codebar,
-                    ref=str(row['CREF']).strip() if not pd.isna(row['CREF']) else None,
+                    ref=row['CREF'] if not pd.isna(row['CREF']) else None,
                     detalle=str(row['CDETALLE']).strip() if not pd.isna(row['CDETALLE']) else None,
                     quantity=int(row['NCANT']),
                     unit_price=float(row['NPREUNIT'])
