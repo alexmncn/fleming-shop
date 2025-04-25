@@ -13,6 +13,14 @@ from .extensions import db
 
 class Article(db.Model):
     __tablename__ = "article"
+    __table_args__ = (
+        Index('detalle_index', 'detalle', mysql_prefix='FULLTEXT'),
+        {
+            'mysql_charset': 'utf8mb4',
+            'mysql_collate': 'utf8mb4_unicode_ci'
+        }
+    )
+    
     ref = Column(BIGINT, nullable=False)
     detalle = Column(String(100), nullable=True)
     codfam = Column(Integer, ForeignKey('family.codfam'), index=True, nullable=True)
@@ -72,6 +80,11 @@ class Article(db.Model):
         
 class Family(db.Model):
     __tablename__= "family"
+    __table_args__ = {
+        'mysql_charset': 'utf8mb4',
+        'mysql_collate': 'utf8mb4_unicode_ci'
+    }
+    
     codfam = Column(Integer, primary_key=True, nullable=False)
     nomfam = Column(String(50), nullable=False)
     hidden = Column(TINYINT(1), default=0, nullable=True)
@@ -92,6 +105,11 @@ class Family(db.Model):
         
 class Article_import(db.Model):
     __tablename__="article_imports"
+    __table_args__ = {
+        'mysql_charset': 'utf8mb4',
+        'mysql_collate': 'utf8mb4_unicode_ci'
+    }
+    
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = Column(Integer, db.ForeignKey('users.id'), index=True, nullable=True)
     status = Column(TINYINT(1), default=1, nullable=True)
@@ -109,6 +127,11 @@ class Article_import(db.Model):
     
 class Article_import_log(db.Model):
     __tablename__="article_import_logs"
+    __table_args__ = {
+        'mysql_charset': 'utf8mb4',
+        'mysql_collate': 'utf8mb4_unicode_ci'
+    }
+    
     id = db.Column(Integer, primary_key=True, autoincrement=True)
     import_id = Column(String(36), ForeignKey('article_imports.id'), nullable=False)
     type = Column(Integer, nullable=False)
@@ -122,6 +145,10 @@ class Article_import_log(db.Model):
         
 class DailySales(db.Model):
     __tablename__ = 'daily_sales'
+    __table_args__ = {
+        'mysql_charset': 'utf8mb4',
+        'mysql_collate': 'utf8mb4_unicode_ci'
+    }
 
     date = Column(Date, primary_key=True)
     counter = Column(Integer, primary_key=True)
@@ -137,6 +164,10 @@ class DailySales(db.Model):
 
 class Ticket(db.Model):
     __tablename__ = 'tickets'
+    __table_args__ = {
+        'mysql_charset': 'utf8mb4',
+        'mysql_collate': 'utf8mb4_unicode_ci'
+    }
 
     number = Column(Integer, primary_key=True)
     date = Column(Date, nullable=False)
@@ -149,6 +180,10 @@ class Ticket(db.Model):
 
 class TicketItem(db.Model):
     __tablename__ = 'ticket_items'
+    __table_args__ = {
+        'mysql_charset': 'utf8mb4',
+        'mysql_collate': 'utf8mb4_unicode_ci'
+    }
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     ticket_number = Column(Integer, ForeignKey('tickets.number'), nullable=False)
@@ -163,6 +198,11 @@ class TicketItem(db.Model):
         
 class User(UserMixin,db.Model):
     __tablename__ = "users"
+    __table_args__ = {
+        'mysql_charset': 'utf8mb4',
+        'mysql_collate': 'utf8mb4_unicode_ci'
+    }
+    
     id = Column(Integer, primary_key=True)
     username = Column(String(64), index=True, unique=True, nullable=False)
     password_hash = Column(String(255), nullable=False)
@@ -178,6 +218,10 @@ class User(UserMixin,db.Model):
     
 class OTPCode(db.Model):
     __tablename__ = 'otp_codes'
+    __table_args__ = {
+        'mysql_charset': 'utf8mb4',
+        'mysql_collate': 'utf8mb4_unicode_ci'
+    }
     
     id = Column(db.Integer, primary_key=True)
     username = Column(String(80), nullable=False)
