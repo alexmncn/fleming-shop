@@ -60,7 +60,7 @@ def search_articles():
     filter = request.args.get('filter', 'detalle')
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', def_per_page, type=int)
-    order_by = request.args.get('order_by')
+    order_by = request.args.get('order_by', None)
     direction = request.args.get('direction', 'asc')
     context_filter = request.args.get('context_filter')
     context_value = request.args.get('context_value', None, type=int)

@@ -29,8 +29,8 @@ export class HomeComponent implements OnInit {
   newHeaderTitle: string = 'Novedades';
   newArticles: any[] = [];
   newArticlesPage: number = 1;
-  newArticlesOrderBy: string = 'detalle';
-  newArticlesDirection: string = 'asc';
+  newArticlesOrderBy: string = 'date';
+  newArticlesDirection: string = 'desc';
   totalNewArticles: number = 0;
   loadingNewArticles: boolean = false;
   newStatusCode: number = 0;

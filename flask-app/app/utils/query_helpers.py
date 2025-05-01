@@ -28,7 +28,7 @@ def get_raw_sql_families_auth_filter():
     return ' AND '.join([str(condition.compile(dialect=mysql.dialect())) for condition in def_family_filter])
 
 
-def apply_articles_ordering(query, order_by='codebar', direction='asc'):
+def apply_articles_ordering(query, order_by, direction):
     valid_fields = {
         'codebar': Article.codebar,
         'pvp': Article.pvp,
@@ -47,10 +47,10 @@ def apply_articles_ordering(query, order_by='codebar', direction='asc'):
 
 def get_raw_sql_articles_ordering(order_by, direction):
     valid_fields = {
+        'codebar': 'codebar',
         'pvp': 'pvp',
         'detalle': 'detalle',
         'date': 'date_created',
-        'codebar': 'codebar',
     }
     
     direction = direction.lower()

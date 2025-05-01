@@ -11,7 +11,9 @@
         [totalArticles]="totalFeaturedArticles" 
         [perPage]="perPage" 
         [loadingArticles]="loadingFeaturedArticles" 
-        [statusCode]="featuredStatusCode" 
+        [statusCode]="featuredStatusCode"
+        [defOrderBy]="featuredArticlesOrderBy"
+        [defDirection]="featuredArticlesDirection"
     />
 </section>
 
@@ -25,5 +27,7 @@
         [perPage]="perPage"
         [loadingArticles]="loadingNewArticles"
         [statusCode]="newStatusCode"
+        [defOrderBy]="newArticlesOrderBy"
+        [defDirection]="newArticlesDirection"
     />
 </section>
