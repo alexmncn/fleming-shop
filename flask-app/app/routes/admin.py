@@ -110,3 +110,41 @@ def hide_family_articles():
         return jsonify(error='Internal error.'), 500
         
     return jsonify(error='No codebar in request.'), 400
+
+
+@admin_bp.route('/sales/daily_sales', methods=['GET'])
+#@jwt_required()
+def daily_sales():
+    return admin_data.all_daily_sales()
+
+@admin_bp.route('/sales/daily_sales/dates', methods=['GET'])
+#@jwt_required()
+def daily_sales_dates():
+    return admin_data.all_daily_sales_dates()
+
+@admin_bp.route('/sales/day_sales', methods=['GET'])
+#@jwt_required()
+def daily_sales_():
+    date = request.args.get('date', None, str)
+    if date:
+        return admin_data.day_sales(date)
+    
+    return jsonify(error='No date in request.'), 400
+
+@admin_bp.route('/sales/day_sales/tickets', methods=['GET'])
+#@jwt_required()
+def day_sales_tickets():
+    date = request.args.get('date', None, str)
+    if date:
+        return admin_data.all_tickets_of_day(date)
+    
+    return jsonify(error='No date in request.'), 400
+
+@admin_bp.route('/sales/day_sales/ticket/items', methods=['GET'])
+#@jwt_required()
+def ticket_items():
+    ticket_number = request.args.get('ticket_number', None, int)
+    if ticket_number:
+        return admin_data.all_items_of_ticket(ticket_number)
+
+    return jsonify(error='Invalid ticket number in request.'), 400

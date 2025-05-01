@@ -9,6 +9,7 @@ import { LoginComponent } from './features/auth/login/login.component';
 import { RegisterComponent } from './features/auth/register/register.component';
 import { authGuard } from './guards/auth.guard';
 import { AdminComponent } from './features/admin/admin.component';
+import { SalesComponent } from './features/admin/sales/sales.component';
 
 
 export const routes: Routes = [
@@ -37,7 +38,11 @@ export const routes: Routes = [
         path: 'admin',
         component: AdminComponent,
         canActivate: [authGuard],
-        children: []
+        children: [
+            { path: '', redirectTo: 'sales', pathMatch: 'full' },
+            { path: 'sales', component: SalesComponent }
+
+        ]
     },
     { path: '**', redirectTo: '/catalog' }
 ];

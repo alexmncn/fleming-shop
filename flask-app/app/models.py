@@ -160,7 +160,18 @@ class DailySales(db.Model):
     current_balance = Column(Float, nullable=False)
 
     tickets = relationship("Ticket", back_populates="daily_summary")
-
+    
+    def to_dict(self):
+        return {
+            'date': self.date.strftime('%d-%m-%Y'),
+            'counter': self.counter,
+            'time': self.time.strftime('%H:%M'),
+            'first_ticket': self.first_ticket,
+            'last_ticket': self.last_ticket,
+            'total_sold': self.total_sold,
+            'previous_balance': self.previous_balance,
+            'current_balance': self.current_balance
+        }
 
 class Ticket(db.Model):
     __tablename__ = 'tickets'
@@ -176,7 +187,14 @@ class Ticket(db.Model):
 
     daily_summary = relationship("DailySales", back_populates="tickets")
     items = relationship("TicketItem", back_populates="ticket")
-
+    
+    def to_dict(self):
+        return {
+            'number': self.number,
+            'date': self.date.strftime('%d-%m-%Y'),
+            'amount': self.amount,
+            'closed_at': self.closed_at.strftime('%d-%m-%Y')
+        }
 
 class TicketItem(db.Model):
     __tablename__ = 'ticket_items'
@@ -194,6 +212,17 @@ class TicketItem(db.Model):
     unit_price = Column(Float, nullable=False)
 
     ticket = relationship("Ticket", back_populates="items")
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'ticket_number': self.ticket_number,
+            'ref': self.ref,
+            'codebar': self.codebar,
+            'detalle': self.detalle,
+            'quantity': self.quantity,
+            'unit_price': self.unit_price
+        }
 
         
 class User(UserMixin,db.Model):

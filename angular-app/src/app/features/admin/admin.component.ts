@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 
 import { AuthService } from '../../services/auth/auth.service';
 import { MessageService } from '../../services/message/message.service';
 
 @Component({
     selector: 'app-admin',
-    imports: [],
+    imports: [RouterOutlet],
     templateUrl: './admin.component.html',
     styleUrl: './admin.component.css'
 })

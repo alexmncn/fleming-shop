@@ -1,0 +1,23 @@
+<div class="calendar-container">
+    <div class="calendar-header">
+      <button (click)="changeMonth(-1)">◀</button>
+      <span>{{ getMonthName() }}</span>
+      <button (click)="changeMonth(1)">▶</button>
+    </div>
+  
+    <div class="calendar-grid">
+      <div class="calendar-day-name" *ngFor="let d of ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']">
+        {{ d }}
+      </div>
+  
+      <div 
+        class="calendar-day"
+        *ngFor="let day of currentMonthDays"
+        [class.marked]="isMarked(day)"
+        [class.inactive]="day.getMonth() !== currentDate.getMonth()"
+        (click)="selectDate(day)">
+        {{ day.getDate() }}
+      </div>
+    </div>
+  </div>
+  
