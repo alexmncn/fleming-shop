@@ -73,7 +73,7 @@ def search_articles_total(search, filter, context_filter=None, context_value=Non
                 except TypeError:
                     return None
 
-        query = db.session.execute(text(base_query),{'search': search})
+        query = db.session.execute(text(base_query),{'search': search })
         
         return query.scalar()
 
@@ -107,8 +107,11 @@ def search_articles(search, filter, page, per_page, order_by, direction, context
 
     if filter == 'detalle':
         base_query = """
-        SELECT * FROM article 
-        WHERE MATCH(detalle) AGAINST(:search IN NATURAL LANGUAGE MODE)
+            SELECT *,
+                MATCH(detalle) AGAINST(:search IN NATURAL LANGUAGE MODE) AS relevance,
+                CASE WHEN detalle LIKE :start_pattern THEN 1 ELSE 0 END AS starts_with
+            FROM article
+            WHERE MATCH(detalle) AGAINST(:search IN NATURAL LANGUAGE MODE)
         """
 
         # Auth filter
@@ -129,20 +132,30 @@ def search_articles(search, filter, page, per_page, order_by, direction, context
                     base_query += f" AND codfam = {codfam}"
                 except TypeError:
                     return None
-                
+
         # Ordering
-        order_clause = query_helpers.get_raw_sql_articles_ordering(order_by, direction)
-        base_query += f" {order_clause}"
+        if order_by:
+            order_clause = query_helpers.get_raw_sql_articles_ordering(order_by, direction)
+            base_query += f" {order_clause}"
+        else:
+            base_query += " ORDER BY starts_with DESC, relevance DESC"
 
         # Pagination
         limit, offset = query_helpers.get_pagination_values(page, per_page)
         base_query += " LIMIT :limit OFFSET :offset"
 
-        # Execute the query with parameters
-        query = db.session.execute(text(base_query), {'search': search, 'limit': limit, 'offset': offset}).mappings()
+        # Execute the query
+        query = db.session.execute(text(base_query), {'search': search, 'start_pattern': f"{search}%", 'limit': limit, 'offset': offset }).mappings()
         articles_raw = query.fetchall()
 
-        return [Article(**article).to_dict() if jwt else Article(**article).to_dict_reduced() for article in articles_raw]
+        valid_columns = set(Article.__table__.columns.keys())
+        articles = []
+        for article in articles_raw:
+            clean_data = {k: v for k, v in article.items() if k in valid_columns}
+            article_obj = Article(**clean_data)
+            articles.append(article_obj.to_dict() if jwt else article_obj.to_dict_reduced())
+
+        return articles
 
     elif filter == 'codebar':
         try:

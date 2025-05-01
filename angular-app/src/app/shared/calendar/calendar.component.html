@@ -14,6 +14,7 @@
         class="calendar-day"
         *ngFor="let day of currentMonthDays"
         [class.marked]="isMarked(day)"
+        [class.selected]="isSelected(day)"
         [class.inactive]="day.getMonth() !== currentDate.getMonth()"
         (click)="selectDate(day)">
         {{ day.getDate() }}

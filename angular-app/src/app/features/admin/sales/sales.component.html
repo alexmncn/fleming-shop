@@ -1,34 +1,67 @@
-<div>
-    <h2>Calendario de cierres</h2>
-    <app-calendar [markedDates]="dailySalesDates" (dateSelected)="onDateSelected($event)"></app-calendar>
+<div class="sales-calendar">
+  <h2>Calendario de cierres</h2>
   
-    <div *ngIf="selectedDate">
-      <h3>Tickets de {{ selectedDate }}</h3>
-      <ul>
-        <li *ngFor="let ticket of tickets" (click)="onTicketSelected(ticket)">
-          Ticket #{{ ticket.number }} - {{ ticket.amount }}
+  <div class="row">
+    <app-calendar
+      class="calendar-box"
+      [markedDates]="dailySalesDates"
+      (dateSelected)="onDateSelected($event)">
+    </app-calendar>
+
+    <section *ngIf="selectedDate" class="sales-day">
+      <h3>Cierres del {{ selectedDate }}</h3>
+      <ul class="day-sales">
+        <li *ngFor="let sale of daySales">
+          <div class="sale-header">
+            <strong>Cierre {{ sale.counter }}</strong> - {{ sale.time }} - Vendido: <span class="highlight">{{ sale.total_sold }} €</span>
+          </div>
+          <ul class="sale-balances">
+            <li>Saldo anterior: {{ sale.previous_balance }} €</li>
+            <li>Saldo actual: {{ sale.current_balance }} €</li>
+          </ul>
         </li>
       </ul>
-    </div>
-  
-    <div *ngIf="selectedTicket">
-      <h4>Artículos del ticket #{{ selectedTicket!.number }}</h4>
-      <table>
+    </section>
+  </div>
+
+  <div class="row" *ngIf="selectedDate">
+    <section class="tickets-list-box">
+      <h3>Tickets de {{ selectedDate }}</h3>
+      <ul class="tickets-list">
+        <li *ngFor="let ticket of tickets"
+            (click)="onTicketSelected(ticket)"
+            [class.selected]="ticket === selectedTicket">
+          Ticket #{{ ticket.number }} - Importe: {{ ticket.amount }} €
+        </li>
+      </ul>
+    </section>
+
+    <section *ngIf="selectedTicket" id="ticketDetails" class="ticket-details">
+      <h4>Artículos del ticket #{{ selectedTicket.number }}</h4>
+      <table class="ticket-table">
         <thead>
           <tr>
             <th>Artículo</th>
             <th>Cantidad</th>
             <th>Precio Unitario</th>
+            <th>Precio Total</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let item of ticketItems">
             <td>{{ item.detalle }}</td>
             <td>{{ item.quantity }}</td>
-            <td>{{ item.unit_price }}</td>
+            <td>{{ item.unit_price }} €</td>
+            <td>{{ item.unit_price * item.quantity }} €</td>
           </tr>
         </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3"><strong>Total</strong></td>
+            <td><strong>{{ selectedTicket.amount }} €</strong></td>
+          </tr>
+        </tfoot>
       </table>
-    </div>
+    </section>
   </div>
-  
+</div>

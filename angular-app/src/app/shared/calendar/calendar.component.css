@@ -44,7 +44,13 @@
     }
   
     &:hover {
-      background-color: #2196f3;
+      background-color: var(--primary-accent-400);
       color: white;
+    }
+
+    &.selected {
+      background-color: var(--primary-accent-400);
+      color: white;
+      font-weight: bold;
     }
 }  

@@ -1,11 +1,14 @@
 <section class="articles">
   <app-articles 
-  (loadArticles)="loadFamilyArticles()"
-  (sortChanged)="onSortChangeArticles($event.order_by, $event.direction)"
-  [articles]="articles" 
-  [headerTitle]="nomfam" 
-  [totalArticles]="totalArticles" 
-  [perPage]="perPage" 
-  [loadingArticles]="loadingArticles" 
-  [statusCode]="statusCode"/>
+    (loadArticles)="loadFamilyArticles()"
+    (sortChanged)="onSortChangeArticles($event.order_by, $event.direction)"
+    [articles]="articles" 
+    [headerTitle]="nomfam" 
+    [totalArticles]="totalArticles" 
+    [perPage]="perPage" 
+    [loadingArticles]="loadingArticles" 
+    [statusCode]="statusCode"
+    [defOrderBy]="articlesOrderBy"
+    [defDirection]="articlesDirection"
+  />
 </section>

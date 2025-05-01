@@ -7,7 +7,6 @@ import { of } from 'rxjs';
 import { ArticlesComponent } from "../../../shared/articles/articles.component";
 
 import { ArticlesService } from '../../../services/catalog/articles/articles.service';
-import { MessageService } from '../../../services/message/message.service';
 
 @Component({
     selector: 'app-search',
@@ -28,11 +27,11 @@ export class SearchComponent {
   filter: string = 'detalle';
   contextFilter: string = '';
   contextValue: string = '';
-  orderBy: string = 'detalle';
-  direction: string = 'asc';
+  orderBy: string = '';
+  direction: string = '';
 
 
-  constructor(private articlesService: ArticlesService, private messageService: MessageService, private route: ActivatedRoute) { }
+  constructor(private articlesService: ArticlesService, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {

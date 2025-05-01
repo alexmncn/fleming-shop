@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { CalendarComponent } from '../../../shared/calendar/calendar.component';
@@ -7,6 +7,8 @@ import { Ticket } from '../../../models/ticket.model';
 import { TicketItem } from '../../../models/ticketItem.model';
 
 import { SalesService } from '../../../services/admin/data/sales/sales.service';
+import { DailySales } from '../../../models/dailySales.model';
+import { timeout } from 'rxjs';
 
 
 @Component({
@@ -18,6 +20,7 @@ import { SalesService } from '../../../services/admin/data/sales/sales.service';
 export class SalesComponent implements OnInit{
   dailySalesDates: string[] = [];
   selectedDate: string | null = null;
+  daySales: DailySales[] | null = null;
 
   tickets: Ticket[] = [];
   selectedTicket: Ticket | null = null;
@@ -37,6 +40,10 @@ export class SalesComponent implements OnInit{
     this.selectedTicket = null;
     this.ticketItems = [];
     
+    this.salesService.getDaySales(date).subscribe(daySales => {
+      this.daySales = daySales;
+    });
+
     this.salesService.getTicketsByDate(date).subscribe(tickets => {
       this.tickets = tickets;
     });
@@ -46,6 +53,19 @@ export class SalesComponent implements OnInit{
     this.selectedTicket = ticket;
     this.salesService.getItemsByTicket(ticket.number).subscribe(items => {
       this.ticketItems = items;
+
+      setTimeout(() => this.scrollToTicketDetails(), 500);
     });
+  }
+
+  scrollToTicketDetails() {
+    if (window.innerWidth > 600) {
+      return; // No hacer scroll si la pantalla es grande
+    }
+
+    const el = document.getElementById('ticketDetails');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
   }
 }
