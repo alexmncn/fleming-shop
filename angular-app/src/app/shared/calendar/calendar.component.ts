@@ -14,6 +14,8 @@ export class CalendarComponent implements OnInit {
   currentDate = new Date();
   currentMonthDays: Date[] = [];
 
+  selectedDate: Date | null = null;
+
   ngOnInit(): void {
     this.generateCalendar();
   }
@@ -21,6 +23,10 @@ export class CalendarComponent implements OnInit {
   isMarked(date: Date): boolean {
     const dateString = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
     return this.markedDates.includes(dateString);
+  }
+
+  isSelected(date: Date): boolean {
+    return this.selectedDate?.getTime() === date.getTime();
   }
 
   generateCalendar() {
@@ -54,6 +60,7 @@ export class CalendarComponent implements OnInit {
     const formatted = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
 
     if (this.isMarked(date)) {
+      this.selectedDate = date;
       this.dateSelected.emit(formatted);
     }
   }

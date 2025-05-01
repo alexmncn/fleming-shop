@@ -1,10 +1,10 @@
 export interface DailySales {
     date: string;
     counter: number;
-    timer: string;
-    firstTicket: number;
-    lastTicket: number;
-    totalSold: number;
-    previousBalance: number;
-    currentBalance: number;
+    time: string;
+    first_ticket: number;
+    last_ticket: number;
+    total_sold: number;
+    previous_balance: number;
+    current_balance: number;
 }

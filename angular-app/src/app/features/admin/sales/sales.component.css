@@ -1,0 +1,96 @@
+.sales-calendar {
+    font-family: Arial, sans-serif;
+    padding: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  h2, h3, h4 {
+    color: #333;
+    margin-top: 1rem;
+  }
+  
+  .row {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .calendar-box,
+  .sales-day,
+  .tickets-list-box,
+  .ticket-details {
+    flex: 1;
+    min-width: 300px;
+  }
+  
+  .day-sales,
+  .tickets-list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+  }
+  
+  .day-sales li,
+  .tickets-list li {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    background-color: #f9f9f9;
+  }
+  
+  .sale-header {
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .sale-balances {
+    list-style: none;
+    padding-left: 1rem;
+    font-size: 0.9rem;
+    color: #555;
+  }
+  
+  .highlight {
+    color: var(--primary-accent-500);
+    font-weight: bold;
+  }
+  
+  .tickets-list li {
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .tickets-list li:hover {
+    background-color: #e8f0fe;
+  }
+  
+  .tickets-list li.selected {
+    background-color: #d0e0fc;
+    font-weight: bold;
+  }
+  
+  .ticket-table {
+    font-size: clamp(0.8rem, 1vw, 1rem);
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
+  
+  .ticket-table th,
+  .ticket-table td {
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    text-align: center;
+  }
+  
+  .ticket-table th {
+    background-color: #f0f0f0;
+  }
+  
+  .ticket-table tfoot td {
+    background-color: #fafafa;
+  }
+  

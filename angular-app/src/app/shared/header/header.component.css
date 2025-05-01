@@ -52,15 +52,15 @@ img {
 
 .admin-menu mat-icon {
     display: flex;
-    font-size: clamp(0.8rem, 3vw, 1.3rem);
-    width: clamp(0.8rem, 3vw, 1.3rem);
-    height: clamp(0.8rem, 3vw, 1.3rem);
+    font-size: clamp(0.9rem, 3vw, 1.3rem);
+    width: clamp(0.9rem, 3vw, 1.3rem);
+    height: clamp(0.9rem, 3vw, 1.3rem);
     font-variation-settings: 'FILL' 0, 'wght' 400;
 }
 
 
 .admin-menu p {
-    font-size: clamp(0.5rem, 2.5vw, 1rem);
+    font-size: clamp(0.75rem, 2.5vw, 1.1rem);
     margin: 0;
     font-variation-settings: 'wght' 500;
 }
