@@ -4,7 +4,7 @@ from dbfread import DBF
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
-from app.models import Article, Family, Article_import_log, Article_import, User
+from app.models import Article, Family, Article_import_log, Article_import, DailySales, Ticket, TicketItem, User
 
 from app.config import UPLOAD_ROUTE, DATA_ROUTE, DATA_LOGS_ROUTE
 
@@ -125,10 +125,10 @@ def validate_clean_article_data(row):
                         errors.append("El campo 'CREF' debe ser un entero positivo.") # Se añade el error al la lista
 
     
-    # CDETALLE: cadena de hasta 50 caracteres, puede contener cualquier carácter UTF-8
+    # CDETALLE: cadena de hasta 100 caracteres, puede contener cualquier carácter UTF-8
     detalle = row.get('CDETALLE')
-    if detalle is not None and (not isinstance(detalle, str) or len(detalle) > 50):
-        errors.append("El campo 'CDETALLE' debe ser una cadena de texto de máximo 50 caracteres.")
+    if detalle is not None and (not isinstance(detalle, str) or len(detalle) > 100):
+        errors.append("El campo 'CDETALLE' debe ser una cadena de texto de máximo 100 caracteres.")
     
     
     # CCODFAM: debe ser un entero, puede ser nulo
@@ -421,7 +421,7 @@ def save_article_import_log(import_id, user, status, info, n_new, n_updated, n_d
             os.remove(file_)
             
     print(f"Conflictos guardados en {log_file_path}")
-            
+        
     
 
 def families_dbf_to_csv(families_dbf):
@@ -676,7 +676,6 @@ def update_stocks(stocks_dbf):
                 is_valid, clean_row, logs_info = validate_clean_stocks_data(row)
                 if not is_valid:
                     # Si no es valida se descarta
-                    print(logs_info)
                     errors += 1
                     continue
                 
@@ -719,4 +718,442 @@ def update_stocks(stocks_dbf):
     print(status_info)
     print(import_resume)
     
-    return status, status_info, import_resume 
+    return status, status_info, import_resume
+
+
+def cierre_dbf_to_csv(cierre_dbf):
+    dbf_table = DBF(UPLOAD_ROUTE + cierre_dbf, encoding='latin1')
+    df = pd.DataFrame(iter(dbf_table))
+    
+    cierre_dbf_name, extension = os.path.splitext(cierre_dbf) # Clean (with date) filename and extension
+    clean_cierre_dbf_name = str.split(cierre_dbf_name,'_')[0]
+    csv_path = DATA_ROUTE + 'no_filtered_' + cierre_dbf_name + '.csv'
+    df.to_csv(csv_path, index=False)
+    
+    df = pd.read_csv(csv_path)
+    df.columns = df.columns.str.strip()
+    selected_columns = ['DFECHA', 'NCONTADOR', 'CHORA', 'NTICKINI', 'NTICKFIN', 'NTOTAL', 'NSALDOANT', 'NSALDOACT']
+    
+    try:
+        df_filtered = df[selected_columns]
+    except KeyError as e:
+        missing_cols = list(set(selected_columns) - set(df.columns))
+        raise KeyError(f"Las siguientes columnas faltan en el DataFrame: {missing_cols}") from e
+    
+    filtered_csv_path = DATA_ROUTE + cierre_dbf_name + '.csv'
+    df_filtered.to_csv(filtered_csv_path, index=False)
+    
+    os.remove(csv_path) # Remove no filtered csv file
+    
+    pattern = os.path.join(DATA_ROUTE, f"{clean_cierre_dbf_name}_*.csv") # Get old file versions
+
+    for file_ in glob.glob(pattern):
+        file_name = os.path.basename(file_)
+        new_file_name = os.path.basename(filtered_csv_path)
+
+        if file_name != new_file_name: # Remove all except the new one
+            os.remove(file_)
+    
+    return filtered_csv_path
+
+def update_cierre(cierre_dbf):
+    start_time = time.perf_counter()
+    cierre_csv_path = cierre_dbf_to_csv(cierre_dbf)
+
+    timeout = 5.0   # segundos
+    interval = 0.1  # segundos
+    while True:
+        if os.path.exists(cierre_csv_path) and os.path.getsize(cierre_csv_path) > 0:
+            break
+        if time.perf_counter() - start_time > timeout:
+            raise TimeoutError(f"El CSV {cierre_csv_path} no estuvo disponible en {timeout}s")
+        time.sleep(interval)
+
+    df = pd.read_csv(cierre_csv_path)
+
+    # Inicializamos estado
+    status = 0
+    status_info = ''
+    inserted = 0
+    errors = 0
+
+    # Recogemos las fechas ya insertadas
+    existing_dates = { row.date for row in DailySales.query.with_entities(DailySales.date).all() }
+
+    new_records = []
+    for _, row in df.iterrows():
+        try:
+            # Parsear fecha y hora
+            date_ = pd.to_datetime(row['DFECHA']).date()
+            time_ = pd.to_datetime(row['CHORA']).time()
+
+            if date_ in existing_dates:
+                continue
+
+            record = DailySales(
+                date=date_,
+                counter=int(row['NCONTADOR']),
+                time=time_,
+                first_ticket=int(row['NTICKINI']),
+                last_ticket=int(row['NTICKFIN']),
+                total_sold=float(row['NTOTAL']),
+                previous_balance=float(row['NSALDOANT']),
+                current_balance=float(row['NSALDOACT'])
+            )
+            new_records.append(record)
+        except Exception as e:
+            errors += 1
+
+    session = db.session
+    try:
+        session.add_all(new_records)
+        session.commit()
+        inserted = len(new_records)
+        status_info = f"Importación completada con éxito"
+    except SQLAlchemyError as e:
+        session.rollback()
+        status = 1
+        status_info = f"Error en base de datos: {e}"
+    finally:
+        session.close()
+
+    elapsed = round(time.perf_counter() - start_time, 2)
+    resume = f"Tiempo: {elapsed}s. Insertados: {inserted}. Errores: {errors}."
+
+    return status, status_info, resume
+
+
+def movimt_dbf_to_csv(movimt_dbf):
+    dbf_table = DBF(UPLOAD_ROUTE + movimt_dbf, encoding='latin1')
+    df = pd.DataFrame(iter(dbf_table))
+    
+    movimt_dbf_name, extension = os.path.splitext(movimt_dbf) # Clean (with date) filename and extension
+    clean_movimt_dbf_name = str.split(movimt_dbf_name,'_')[0]
+    csv_path = DATA_ROUTE + 'no_filtered_' + movimt_dbf_name + '.csv'
+    df.to_csv(csv_path, index=False)
+    
+    df = pd.read_csv(csv_path)
+    df.columns = df.columns.str.strip()
+    selected_columns = ['NNUMTICKET', 'DFECHA', 'NIMPORTE', 'DFECCIERRE']
+    
+    try:
+        df_filtered = df[selected_columns]
+    except KeyError as e:
+        missing_cols = list(set(selected_columns) - set(df.columns))
+        raise KeyError(f"Las siguientes columnas faltan en el DataFrame: {missing_cols}") from e
+    
+    filtered_csv_path = DATA_ROUTE + movimt_dbf_name + '.csv'
+    df_filtered.to_csv(filtered_csv_path, index=False)
+    
+    os.remove(csv_path) # Remove no filtered csv file
+    
+    pattern = os.path.join(DATA_ROUTE, f"{clean_movimt_dbf_name}_*.csv") # Get old file versions
+
+    for file_ in glob.glob(pattern):
+        file_name = os.path.basename(file_)
+        new_file_name = os.path.basename(filtered_csv_path)
+
+        if file_name != new_file_name: # Remove all except the new one
+            os.remove(file_)
+    
+    return filtered_csv_path
+
+def update_movimt(movimt_dbf):
+    start_time = time.perf_counter()
+    movimt_csv_path = movimt_dbf_to_csv(movimt_dbf)  # Esta función debe existir
+
+    status = 0
+    status_info = ''
+    import_resume = ''
+
+    new_tickets = []
+    unprocessed_tickets = 0
+    errors = 0
+
+    try:
+        timeout = 5
+        interval = 0.1
+        while True:
+            if os.path.exists(movimt_csv_path) and os.path.getsize(movimt_csv_path) > 0:
+                break
+            if time.perf_counter() - start_time > timeout:
+                raise TimeoutError(f"El archivo {movimt_csv_path} no estuvo disponible en {timeout} segundos.")
+            time.sleep(interval)
+
+        movimt_csv = pd.read_csv(movimt_csv_path)
+
+        # Convertimos la columna NNUMTICKET a int y eliminamos nulos
+        movimt_csv = movimt_csv.dropna(subset=['NNUMTICKET'])
+
+        # Obtenemos los tickets que ya existen
+        existing_tickets = {
+            ticket.number for ticket in Ticket.query.with_entities(Ticket.number).all()
+        }
+                
+        # Agrupar por número de ticket y fecha (por si hay duplicados por día)
+        movimt_csv = movimt_csv.groupby(['NNUMTICKET', 'DFECHA'], as_index=False).agg({
+            'NIMPORTE': 'sum',
+            'DFECCIERRE': 'first'
+        })
+        
+        for _, row in movimt_csv.iterrows():
+            try:
+                ticket_number = int(row['NNUMTICKET'])
+
+                if ticket_number in existing_tickets:
+                    continue  # Ya está en la base de datos
+                
+                # Si la fecha de cierre no está definida, lo dejamos para la próxima
+                if pd.notna(row['DFECCIERRE']):
+                    closed_at = pd.to_datetime(row['DFECCIERRE']).date()
+                else:
+                    unprocessed_tickets += 1
+                    continue
+
+                new_ticket = Ticket(
+                    number=ticket_number,
+                    date=pd.to_datetime(row['DFECHA']).date(),
+                    amount=float(row['NIMPORTE']),
+                    closed_at=closed_at,
+                )
+
+                new_tickets.append(new_ticket)
+
+            except Exception as e:
+                print(f"Error procesando fila: {row}. Error: {str(e)}")
+                errors += 1
+                continue
+
+        # Insertar nuevos tickets
+        try:
+            session = db.session
+            session.add_all(new_tickets)
+            session.commit()
+            status_info = "Importación de tickets completada con éxito."
+        except SQLAlchemyError as e:
+            session.rollback()
+            status = 1
+            status_info = f"Error en la base de datos: {str(e)}"
+        finally:
+            session.close()
+
+    except Exception as e:
+        status = 1
+        status_info = f"Error inesperado al procesar el archivo: {str(e)}"
+
+    end_time = time.perf_counter()
+    elapsed_time = round(end_time - start_time, 2)
+    import_resume = f'Tiempo: {elapsed_time}s.\nInsertados: {len(new_tickets)}, No procesados: {unprocessed_tickets}, Errores: {errors}.'
+    
+    return status, status_info, import_resume
+
+
+def hticketl_dbf_to_csv(hticketl_dbf):
+    dbf_table = DBF(UPLOAD_ROUTE + hticketl_dbf, encoding='latin1')
+    df = pd.DataFrame(iter(dbf_table))
+    
+    hticketl_dbf_name, extension = os.path.splitext(hticketl_dbf) # Clean (with date) filename and extension
+    clean_hticketl_dbf_name = str.split(hticketl_dbf_name,'_')[0]
+    csv_path = DATA_ROUTE + 'no_filtered_' + hticketl_dbf_name + '.csv'
+    df.to_csv(csv_path, index=False)
+    
+    df = pd.read_csv(csv_path)
+    df.columns = df.columns.str.strip()
+    
+    # Convertir a string y quitar ".0" para columnas específicas
+    columns_to_fix = ['CCODBAR','CREF']
+    for col in columns_to_fix:
+        if col in df.columns:
+            df[col] = df[col].astype(str).str.replace(r'\.0$', '', regex=True)
+    
+    selected_columns = ['NNUMTICKET', 'CCODBAR', 'CREF', 'CDETALLE', 'NCANT', 'NPREUNIT']
+    
+    try:
+        df_filtered = df[selected_columns]
+    except KeyError as e:
+        missing_cols = list(set(selected_columns) - set(df.columns))
+        raise KeyError(f"Las siguientes columnas faltan en el DataFrame: {missing_cols}") from e
+    
+    filtered_csv_path = DATA_ROUTE + hticketl_dbf_name + '.csv'
+    df_filtered.to_csv(filtered_csv_path, index=False)
+    
+    os.remove(csv_path) # Remove no filtered csv file
+    
+    pattern = os.path.join(DATA_ROUTE, f"{clean_hticketl_dbf_name}_*.csv") # Get old file versions
+
+    for file_ in glob.glob(pattern):
+        file_name = os.path.basename(file_)
+        new_file_name = os.path.basename(filtered_csv_path)
+
+        if file_name != new_file_name: # Remove all except the new one
+            os.remove(file_)
+    
+    return filtered_csv_path
+
+def validate_clean_hticketl_data(row):    
+    fixes = [] # Lista de erorres corregidos
+    errors = []
+    
+    # CCODEBAR: debe ser un entero positivo y único
+    codebar = row.get('CCODBAR')
+    
+    if not isinstance(codebar, (int, str)): # Si no es valido lanzamos error
+        errors.append(f"El campo 'CCODBAR' no es del tipo esperado (int, str): Type -> {type(codebar)}.")
+    else: # Si es valido...
+        try:
+            row['CCODBAR'] = int(codebar) # Convertimos a entero y modificamos el valor original
+        except: # Intentamos limpieza
+            clean_codebar = codebar.split('.')[0] #  Eliminar decimales (BUG de .0 a la derecha)
+            clean_codebar = re.sub(r'\D', '', str(clean_codebar)).strip() # Eliminar espacios y caracteres no numéricos
+
+            # Verificar si después de limpiar hay un valor válido
+            if not clean_codebar:
+                errors.append("El campo 'CCODBAR' debe ser un entero positivo.")
+            else:
+                # Si ha cambiado el valor original...
+                if codebar != clean_codebar:
+                    try:
+                        row['CCODBAR'] = int(clean_codebar) # Convertimos a entero y modificamos el valor original
+                        
+                        fixes.append(f"Se ha corregido el campo 'CCODBAR'") # Se añade la corrección a la lsita    
+                    except ValueError:
+                        errors.append("El campo 'CCODBAR' debe ser un entero positivo.") # Se añade el error al la lista
+                        
+    
+    # CREF debe ser un entero positivo
+    ref = row.get('CREF')
+    
+    if not isinstance(ref, (int, str)): # Si no es valido lanzamos error
+        errors.append(f"El campo 'CREF' no es del tipo esperado (int, str): Type -> {type(ref)}.")
+    else: # Si es valido...
+        try:
+            row['CREF'] = int(ref) # Convertimos a entero y modificamos el valor original
+        except: # Intentamos limpieza
+            clean_ref = ref.split('.')[0] #  Eliminar decimales (BUG de .0 a la derecha)
+            clean_ref = re.sub(r'\D', '', str(clean_ref)).strip() # Eliminar espacios y caracteres no numéricos
+
+            # Verificar si después de limpiar hay un valor válido
+            if not clean_ref:
+                errors.append("El campo 'CREF' debe ser un entero positivo.")
+            else:
+                # Si ha cambiado el valor original...
+                if ref != clean_ref:
+                    try:
+                        row['CREF'] = int(clean_ref) # Convertimos a entero y modificamos el valor original
+                        
+                        fixes.append(f"Se ha corregido el campo 'CREF'") # Se añade la corrección a la lsita    
+                    except ValueError:
+                        errors.append("El campo 'CREF' debe ser un entero positivo.") # Se añade el error al la lista
+
+    
+    # CDETALLE: cadena de hasta 100 caracteres, puede contener cualquier carácter UTF-8
+    detalle = row.get('CDETALLE')
+    if detalle is not None and (not isinstance(detalle, str) or len(detalle) > 100):
+        errors.append("El campo 'CDETALLE' debe ser una cadena de texto de máximo 100 caracteres.")
+        
+    return True, row, fixes
+
+def update_hticketl(hticketl_dbf):
+    start_time = time.perf_counter()
+    hticketl_csv_path = hticketl_dbf_to_csv(hticketl_dbf)
+
+    status = 0
+    status_info = ''
+    import_resume = ''
+
+    hticketl_csv = None
+    try:
+        timeout = 5
+        interval = 0.1
+        while True:
+            if os.path.exists(hticketl_csv_path) and os.path.getsize(hticketl_csv_path) > 0:
+                break
+            if time.perf_counter() - start_time > timeout:
+                raise TimeoutError(f"El archivo {hticketl_csv_path} no estuvo disponible en {timeout} segundos.")
+            time.sleep(interval)
+
+        hticketl_csv = pd.read_csv(hticketl_csv_path)
+    except Exception as e:
+        status = 1
+        status_info = f"Error al leer el CSV: {str(e)}"
+        return status, status_info, import_resume
+
+    new_items = []
+    errors = 0
+    format_errors = 0
+    unprocessed_ticket_items = 0
+    total_inserted = 0
+
+    try:
+        clean_rows = []
+            
+        # Limpiamos los datos del CSV
+        for _, row in hticketl_csv.iterrows():
+            # Validar y limpiar los datos de la fila
+            is_valid, clean_row, logs_info = validate_clean_hticketl_data(row)
+            if not is_valid:
+                format_errors += 1
+                continue
+            else:
+                # Si es valida se añade a la nueva lista
+                clean_rows.append(clean_row)
+            
+        # Crear un nuevo DataFrame con las filas limpias
+        clean_hticketl_csv = pd.DataFrame(clean_rows, columns=hticketl_csv.columns)
+        
+        # Obtener tickets válidos
+        existing_tickets = {ticket_item.number for ticket_item in TicketItem.query.with_entities(Ticket.number).all()}
+
+        # Obtener combinaciones existentes (ticket_number, codebar)
+        existing_items = set(
+            TicketItem.query.with_entities(TicketItem.ticket_number, TicketItem.codebar).all()
+        )
+
+        for _, row in clean_hticketl_csv.iterrows():
+            
+            try:
+                ticket_number = int(row['NNUMTICKET'])
+                codebar = row['CCODBAR'] if not pd.isna(row['CCODBAR']) else None
+
+                if ticket_number not in existing_tickets or codebar is None:
+                    unprocessed_ticket_items += 1
+                    continue
+
+                key = (ticket_number, codebar)
+                if key in existing_items:
+                    continue  # Ya existe, no lo insertamos
+
+                item = TicketItem(
+                    ticket_number=ticket_number,
+                    codebar=codebar,
+                    ref=row['CREF'] if not pd.isna(row['CREF']) else None,
+                    detalle=str(row['CDETALLE']).strip() if not pd.isna(row['CDETALLE']) else None,
+                    quantity=int(row['NCANT']),
+                    unit_price=float(row['NPREUNIT'])
+                )
+
+                new_items.append(item)
+                existing_items.add(key)
+                total_inserted += 1
+
+            except Exception:
+                errors += 1
+                continue
+
+        session = db.session
+        session.add_all(new_items)
+        session.commit()
+
+        status_info = "Artículos de tickets actualizados correctamente."
+    except SQLAlchemyError as e:
+        session.rollback()
+        status = 1
+        status_info = f"Error en la base de datos: {str(e)}"
+    finally:
+        session.close()
+
+    end_time = time.perf_counter()
+    elapsed = round(end_time - start_time, 2)
+    import_resume = f"Tiempo: {elapsed}s.\n Insertados: {total_inserted}, No procesados: {unprocessed_ticket_items}, Errores: {errors}, Errores de formato: {format_errors}."
+
+    return status, status_info, import_resume
