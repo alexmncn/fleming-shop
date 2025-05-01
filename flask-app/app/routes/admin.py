@@ -113,17 +113,17 @@ def hide_family_articles():
 
 
 @admin_bp.route('/sales/daily_sales', methods=['GET'])
-#@jwt_required()
+@jwt_required()
 def daily_sales():
     return admin_data.all_daily_sales()
 
 @admin_bp.route('/sales/daily_sales/dates', methods=['GET'])
-#@jwt_required()
+@jwt_required()
 def daily_sales_dates():
     return admin_data.all_daily_sales_dates()
 
 @admin_bp.route('/sales/day_sales', methods=['GET'])
-#@jwt_required()
+@jwt_required()
 def daily_sales_():
     date = request.args.get('date', None, str)
     if date:
@@ -132,7 +132,7 @@ def daily_sales_():
     return jsonify(error='No date in request.'), 400
 
 @admin_bp.route('/sales/day_sales/tickets', methods=['GET'])
-#@jwt_required()
+@jwt_required()
 def day_sales_tickets():
     date = request.args.get('date', None, str)
     if date:
@@ -141,7 +141,7 @@ def day_sales_tickets():
     return jsonify(error='No date in request.'), 400
 
 @admin_bp.route('/sales/day_sales/ticket/items', methods=['GET'])
-#@jwt_required()
+@jwt_required()
 def ticket_items():
     ticket_number = request.args.get('ticket_number', None, int)
     if ticket_number:
