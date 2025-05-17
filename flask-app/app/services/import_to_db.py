@@ -1,4 +1,5 @@
 import os, time, glob, re, math, uuid
+from flask_jwt_extended import get_jwt_identity
 import pandas as pd
 from dbfread import DBF
 from sqlalchemy.exc import SQLAlchemyError
@@ -128,7 +129,7 @@ def validate_clean_article_data(row):
     # CDETALLE: cadena de hasta 100 caracteres, puede contener cualquier carácter UTF-8
     detalle = row.get('CDETALLE')
     if detalle is not None and (not isinstance(detalle, str) or len(detalle) > 100):
-        errors.append("El campo 'CDETALLE' debe ser una cadena de texto de máximo 100 caracteres.")
+        errors.append("El campo 'CDETALLE' debe ser una cadena de texto de maximo 100 caracteres.")
     
     
     # CCODFAM: debe ser un entero, puede ser nulo
@@ -166,8 +167,9 @@ def clean_nan_value(value):
         return None
     return value
 
-def update_articles(articles_dbf, user):
+def update_articles(articles_dbf):
     start_time = time.perf_counter() # Inicializar contador de tiempo
+    username = get_jwt_identity()
     
     articles_csv_path = articles_dbf_to_csv(articles_dbf) # DBF to CSV
     import_id = str(uuid.uuid4()) # Genera uuid de importación
@@ -311,7 +313,7 @@ def update_articles(articles_dbf, user):
                     
                 session.commit() # Confirmar los cambios
                 
-                status_info = "Importación completada con éxito."
+                status_info = "Importación completada con exito."
             except SQLAlchemyError as e:
                 session.rollback()
                 status = 1
@@ -336,7 +338,7 @@ def update_articles(articles_dbf, user):
     # Save LOGs
     save_article_import_log(
         import_id, 
-        user, 
+        username, 
         status, 
         status_info, 
         len(new_articles), 
@@ -525,7 +527,7 @@ def update_families(families_dbf):
                     
                 session.commit() # Confirmar los cambios
                 
-                status_info = "Importación completada con éxito."
+                status_info = "Importación completada con exito."
             except SQLAlchemyError as e:
                 session.rollback()
                 status = 1
@@ -696,7 +698,7 @@ def update_stocks(stocks_dbf):
                     
                 session.commit() # Confirmar los cambios
                 
-                status_info = "Importación completada con éxito."
+                status_info = "Importación completada con exito."
             except SQLAlchemyError as e:
                 session.rollback()
                 status = 1
@@ -809,7 +811,7 @@ def update_cierre(cierre_dbf):
         session.add_all(new_records)
         session.commit()
         inserted = len(new_records)
-        status_info = f"Importación completada con éxito"
+        status_info = f"Importación completada con exito"
     except SQLAlchemyError as e:
         session.rollback()
         status = 1
@@ -929,7 +931,7 @@ def update_movimt(movimt_dbf):
             session = db.session
             session.add_all(new_tickets)
             session.commit()
-            status_info = "Importación de tickets completada con éxito."
+            status_info = "Importación de tickets completada con exito."
         except SQLAlchemyError as e:
             session.rollback()
             status = 1
@@ -1001,7 +1003,7 @@ def validate_clean_hticketl_data(row):
         errors.append(f"El campo 'CCODBAR' no es del tipo esperado (int, str): Type -> {type(codebar)}.")
     else: # Si es valido...
         try:
-            row['CCODBAR'] = int(codebar) # Convertimos a entero y modificamos el valor original
+            row['CCODBAR'] = str(int(codebar)) # Convertimos a entero y modificamos el valor original
         except: # Intentamos limpieza
             clean_codebar = codebar.split('.')[0] #  Eliminar decimales (BUG de .0 a la derecha)
             clean_codebar = re.sub(r'\D', '', str(clean_codebar)).strip() # Eliminar espacios y caracteres no numéricos
@@ -1013,9 +1015,9 @@ def validate_clean_hticketl_data(row):
                 # Si ha cambiado el valor original...
                 if codebar != clean_codebar:
                     try:
-                        row['CCODBAR'] = int(clean_codebar) # Convertimos a entero y modificamos el valor original
-                        
-                        fixes.append(f"Se ha corregido el campo 'CCODBAR'") # Se añade la corrección a la lsita    
+                        row['CCODBAR'] = str(int(clean_codebar)) # Convertimos a entero y modificamos el valor original
+
+                        fixes.append(f"Se ha corregido el campo 'CCODBAR'") # Se añade la corrección a la lista
                     except ValueError:
                         errors.append("El campo 'CCODBAR' debe ser un entero positivo.") # Se añade el error al la lista
                         
@@ -1027,7 +1029,7 @@ def validate_clean_hticketl_data(row):
         errors.append(f"El campo 'CREF' no es del tipo esperado (int, str): Type -> {type(ref)}.")
     else: # Si es valido...
         try:
-            row['CREF'] = int(ref) # Convertimos a entero y modificamos el valor original
+            row['CREF'] = str(int(ref)) # Convertimos a entero y modificamos el valor original
         except: # Intentamos limpieza
             clean_ref = ref.split('.')[0] #  Eliminar decimales (BUG de .0 a la derecha)
             clean_ref = re.sub(r'\D', '', str(clean_ref)).strip() # Eliminar espacios y caracteres no numéricos
@@ -1039,9 +1041,9 @@ def validate_clean_hticketl_data(row):
                 # Si ha cambiado el valor original...
                 if ref != clean_ref:
                     try:
-                        row['CREF'] = int(clean_ref) # Convertimos a entero y modificamos el valor original
-                        
-                        fixes.append(f"Se ha corregido el campo 'CREF'") # Se añade la corrección a la lsita    
+                        row['CREF'] = str(int(clean_ref)) # Convertimos a entero y modificamos el valor original
+
+                        fixes.append(f"Se ha corregido el campo 'CREF'") # Se añade la corrección a la lista
                     except ValueError:
                         errors.append("El campo 'CREF' debe ser un entero positivo.") # Se añade el error al la lista
 
@@ -1100,36 +1102,46 @@ def update_hticketl(hticketl_dbf):
             
         # Crear un nuevo DataFrame con las filas limpias
         clean_hticketl_csv = pd.DataFrame(clean_rows, columns=hticketl_csv.columns)
-        
+
         # Obtener tickets válidos
-        existing_tickets = {ticket_item.number for ticket_item in TicketItem.query.with_entities(Ticket.number).all()}
+        existing_tickets = {ticket.number for ticket in Ticket.query.with_entities(Ticket.number).all()}
 
         # Obtener combinaciones existentes (ticket_number, codebar)
         existing_items = set(
             TicketItem.query.with_entities(TicketItem.ticket_number, TicketItem.codebar).all()
         )
-
+        
+        # Obtener combinaciones existentes
+        existing_items = {
+            (item.ticket_number, item.codebar)
+            for item in TicketItem.query.with_entities(TicketItem.ticket_number, TicketItem.codebar).all()
+        }        
+        
         for _, row in clean_hticketl_csv.iterrows():
-            
+
             try:
                 ticket_number = int(row['NNUMTICKET'])
                 codebar = row['CCODBAR'] if not pd.isna(row['CCODBAR']) else None
+                ref=row['CREF'] if not pd.isna(row['CREF']) else None
+                detalle=str(row['CDETALLE']).strip() if not pd.isna(row['CDETALLE']) else None
+                quantity=int(row['NCANT'])
+                unit_price=float(row['NPREUNIT'])
 
                 if ticket_number not in existing_tickets or codebar is None:
                     unprocessed_ticket_items += 1
                     continue
 
-                key = (ticket_number, codebar)
+                key = (ticket_number, codebar) # Claves del csv
                 if key in existing_items:
                     continue  # Ya existe, no lo insertamos
 
                 item = TicketItem(
                     ticket_number=ticket_number,
                     codebar=codebar,
-                    ref=row['CREF'] if not pd.isna(row['CREF']) else None,
-                    detalle=str(row['CDETALLE']).strip() if not pd.isna(row['CDETALLE']) else None,
-                    quantity=int(row['NCANT']),
-                    unit_price=float(row['NPREUNIT'])
+                    ref=ref,
+                    detalle=detalle,
+                    quantity=quantity,
+                    unit_price=unit_price
                 )
 
                 new_items.append(item)
@@ -1144,7 +1156,7 @@ def update_hticketl(hticketl_dbf):
         session.add_all(new_items)
         session.commit()
 
-        status_info = "Artículos de tickets actualizados correctamente."
+        status_info = "Articulos de tickets actualizados correctamente."
     except SQLAlchemyError as e:
         session.rollback()
         status = 1

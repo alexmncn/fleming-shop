@@ -102,9 +102,9 @@ def hide_family_articles(codfam, hidden):
         return False
     except Exception as e:
         if hidden is True:
-            send_alert(f'Error al ocultar los articuos de la familia con <b>codigo: {codfam}</b>:\n {e}', 0)
+            send_alert(f'Error al ocultar los articulos de la familia con <b>codigo: {codfam}</b>:\n {e}', 0)
         else:
-            send_alert(f'Error al eliminar de ocultos los articuos de la familia con <b>codigo: {codfam}</b>:\n {e}', 0)
+            send_alert(f'Error al eliminar de ocultos los articulos de la familia con <b>codigo: {codfam}</b>:\n {e}', 0)
         return e
     
      
