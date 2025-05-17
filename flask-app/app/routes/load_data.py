@@ -42,8 +42,6 @@ def upload_file(filetype):
     new_filename = f"{clean_filename}_{timestamp}{extension}"
     file_path = os.path.join(UPLOAD_ROUTE, new_filename)
 
-    username = get_jwt_identity()
-
     try:
         file.save(file_path)
 
@@ -56,20 +54,25 @@ def upload_file(filetype):
 
     update_func = valid_types[filetype]
     try:
-        if filetype == 'articles':
-            status, info, resume = update_func(new_filename, username)
-        else:
-            status, info, resume = update_func(new_filename)
+        status, info, resume = update_func(new_filename)
     except Exception as e:
+        message = f"❌ Error inesperado en la actualización de <b>{filetype}</b>: {str(e)}"
+        send_alert(message, 0)
         return jsonify(error=str(e)), 500
 
+    # Construcción del mensaje, siempre se ejecuta si no hay excepción
+    if status == 0:
+        message = f"✅ <b>Importacion de {filetype.capitalize()}</b>\n{resume}"
+    else:
+        message = f"⚠️ <b>Importacion de {filetype.capitalize()}</b>\n{info}"
+
     try:
-        message = f'<b>Importación de {filetype.capitalize()}:</b>\n {resume}'
         send_alert(message, 0)
-    except:
+    except Exception as e:
         pass
 
     if status == 0:
-        return jsonify(message=info), 200
+        return jsonify(message=info, resume=resume), 200
     else:
-        return jsonify(error=info), 500
+        return jsonify(error=info), 400
+
