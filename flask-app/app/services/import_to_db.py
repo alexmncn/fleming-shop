@@ -1006,7 +1006,7 @@ def validate_clean_hticketl_data(row):
             row['CCODBAR'] = str(int(codebar)) # Convertimos a entero y modificamos el valor original
         except: # Intentamos limpieza
             clean_codebar = codebar.split('.')[0] #  Eliminar decimales (BUG de .0 a la derecha)
-            clean_codebar = re.sub(r'\D', '', str(clean_codebar)).strip() # Eliminar espacios y caracteres no numéricos
+            clean_codebar = re.sub(r'\D', '', clean_codebar).strip() # Eliminar espacios y caracteres no numéricos
 
             # Verificar si después de limpiar hay un valor válido
             if not clean_codebar:
@@ -1087,6 +1087,7 @@ def update_hticketl(hticketl_dbf):
     total_inserted = 0
 
     try:
+        session = db.session
         clean_rows = []
             
         # Limpiamos los datos del CSV
@@ -1102,20 +1103,25 @@ def update_hticketl(hticketl_dbf):
             
         # Crear un nuevo DataFrame con las filas limpias
         clean_hticketl_csv = pd.DataFrame(clean_rows, columns=hticketl_csv.columns)
+        # Fuerza CCODBAR y CREF a str, elimina ".0" y espacios
+        for col in ['CCODBAR', 'CREF']:
+            if col in clean_hticketl_csv.columns:
+                clean_hticketl_csv[col] = (
+                    clean_hticketl_csv[col]
+                    .astype(str)
+                    .str.rstrip('.0')
+                    .str.strip()
+                    .replace({'nan': None, 'None': None})
+                )
 
         # Obtener tickets válidos
         existing_tickets = {ticket.number for ticket in Ticket.query.with_entities(Ticket.number).all()}
-
-        # Obtener combinaciones existentes (ticket_number, codebar)
-        existing_items = set(
-            TicketItem.query.with_entities(TicketItem.ticket_number, TicketItem.codebar).all()
-        )
         
         # Obtener combinaciones existentes
         existing_items = {
             (item.ticket_number, item.codebar)
             for item in TicketItem.query.with_entities(TicketItem.ticket_number, TicketItem.codebar).all()
-        }        
+        }
         
         for _, row in clean_hticketl_csv.iterrows():
 
@@ -1152,7 +1158,6 @@ def update_hticketl(hticketl_dbf):
                 errors += 1
                 continue
 
-        session = db.session
         session.add_all(new_items)
         session.commit()
 
@@ -1161,6 +1166,9 @@ def update_hticketl(hticketl_dbf):
         session.rollback()
         status = 1
         status_info = f"Error en la base de datos: {str(e)}"
+    except Exception as e:
+        status = 1
+        status_info = f"Error inesperado al procesar el archivo: {str(e)}"
     finally:
         session.close()
 
