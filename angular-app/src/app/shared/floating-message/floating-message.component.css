@@ -65,21 +65,21 @@ p {
 }
 
 .progress-bar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 2px;
-    background-color: var(--p-slate-100);
-    width: 100%;
-    border-radius: 0 0 12px 12px;
-    transform: scaleX(1);
-    transform-origin: left;
-    animation: fillBar linear forwards;
-  }
-  
-@keyframes fillBar {
-    from { transform: scaleX(1); }
-    to { transform: scaleX(0); }
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background-color: var(--p-slate-100);
+  width: 100%;
+  border-radius: 0 0 12px 12px;
+  animation-name: shrinkBar;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes shrinkBar {
+  from { width: 100%; }
+  to { width: 0%; }
 }
 
 @media (max-width: 600px) {
