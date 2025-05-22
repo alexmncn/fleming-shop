@@ -4,9 +4,6 @@ angular-app/public/images/*
 # data
 */app/data
 
-# flask
-*/migrations
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
