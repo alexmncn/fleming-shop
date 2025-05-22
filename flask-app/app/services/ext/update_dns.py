@@ -36,7 +36,7 @@ def get_record_id(domain):
     if data['success']:
         return data['result'][0]['id'], data['result'][0]['content'] 
     else:
-        errors.append(f'Error obteniendo el ID del registro para {domain['name']}: {data['errors']}.')
+        errors.append(f"Error obteniendo el ID del registro para {domain['name']}: {data['errors']}.")
         return None
 
 
@@ -56,7 +56,7 @@ def update_dns_record(record_id, domain, server_ip):
         domain['updated'] = True
         
     else:
-        errors.append(f'Error actualizando el registro DNS para {domain['name']}: {data['errors']}.')
+        errors.append(f"Error actualizando el registro DNS para {domain['name']}: {data['errors']}.")
 
 
 def send_update_status(changed_ip, server_ip):
@@ -73,13 +73,13 @@ def send_update_status(changed_ip, server_ip):
         for domain in domains: 
             if domain['updated'] == True:
                 n_domains_updated +=1
-                domains_updated += f'<font color="#4a99f3">{domain['name']}</font>, '
-            
+                domains_updated += f"<font color='#4a99f3'>{domain['name']}</font>, "
+
             for subdomain in domain['subdomains']:
                 n_domains_updated +=1
-                domains_updated += f'<font color="#4a99f3">{subdomain['name']}</font>, '
-                
-                
+                domains_updated += f"<font color='#4a99f3'>{subdomain['name']}</font>, "
+
+
         if n_domains_updated == 0:
             record_updated_info = None
         else:
@@ -98,7 +98,7 @@ def send_update_status(changed_ip, server_ip):
             if n_domains_updated == 0:
                 alert_priority = 1
         else:
-            alert_content.append('\n<font color="#72df51">Sin errores</font>')
+            alert_content.append("<br>\n<font color='#72df51'>Sin errores</font>")
         
         message = ''.join([content for content in alert_content])
         send_alert(message, alert_priority)
