@@ -391,6 +391,7 @@ def save_article_import_log(import_id, user, status, info, n_new, n_updated, n_d
             session.rollback()
             print(f"Error al guardar logs de la importación en la DB: {str(e)}")
     
+    os.makedirs(DATA_LOGS_ROUTE, exist_ok=True)
     
     # Save logs in CSV file
     log_file_path = os.path.join(DATA_LOGS_ROUTE, f"conflicts_{os.path.basename(articles_csv_path)}")
