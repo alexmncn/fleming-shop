@@ -20,7 +20,7 @@ nav .button {
     padding: 0 1rem;
     background-color: white;
     border: var(--border-1-2);
-    border-radius: 12px;
+    border-radius: 8px;
     box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.05);
     cursor: pointer;
     font-size: clamp(0.75rem, 2.5vw, 1.1rem);
