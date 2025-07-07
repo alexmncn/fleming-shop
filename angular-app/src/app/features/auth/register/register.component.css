@@ -126,3 +126,10 @@ button:active {
     margin-top: 2rem;
     position: absolute;
 }
+
+@media (max-width: 600px) {
+    .turnstile-wrapper {
+        margin-top: 1rem;
+        scale: 0.75;
+    }
+}
