@@ -39,7 +39,7 @@
 
     <div *ngIf="registerStep==0" class="turnstile-container">
         <div class="turnstile-wrapper">
-            <ngx-turnstile [siteKey]="turnstileSiteKey" (resolved)="handleTurnstileResolved($event)" theme="light" [tabIndex]="0"></ngx-turnstile>
+            <ngx-turnstile #turnstileRef [siteKey]="turnstileSiteKey" (resolved)="handleTurnstileResolved($event)" theme="light" [tabIndex]="0"></ngx-turnstile>
         </div>
     </div>
 

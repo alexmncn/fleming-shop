@@ -28,7 +28,10 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
           authService.clearToken();
           localStorage.clear();
           
-          messageService.showMessage('warn', 'No tienes permiso para entrar a esta página', 5);
+          if (router.url !== '/auth/login') {
+            router.navigate(['/auth/login']);
+            messageService.showMessage('warn', 'No tienes permiso para entrar a esta página', 5);
+          }
         }
   
         return throwError(() => error);

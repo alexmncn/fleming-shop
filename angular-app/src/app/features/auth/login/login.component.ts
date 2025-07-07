@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { NgxTurnstileModule } from 'ngx-turnstile';
+import { NgxTurnstileComponent } from 'ngx-turnstile';
 
 import { AuthService } from '../../../services/auth/auth.service';
 import { MessageService } from '../../../services/message/message.service';
@@ -46,6 +46,7 @@ export class LoginComponent {
   defaultRedirectRoute: string = '/home';
 
   // Turnstile captcha
+  @ViewChild('turnstileRef') turnstileComponent!: NgxTurnstileComponent;
   turnstileSiteKey: string = '0x4AAAAAABCNsBv9TuGNBJQn';
   turnstileResolved: boolean = false;
   turnstileResponse: string | null = null;
@@ -86,6 +87,11 @@ export class LoginComponent {
             }
 
             this.isLoading = false;
+
+            // Reset turnstile captcha
+            this.turnstileResolved = false;
+            this.turnstileResponse = null;
+            this.turnstileComponent.reset();
           }
         });
     } else {
