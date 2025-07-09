@@ -79,7 +79,7 @@ def search_articles_total(search, filter, context_filter=None, context_value=Non
 
     elif filter == 'codebar':
         try:
-            codebar = int(search)
+            codebar = search
             query = Article.query.filter_by(codebar=codebar)
             query = query_helpers.apply_articles_auth_filter(query, jwt)
             
@@ -159,7 +159,7 @@ def search_articles(search, filter, page, per_page, order_by, direction, context
 
     elif filter == 'codebar':
         try:
-            codebar = int(search)
+            codebar = search
             query = Article.query.filter_by(codebar=codebar)
             query = query_helpers.apply_articles_auth_filter(query, jwt)
             

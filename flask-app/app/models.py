@@ -6,7 +6,7 @@ from flask_login import UserMixin
 from sqlalchemy import Column, Integer, String, Boolean, Text, Float, DateTime, Date, Time, ForeignKey, Index
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy.dialects.mysql import TINYINT, BIGINT
+from sqlalchemy.dialects.mysql import TINYINT
 
 from .extensions import db
 
@@ -21,12 +21,12 @@ class Article(db.Model):
         }
     )
     
-    ref = Column(BIGINT, nullable=False)
+    ref = Column(String(50), nullable=False)
     detalle = Column(String(100), nullable=True)
     codfam = Column(Integer, ForeignKey('family.codfam'), index=True, nullable=True)
     pcosto = Column(Float, nullable=True)
     pvp = Column(Float, nullable=False)
-    codebar = Column(BIGINT, primary_key=True, autoincrement=False, nullable=False)
+    codebar = Column(String(50), primary_key=True, autoincrement=False, nullable=False)
     stock = Column(Integer, default=0, nullable=True)
     factualizacion = Column(DateTime, nullable=True)
     date_created = Column(DateTime, default=lambda: datetime.now(pytz.timezone('Europe/Madrid')), nullable=True)

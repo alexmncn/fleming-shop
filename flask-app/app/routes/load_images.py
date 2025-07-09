@@ -18,7 +18,7 @@ def upload_article_images():
         return jsonify(error='No file part in request'), 400
 
     file = request.files['file']
-    codebar = request.args.get('codebar', None, int)
+    codebar = request.args.get('codebar', None, str)
 
     if file.filename == '':
         return jsonify(error='No file selected to upload'), 400

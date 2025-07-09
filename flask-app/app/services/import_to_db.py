@@ -64,75 +64,55 @@ def articles_dbf_to_csv(articles_dbf):
     return filtered_csv_path
 
 
+import re
+import math
+
 def validate_clean_article_data(row):
     """
-    Valida y limpia los datos de una fila del artículo en formato pandas.Series.
-    - Verifica que los valores cumplan con los tipos de datos y el formato.
-    - Si no son válidos, se intentan corregir
+    Valida y limpia los datos de una fila del artículo (pandas.Series).
+    - Ref y Codebar deben contener solo dígitos (como texto).
+    - El resto de campos se validan según reglas conocidas.
     """
     
-    fixes = [] # Lista de erorres corregidos
-    errors = []
-    
-    # CCODEBAR: debe ser un entero positivo y único
+    fixes = []  # Correcciones aplicadas
+    errors = []  # Errores encontrados
+
+    # === CCODEBAR ===
     codebar = row.get('CCODEBAR')
-    
-    if not isinstance(codebar, (int, str)): # Si no es valido lanzamos error
+    if not isinstance(codebar, (int, str)):
         errors.append(f"El campo 'CCODEBAR' no es del tipo esperado (int, str): Type -> {type(codebar)}.")
-    else: # Si es valido...
-        try:
-            row['CCODEBAR'] = int(codebar) # Convertimos a entero y modificamos el valor original
-        except: # Intentamos limpieza
-            clean_codebar = codebar.split('.')[0] #  Eliminar decimales (BUG de .0 a la derecha)
-            clean_codebar = re.sub(r'\D', '', str(clean_codebar)).strip() # Eliminar espacios y caracteres no numéricos
+    else:
+        original = str(codebar).strip()
+        cleaned = re.sub(r'\D', '', original)
+        if not cleaned:
+            errors.append("El campo 'CCODEBAR' está vacío o no contiene números.")
+        elif cleaned != original:
+            fixes.append("Se han eliminado caracteres no numéricos del campo 'CCODEBAR'.")
+            row['CCODEBAR'] = cleaned
+        else:
+            row['CCODEBAR'] = original
 
-            # Verificar si después de limpiar hay un valor válido
-            if not clean_codebar:
-                errors.append("El campo 'CCODEBAR' debe ser un entero positivo.")
-            else:
-                # Si ha cambiado el valor original...
-                if codebar != clean_codebar:
-                    try:
-                        row['CCODEBAR'] = int(clean_codebar) # Convertimos a entero y modificamos el valor original
-                        
-                        fixes.append(f"Se ha corregido el campo 'CCODEBAR'") # Se añade la corrección a la lsita    
-                    except ValueError:
-                        errors.append("El campo 'CCODEBAR' debe ser un entero positivo.") # Se añade el error al la lista
-                        
-    
-    # CREF debe ser un entero positivo
+    # === CREF ===
     ref = row.get('CREF')
-    
-    if not isinstance(ref, (int, str)): # Si no es valido lanzamos error
+    if not isinstance(ref, (int, str)):
         errors.append(f"El campo 'CREF' no es del tipo esperado (int, str): Type -> {type(ref)}.")
-    else: # Si es valido...
-        try:
-            row['CREF'] = int(ref) # Convertimos a entero y modificamos el valor original
-        except: # Intentamos limpieza
-            clean_ref = ref.split('.')[0] #  Eliminar decimales (BUG de .0 a la derecha)
-            clean_ref = re.sub(r'\D', '', str(clean_ref)).strip() # Eliminar espacios y caracteres no numéricos
+    else:
+        original = str(ref).strip()
+        cleaned = re.sub(r'\D', '', original)
+        if not cleaned:
+            errors.append("El campo 'CREF' está vacío o no contiene números.")
+        elif cleaned != original:
+            fixes.append("Se han eliminado caracteres no numéricos del campo 'CREF'.")
+            row['CREF'] = cleaned
+        else:
+            row['CREF'] = original
 
-            # Verificar si después de limpiar hay un valor válido
-            if not clean_ref:
-                errors.append("El campo 'CREF' debe ser un entero positivo.")
-            else:
-                # Si ha cambiado el valor original...
-                if ref != clean_ref:
-                    try:
-                        row['CREF'] = int(clean_ref) # Convertimos a entero y modificamos el valor original
-                        
-                        fixes.append(f"Se ha corregido el campo 'CREF'") # Se añade la corrección a la lsita    
-                    except ValueError:
-                        errors.append("El campo 'CREF' debe ser un entero positivo.") # Se añade el error al la lista
-
-    
-    # CDETALLE: cadena de hasta 100 caracteres, puede contener cualquier carácter UTF-8
+    # === CDETALLE ===
     detalle = row.get('CDETALLE')
     if detalle is not None and (not isinstance(detalle, str) or len(detalle) > 100):
-        errors.append("El campo 'CDETALLE' debe ser una cadena de texto de maximo 100 caracteres.")
-    
-    
-    # CCODFAM: debe ser un entero, puede ser nulo
+        errors.append("El campo 'CDETALLE' debe ser una cadena de texto de máximo 100 caracteres.")
+
+    # === CCODFAM ===
     codfam = row.get('CCODFAM')
     try:
         if codfam is not None:
@@ -140,24 +120,23 @@ def validate_clean_article_data(row):
     except (ValueError, TypeError):
         errors.append("El campo 'CCODFAM' debe ser un entero o nulo.")
 
-
-    # NCOSTEDIV y NPVP: deben ser flotantes y positivos
+    # === NCOSTEDIV y NPVP ===
     for key in ['NCOSTEDIV', 'NPVP']:
         value = row.get(key)
         try:
-            if value is not None and row[key] >= 0:
-                value = float(value)  # Convertir a float
-                row[key] = math.trunc(value * 100) / 100 # Truncar a 2 decimales y actualizar
-            else:
-                errors.append(f"El campo '{key}' debe ser un número positivo.")
+            if value is not None:
+                value = float(value)
+                if value >= 0:
+                    row[key] = math.trunc(value * 100) / 100  # Truncar a 2 decimales
+                else:
+                    errors.append(f"El campo '{key}' debe ser un número positivo.")
         except (ValueError, TypeError):
             errors.append(f"Error desconocido. El campo '{key}' debe ser un número positivo.")
-            
-    # Si ha habido errores, devolver False y los errores encontrados
-    if len(errors) > 0:
-        return False, row, errors
 
-    # Si todo está bien, devolver True, los datos corregidos y las correcciones realizadas
+    # === Resultado final ===
+    if errors:
+        return False, row, errors
+    
     return True, row, fixes
 
 # Para logs
@@ -588,37 +567,28 @@ def stocks_dbf_to_csv(stocks_dbf):
     
     return filtered_csv_path
 
-def validate_clean_stocks_data(row):
-    fixes = [] # Lista de erorres corregidos
-    errors = []                        
-    
-    # CREF debe ser un entero positivo
-    ref = row.get('CREF')
-    
-    if not isinstance(ref, (int, str)): # Si no es valido lanzamos error
-        errors.append(f"El campo 'CREF' no es del tipo esperado (int, str): Type -> {type(ref)}.")
-    else: # Si es valido...
-        try:
-            row['CREF'] = int(ref) # Convertimos a entero y modificamos el valor original
-        except: # Intentamos limpieza
-            clean_ref = ref.split('.')[0] #  Eliminar decimales (BUG de .0 a la derecha)
-            clean_ref = re.sub(r'\D', '', str(clean_ref)).strip() # Eliminar espacios y caracteres no numéricos
+import re
 
-            # Verificar si después de limpiar hay un valor válido
-            if not clean_ref:
-                errors.append("El campo 'CREF' debe ser un entero positivo.")
-            else:
-                # Si ha cambiado el valor original...
-                if ref != clean_ref:
-                    try:
-                        row['CREF'] = int(clean_ref) # Convertimos a entero y modificamos el valor original
-                        
-                        fixes.append(f"Se ha corregido el campo 'CREF'") # Se añade la corrección a la lsita    
-                    except ValueError:
-                        errors.append("El campo 'CREF' debe ser un entero positivo.") # Se añade el error al la lista
-                        
+def validate_clean_stocks_data(row):
+    fixes = []  # Lista de correcciones realizadas
+    errors = []  # Lista de errores encontrados
     
-    # NSTOCK: debe ser un entero, puede ser nulo
+    # === CREF ===
+    ref = row.get('CREF')
+    if not isinstance(ref, (int, str)):
+        errors.append(f"El campo 'CREF' no es del tipo esperado (int, str): Type -> {type(ref)}.")
+    else:
+        original = str(ref).strip()
+        cleaned = re.sub(r'\D', '', original)
+        if not cleaned:
+            errors.append("El campo 'CREF' está vacío o no contiene números.")
+        elif cleaned != original:
+            fixes.append("Se han eliminado caracteres no numéricos del campo 'CREF'.")
+            row['CREF'] = cleaned
+        else:
+            row['CREF'] = original
+
+    # === NSTOCK ===
     stock = row.get('NSTOCK')
     try:
         if stock is not None:
@@ -626,12 +596,9 @@ def validate_clean_stocks_data(row):
     except (ValueError, TypeError):
         errors.append("El campo 'NSTOCK' debe ser un entero o nulo.")
 
-
-    # Si ha habido errores, devolver False y los errores encontrados
-    if len(errors) > 0:
+    if errors:
         return False, row, errors
-
-    # Si todo está bien, devolver True, los datos corregidos y las correcciones realizadas
+    
     return True, row, fixes
 
 def update_stocks(stocks_dbf):
@@ -997,62 +964,53 @@ def validate_clean_hticketl_data(row):
     fixes = [] # Lista de erorres corregidos
     errors = []
     
-    # CCODEBAR: debe ser un entero positivo y único
+    # === CCODBAR ===
     codebar = row.get('CCODBAR')
-    
-    if not isinstance(codebar, (int, str)): # Si no es valido lanzamos error
+    if not isinstance(codebar, (int, str)):
         errors.append(f"El campo 'CCODBAR' no es del tipo esperado (int, str): Type -> {type(codebar)}.")
-    else: # Si es valido...
-        try:
-            row['CCODBAR'] = str(int(codebar)) # Convertimos a entero y modificamos el valor original
-        except: # Intentamos limpieza
-            clean_codebar = codebar.split('.')[0] #  Eliminar decimales (BUG de .0 a la derecha)
-            clean_codebar = re.sub(r'\D', '', clean_codebar).strip() # Eliminar espacios y caracteres no numéricos
+    else:
+        original = str(codebar).strip()
+        cleaned = re.sub(r'\D', '', original)
+        if not cleaned:
+            errors.append("El campo 'CCODBAR' está vacío o no contiene números.")
+        elif cleaned != original:
+            fixes.append("Se han eliminado caracteres no numéricos del campo 'CCODBAR'.")
+            row['CCODBAR'] = cleaned
+        else:
+            row['CCODBAR'] = original
 
-            # Verificar si después de limpiar hay un valor válido
-            if not clean_codebar:
-                errors.append("El campo 'CCODBAR' debe ser un entero positivo.")
-            else:
-                # Si ha cambiado el valor original...
-                if codebar != clean_codebar:
-                    try:
-                        row['CCODBAR'] = str(int(clean_codebar)) # Convertimos a entero y modificamos el valor original
-
-                        fixes.append(f"Se ha corregido el campo 'CCODBAR'") # Se añade la corrección a la lista
-                    except ValueError:
-                        errors.append("El campo 'CCODBAR' debe ser un entero positivo.") # Se añade el error al la lista
-                        
-    
-    # CREF debe ser un entero positivo
+    # === CREF ===
     ref = row.get('CREF')
-    
-    if not isinstance(ref, (int, str)): # Si no es valido lanzamos error
+    if not isinstance(ref, (int, str)):
         errors.append(f"El campo 'CREF' no es del tipo esperado (int, str): Type -> {type(ref)}.")
-    else: # Si es valido...
-        try:
-            row['CREF'] = str(int(ref)) # Convertimos a entero y modificamos el valor original
-        except: # Intentamos limpieza
-            clean_ref = ref.split('.')[0] #  Eliminar decimales (BUG de .0 a la derecha)
-            clean_ref = re.sub(r'\D', '', str(clean_ref)).strip() # Eliminar espacios y caracteres no numéricos
-
-            # Verificar si después de limpiar hay un valor válido
-            if not clean_ref:
-                errors.append("El campo 'CREF' debe ser un entero positivo.")
-            else:
-                # Si ha cambiado el valor original...
-                if ref != clean_ref:
-                    try:
-                        row['CREF'] = str(int(clean_ref)) # Convertimos a entero y modificamos el valor original
-
-                        fixes.append(f"Se ha corregido el campo 'CREF'") # Se añade la corrección a la lista
-                    except ValueError:
-                        errors.append("El campo 'CREF' debe ser un entero positivo.") # Se añade el error al la lista
-
+    else:
+        original = str(ref).strip()
+        cleaned = re.sub(r'\D', '', original)
+        if not cleaned:
+            errors.append("El campo 'CREF' está vacío o no contiene números.")
+        elif cleaned != original:
+            fixes.append("Se han eliminado caracteres no numéricos del campo 'CREF'.")
+            row['CREF'] = cleaned
+        else:
+            row['CREF'] = original
     
     # CDETALLE: cadena de hasta 100 caracteres, puede contener cualquier carácter UTF-8
     detalle = row.get('CDETALLE')
     if detalle is not None and (not isinstance(detalle, str) or len(detalle) > 100):
         errors.append("El campo 'CDETALLE' debe ser una cadena de texto de máximo 100 caracteres.")
+        
+    # === NPREUNIT ===
+    for key in ['NPREUNIT']:
+        value = row.get(key)
+        try:
+            if value is not None:
+                value = float(value)
+                if value >= 0:
+                    row[key] = math.trunc(value * 100) / 100  # Truncar a 2 decimales
+                else:
+                    errors.append(f"El campo '{key}' debe ser un número positivo.")
+        except (ValueError, TypeError):
+            errors.append(f"Error desconocido. El campo '{key}' debe ser un número positivo.")
         
     return True, row, fixes
 
@@ -1104,16 +1062,6 @@ def update_hticketl(hticketl_dbf):
             
         # Crear un nuevo DataFrame con las filas limpias
         clean_hticketl_csv = pd.DataFrame(clean_rows, columns=hticketl_csv.columns)
-        # Fuerza CCODBAR y CREF a str, elimina ".0" y espacios
-        for col in ['CCODBAR', 'CREF']:
-            if col in clean_hticketl_csv.columns:
-                clean_hticketl_csv[col] = (
-                    clean_hticketl_csv[col]
-                    .astype(str)
-                    .str.rstrip('.0')
-                    .str.strip()
-                    .replace({'nan': None, 'None': None})
-                )
 
         # Obtener tickets válidos
         existing_tickets = {ticket.number for ticket in Ticket.query.with_entities(Ticket.number).all()}
@@ -1127,12 +1075,12 @@ def update_hticketl(hticketl_dbf):
         for _, row in clean_hticketl_csv.iterrows():
 
             try:
-                ticket_number = int(row['NNUMTICKET'])
-                codebar = row['CCODBAR'] if not pd.isna(row['CCODBAR']) else None
-                ref=row['CREF'] if not pd.isna(row['CREF']) else None
-                detalle=str(row['CDETALLE']).strip() if not pd.isna(row['CDETALLE']) else None
+                ticket_number=int(row['NNUMTICKET'])
+                codebar=row['CCODBAR'] if not pd.isna(row['CCODBAR']) else None # Puede ser None
+                ref=row['CREF'] if not pd.isna(row['CREF']) else None # Puede ser None
+                detalle=str(row['CDETALLE']).strip() if not pd.isna(row['CDETALLE']) else None # Puede ser None
                 quantity=int(row['NCANT'])
-                unit_price=float(row['NPREUNIT'])
+                unit_price=row['NPREUNIT']
 
                 if ticket_number not in existing_tickets or codebar is None:
                     unprocessed_ticket_items += 1

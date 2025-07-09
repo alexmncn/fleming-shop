@@ -9,7 +9,7 @@ admin_bp = Blueprint('admin', __name__)
 @admin_bp.route('/articles/feature', methods=['POST'])
 @jwt_required()
 def feature_article():
-    codebar = request.args.get('codebar', None, int)
+    codebar = request.args.get('codebar', None, str)
     featured = request.args.get('featured', 'true') in ['True','true', '1', 'yes', 'y']
 
     if codebar:
@@ -33,7 +33,7 @@ def feature_article():
 @admin_bp.route('/articles/hide', methods=['POST'])
 @jwt_required()
 def hide_article():
-    codebar = request.args.get('codebar', None, int)
+    codebar = request.args.get('codebar', None, str)
     hidden = request.args.get('hidden', 'true') in ['True','true', '1', 'yes', 'y']
     
     if codebar:
