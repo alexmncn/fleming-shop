@@ -2,6 +2,7 @@
 import pytz
 import uuid
 from datetime import datetime, timedelta
+from flask import url_for
 from flask_login import UserMixin
 from sqlalchemy import Column, Integer, String, Boolean, Text, Float, DateTime, Date, Time, ForeignKey, Index
 from sqlalchemy.orm import relationship
@@ -33,12 +34,26 @@ class Article(db.Model):
     destacado = Column(TINYINT(1), default=0, nullable=True)
     hidden = Column(TINYINT(1), default=0, nullable=True)
     
-    __table_args__ = (
-        Index('detalle_index', 'detalle', mysql_prefix='FULLTEXT'),
-    )
+    @property
+    def has_image(self):
+        return db.session.query(ArticleImage.query.filter_by(article_codebar=self.codebar).exists()).scalar()
+
+    @property
+    def image_url(self):
+        img = ArticleImage.query.filter_by(article_codebar=self.codebar, is_main=True).first()
+        if img:
+            return url_for('images.get_article_image', image_id=img.id, _external=True)
+        return None
+
+    @property
+    def image_urls(self):
+        return [
+            url_for('images.get_article_image', image_id=img.id, _external=True)
+            for img in ArticleImage.query.filter_by(article_codebar=self.codebar).all()
+        ]
     
-    def to_dict(self):
-        return {
+    def to_dict(self, include_images=False):
+        data = {
             'ref': self.ref, 
             'detalle': self.detalle, 
             'codfam': self.codfam, 
@@ -49,35 +64,46 @@ class Article(db.Model):
             'factualizacion': self.factualizacion,
             'date_created': self.date_created,
             'destacado': bool(self.destacado),
-            'hidden': bool(self.hidden)
+            'hidden': bool(self.hidden),
+            'has_image': self.has_image,
+            'image_url': self.image_url
         }
+        if include_images:
+            data['image_urls'] = self.image_urls
+        return data
         
-    def to_dict_reduced(self):
-        return {
+    def to_dict_reduced(self, include_images=False):
+        data = {
             'ref': self.ref,
             'codebar': self.codebar, 
             'detalle': self.detalle, 
             'codfam': self.codfam,  
             'pvp': self.pvp,
             'stock': self.stock,
-            'destacado': bool(self.destacado)
-        }
-        
-    def to_dict_og_keys(self):
-        return {
-            'CREF': self.ref, 
-            'CDETALLE': self.detalle, 
-            'CCODFAM': self.codfam, 
-            'NCOSTEDIV': self.pcosto, 
-            'NPVP': self.pvp, 
-            'CCODEBAR': self.codebar, 
-            'NSTOCKMIN': self.stock, 
-            'DACTUALIZA': self.factualizacion,
-            'date_created': self.date_created,
             'destacado': bool(self.destacado),
-            'hidden': bool(self.hidden)
+            'has_image': self.has_image,
+            'image_url': self.image_url
         }
+        if include_images:
+            data['image_urls'] = self.image_urls
+        return data
         
+class ArticleImage(db.Model):
+    __tablename__ = "article_images"
+    __table_args__ = {
+        'mysql_charset': 'utf8mb4',
+        'mysql_collate': 'utf8mb4_unicode_ci'
+    }
+    
+    id = Column(String(100), primary_key=True)
+    article_codebar = Column(db.String(50), nullable=False, index=True)
+    filename = Column(String(100), nullable=False)
+    is_main = Column(TINYINT(1), default=0, nullable=True)
+    
+    @property
+    def url(self):
+        return url_for('images.get_article_image', image_id=self.id, _external=True)
+
 class Family(db.Model):
     __tablename__= "family"
     __table_args__ = {
@@ -205,8 +231,8 @@ class TicketItem(db.Model):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     ticket_number = Column(Integer, ForeignKey('tickets.number'), nullable=False)
-    ref = Column(String(50), nullable=True)
-    codebar = Column(String(50), nullable=True)
+    ref = Column(String(50), nullable=True, index=True)
+    codebar = Column(String(50), nullable=True, index=True)
     detalle = Column(String(100), nullable=True)
     quantity = Column(Integer, nullable=False)
     unit_price = Column(Float, nullable=False)

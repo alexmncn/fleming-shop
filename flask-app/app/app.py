@@ -3,7 +3,7 @@ from flask import Flask
 from flask_cors import CORS
 
 from app.extensions import db, migrate, jwt
-from app.routes import catalog, load_data, auth, admin, load_images, load_files
+from app.routes import catalog, load_data, auth, admin, images, load_files
 
 def create_app(config_object="app.config"):
     # Create application factory. Param config_object, the configuration object to use.
@@ -26,7 +26,7 @@ def register_blueprints(app):
     app.register_blueprint(load_data.load_data_bp)
     app.register_blueprint(auth.auth_bp)
     app.register_blueprint(admin.admin_bp)
-    app.register_blueprint(load_images.load_images_bp)
+    app.register_blueprint(images.images_bp)
     app.register_blueprint(load_files.load_files_bp)
 
 def set_CORS(app):
