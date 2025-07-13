@@ -1,6 +1,6 @@
 export interface Article {
-    ref: number;
-    codebar: number;
+    ref: string;
+    codebar: string;
     codfam: number;
     detalle: string;
     pcosto: number;
@@ -8,4 +8,6 @@ export interface Article {
     stock: number;
     destacado: boolean;
     hidden: boolean;
+    has_image: boolean;
+    image_url: string;
 }

@@ -1,8 +1,7 @@
-import os
-from flask import Blueprint, jsonify, request, send_file
+import os, uuid
+from flask import Blueprint, jsonify, request, send_file, current_app
 from flask_jwt_extended import jwt_required
 from werkzeug.utils import secure_filename
-import uuid
 
 from app.config import IMAGES_ROUTE
 from app.utils.images import image_to_webp
@@ -13,11 +12,13 @@ from app.models import ArticleImage
 
 images_bp = Blueprint('images', __name__)
 
-ARTICLES_IMAGES_ROUTE = os.path.join(IMAGES_ROUTE, 'articles')
 
 @images_bp.route('/images/articles/upload', methods=['POST'])
 @jwt_required()
 def upload_article_images():
+    images_directory = os.path.join(current_app.root_path, IMAGES_ROUTE)
+    articles_images_directory = os.path.join(images_directory, 'articles')
+
     file = request.files.get('file')
     codebar = request.form.get('codebar')
     is_main = request.form.get('is_main', '0') in ['1', 'true', 'True']
@@ -38,8 +39,8 @@ def upload_article_images():
     # Generar UUID
     image_id = str(uuid.uuid4())
     new_filename = f"{image_id}.webp"
-    tmp_folder = os.path.join(ARTICLES_IMAGES_ROUTE, 'tmp')
-    final_folder = ARTICLES_IMAGES_ROUTE
+    tmp_folder = os.path.join(articles_images_directory, 'tmp')
+    final_folder = articles_images_directory
     os.makedirs(tmp_folder, exist_ok=True)
     os.makedirs(final_folder, exist_ok=True)
 
@@ -68,6 +69,12 @@ def upload_article_images():
     existing_images = ArticleImage.query.filter_by(article_codebar=codebar).count()
     if existing_images == 0:
         is_main = True
+    elif is_main:
+        # Si ya hay imágenes y la nueva debe ser main, quitar is_main a la anterior
+        main_image = ArticleImage.query.filter_by(article_codebar=codebar, is_main=True).first()
+        if main_image:
+            main_image.is_main = False
+            db.session.add(main_image)
 
     # Registrar en la base de datos
     image = ArticleImage(
@@ -88,11 +95,12 @@ def upload_article_images():
 
     send_alert(f'Se ha subido una nueva imagen para el artículo <b>{codebar}</b>', 0)
 
-    return jsonify(message='Imagen subida correctamente', image_url=image.url), 200  
+    return jsonify(message='Image uploaded successfully', image_url=image.url), 200
 
 
 @images_bp.route('/images/articles/<image_id>', methods=['GET'])
 def get_article_image(image_id):
     image = ArticleImage.query.get_or_404(image_id)
-    article_images_route = os.path.join(IMAGES_ROUTE, 'articles')
-    return send_file(os.path.join(article_images_route, image.article_codebar, image.filename))
+    images_directory = os.path.join(current_app.root_path, IMAGES_ROUTE)
+    articles_images_directory = os.path.join(images_directory, 'articles')
+    return send_file(os.path.join(articles_images_directory, image.filename))

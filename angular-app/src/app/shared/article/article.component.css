@@ -406,7 +406,6 @@ section.list .info-placeholder {
     border: var(--border-1-3);
     border-radius: 50%;
     background-color: white;
-    box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.1);
     font-size: clamp(0.7rem, 1.5vw, 1rem);
     align-self: center;
     max-height: min-content;
@@ -604,6 +603,14 @@ section.list .info-placeholder {
 
 .file-select i {
     font-size: clamp(1.5rem, 2.5vw, 2rem);
+}
+
+.is-main-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: clamp(0.75rem, 2.5vw, 1rem);
+    margin-bottom: 0.5rem;
 }
 
 .option-buttons {

@@ -1,8 +1,8 @@
 <section [id]="article.codebar" class="article-card" [class.grid]="gridDisplay" [class.list]="listDisplay" (click)="toggleSelection()">
     <ng-container *ngIf="!loading; else loadingTemplate">
-        <section class="img" [class.placeholder]="imgError">
-            <img *ngIf="!imgError" [src]="imgURL" (error)="imgError=true" loading="lazy">
-            <div *ngIf="imgError" class="placeholder-no-img">
+        <section class="img" [class.placeholder]="!article.has_image || imgError">
+            <img *ngIf="article.has_image || !imgError" [src]="imgUrl" (error)="imgError=true" loading="lazy">
+            <div *ngIf="!article.has_image || imgError" class="placeholder-no-img">
                 <div class="content">
                     <i class="pi pi-image"></i>
                     <p>Sin imagen</p>
@@ -13,9 +13,9 @@
             <div class="left">
                 <p class="detalle">{{ article.detalle | capitalize }}</p>
                 <p class="ref">Ref: {{ article.ref }}</p>
-                <p class="pvp">{{ formatedPvp }} €</p>
+                <p class="pvp">{{ article.pvp }} €</p>
             </div>
-            <div *ngIf="listDisplay" class="stock-info" [title]="article.stock">
+            <div *ngIf="listDisplay" class="stock-info">
                 <div class="circle" [class.green]="inStock" [class.red]="!inStock"></div>
                 <p *ngIf="inStock">Disponible</p>
                 <p *ngIf="!inStock">Sin stock</p>
@@ -26,7 +26,7 @@
                 </div>
             </div>
         </section>
-        <div *ngIf="gridDisplay" class="stock-info" [title]="article.stock">
+        <div *ngIf="gridDisplay" class="stock-info">
             <div class="circle" [class.green]="inStock" [class.red]="!inStock"></div>
             <p *ngIf="inStock">Disponible</p>
             <p *ngIf="!inStock">Sin stock</p>
@@ -86,8 +86,8 @@
                 </div>
             </div>
             <section class="img">
-                <img *ngIf="!imgError" [src]="imgURL" (error)="imgError=true">
-                <div *ngIf="imgError" class="placeholder-no-img">
+                <img *ngIf="article.has_image || !imgError" [src]="imgUrl" (error)="imgError=true">
+                <div *ngIf="!article.has_image || imgError" class="placeholder-no-img">
                     <div class="content">
                         <i class="pi pi-image"></i>
                         <p>Sin imagen</p>
@@ -103,10 +103,11 @@
                             <i class="pi pi-barcode"></i>
                             <p>: {{article.codebar}}</p>
                         </div>
+                        <p *ngIf="isAuth" class="stock">Stock: {{ article.stock }}</p>
                     </div>
                     <div class="prize">
-                        <p class="pvp">{{ formatedPvp }} €</p>
-                        <p *ngIf="isAuth" class="pcosto"><b>{{ formatedPcosto }} €</b></p>
+                        <p class="pvp">{{ article.pvp }} €</p>
+                        <p *ngIf="isAuth" class="pcosto"><b>{{ article.pcosto }} €</b></p>
                     </div>
                 </div>
             </section>
@@ -128,9 +129,13 @@
                 <div *ngIf="uploadImagePreview" class="image-preview">
                     <img [src]="uploadImagePreview" alt="Preview Image" style="max-width: 100%; border-radius: 8px;" />
                 </div>
-                <div class="option-buttons">
-                    <button *ngIf="selectedFile" class="clean-file" (click)="cleanFileSelected()" [disabled]="!selectedFile">Cambiar</button>
-                    <button *ngIf="selectedFile" class="upload" (click)="uploadImage()" [disabled]="!selectedFile">
+                <div class="is-main-option" *ngIf="selectedFile">
+                    <p>Imagen principal</p>
+                    <input type="checkbox" [checked]="isUploadingImageMain" (change)="toggleMainImage($event)">
+                </div>
+                <div class="option-buttons" *ngIf="selectedFile">
+                    <button class="clean-file" (click)="cleanFileSelected()" [disabled]="!selectedFile">Cambiar</button>
+                    <button class="upload" (click)="uploadImage()" [disabled]="!selectedFile">
                         <ng-container *ngIf="!uploadingImage; else loadingTemplate">
                             Subir imagen
                         </ng-container>

@@ -61,8 +61,8 @@ export class ArticleComponent implements OnInit {
   @Input() gridDisplay: boolean = false;
   @Input() listDisplay: boolean = false;
   loading: boolean = true;
-  imgURL: string = '';
   imgError: boolean = false;
+  imgUrl: string = '';
   articleSelected: boolean = false;
   isAuth: boolean = false;
   adminMenuActive: boolean = false;
@@ -70,11 +70,12 @@ export class ArticleComponent implements OnInit {
   isFeatured: boolean = false;
   hideURL: string = environment.apiUrl + '/articles/hide';
   isHidden: boolean = false;
-  uploadImageURL: string = environment.apiUrl + '/upload/articles/images';
+  uploadImageURL: string = environment.apiUrl + '/images/articles/upload';
   uploadImageMenuActive: boolean = false;
   selectedFile: File | null = null;
   uploadingImage: boolean = false;
   uploadImagePreview: string | ArrayBuffer | null = null;
+  isUploadingImageMain: boolean = false;
 
   constructor(private http: HttpClient, private messageService: MessageService, private authService: AuthService, private router: Router, private route: ActivatedRoute) { }
 
@@ -82,12 +83,13 @@ export class ArticleComponent implements OnInit {
     this.authService.isAuthenticated$.subscribe((auth: boolean) => {
       this.isAuth = auth;
     });
+
+    this.imgUrl = this.article.image_url;
   }
 
   ngOnChanges(): void {
     this.loading = !this.article.detalle;
     this.imgError = false;
-    this.imgURL = environment.articleImageRoute + this.article.codebar + '.webp';
     this.isFeatured = this.article.destacado;
     this.isHidden = this.article.hidden;
   }
@@ -192,7 +194,7 @@ export class ArticleComponent implements OnInit {
     return this.http.post(this.hideURL, {},{params: {'codebar': this.article.codebar, 'hidden': newValue}});
   }
 
-  toggleImageUploadMenu():void {
+  toggleImageUploadMenu(): void {
     this.uploadImageMenuActive = !this.uploadImageMenuActive;
     if (this.selectedFile) {
       this.cleanFileSelected();
@@ -217,16 +219,25 @@ export class ArticleComponent implements OnInit {
     this.uploadImagePreview = null;
   }
 
+  toggleMainImage(event: Event): void {
+    const checkbox = event.target as HTMLInputElement;
+    this.isUploadingImageMain = checkbox.checked;
+  }
+
   uploadImage(): void {
     if (this.selectedFile) {
       this.uploadingImage = true;
 
       const formData = new FormData();
       formData.append('file', this.selectedFile, this.selectedFile.name);
+      formData.append('codebar', this.article.codebar);
+      formData.append('is_main', this.isUploadingImageMain ? '1' : '0');
 
-      this.http.post(this.uploadImageURL, formData, {params: {'codebar': this.article.codebar}})
+      this.http.post<{ image_url: string }>(this.uploadImageURL, formData)
         .subscribe({
           next: (response) => {
+            this.imgUrl = response.image_url;
+            console.log('Imagen subida correctamente:', response);
             this.uploadingImage = false;
             this.messageService.showMessage('success', 'La imagen se ha añadido correctamente')
             this.toggleSelection()
@@ -244,14 +255,6 @@ export class ArticleComponent implements OnInit {
     if (this.article.stock > 0) {
       return true
     } else {return false}
-  }
-
-  get formatedPvp(): string {
-    return this.article.pvp.toFixed(2);
-  }
-
-  get formatedPcosto(): string {
-    return this.article.pcosto.toFixed(2);
   }
 
 }
