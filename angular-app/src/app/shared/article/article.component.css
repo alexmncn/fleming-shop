@@ -505,6 +505,12 @@ section.list .info-placeholder {
     font-size: clamp(0.65rem, 1.5vw, 1rem);
 }
 
+.article-overlay p.stock {
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    color: var(--p-slate-500);
+    margin-top: 0.5rem;
+}
+
 .article-overlay .prize {
     display: flex;
     align-items: end;
@@ -563,10 +569,10 @@ section.list .info-placeholder {
         gap: 0.1rem;
     }
     
-    .article-overlay p.ref {
-        font-size: clamp(0.8rem, 2vw, 1.1rem);
+    .article-overlay p.stock {
+        margin-top: 0.2rem;
     }
-    
+
     .article-overlay .prize {
         gap: 0.5rem;
     }
