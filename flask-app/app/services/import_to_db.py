@@ -1062,6 +1062,16 @@ def update_hticketl(hticketl_dbf):
             
         # Crear un nuevo DataFrame con las filas limpias
         clean_hticketl_csv = pd.DataFrame(clean_rows, columns=hticketl_csv.columns)
+        
+        # Elimina ".0"
+        for col in ['CCODBAR', 'CREF']:
+            if col in clean_hticketl_csv.columns:
+                clean_hticketl_csv[col] = (
+                    clean_hticketl_csv[col]
+                    .astype(str)
+                    .str.rstrip('.0')
+                    .replace({'nan': None, 'None': None})
+                )
 
         # Obtener tickets válidos
         existing_tickets = {ticket.number for ticket in Ticket.query.with_entities(Ticket.number).all()}
