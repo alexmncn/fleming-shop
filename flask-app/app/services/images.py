@@ -13,10 +13,10 @@ def process_uploaded_image(file, codebar, is_main):
     # Validación, renombrado, guardado temporal
     image_id = str(uuid.uuid4())
     filename = f"{image_id}.webp"
-    original_filename = secure_filename(file.filename)
+    tmp_filename = str(codebar) + '.' + file.filename.split('.')[-1]
 
     # Convertir y procesar imagen
-    tmp_path = save_temp_image(file, original_filename)
+    tmp_path = save_temp_image(file, tmp_filename)
     processed_img = convert_to_webp_and_clean(tmp_path)
     final_path = save_final_image(processed_img, filename)
 

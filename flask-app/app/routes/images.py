@@ -39,3 +39,22 @@ def get_article_image(image_id):
     images_directory = os.path.join(current_app.root_path, IMAGES_ROUTE)
     articles_images_directory = os.path.join(images_directory, 'articles')
     return send_file(os.path.join(articles_images_directory, image.filename))
+
+
+@images_bp.route('/images/articles/<image_id>', methods=['DELETE'])
+@jwt_required()
+def delete_article_image(image_id):
+    image = ArticleImage.query.get_or_404(image_id)
+    images_directory = os.path.join(current_app.root_path, IMAGES_ROUTE)
+    articles_images_directory = os.path.join(images_directory, 'articles')
+    image_path = os.path.join(articles_images_directory, image.filename)
+
+    try:
+        if os.path.exists(image_path):
+            os.remove(image_path)
+        db.session.delete(image)
+        db.session.commit()
+        return jsonify(message=f'Image with id {image_id} deleted successfully'), 200
+    except Exception as e:
+        send_alert(f"Error eliminando imagen con id {image_id}: {e}", 1)
+        return jsonify(error="Internal server error"), 500
