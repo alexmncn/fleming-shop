@@ -42,13 +42,13 @@ class Article(db.Model):
     def image_url(self):
         img = ArticleImage.query.filter_by(article_codebar=self.codebar, is_main=True).first()
         if img:
-            return url_for('images.get_article_image', image_id=img.id, _external=True)
+            return url_for('images.get_article_image', image_id=img.id, _external=True, _scheme="https")
         return None
 
     @property
     def image_urls(self):
         return [
-            url_for('images.get_article_image', image_id=img.id, _external=True)
+            url_for('images.get_article_image', image_id=img.id, _external=True, _scheme="https")
             for img in ArticleImage.query.filter_by(article_codebar=self.codebar).all()
         ]
     
@@ -102,7 +102,7 @@ class ArticleImage(db.Model):
     
     @property
     def url(self):
-        return url_for('images.get_article_image', image_id=self.id, _external=True)
+        return url_for('images.get_article_image', image_id=self.id, _external=True, _scheme="https")
 
 class Family(db.Model):
     __tablename__= "family"
