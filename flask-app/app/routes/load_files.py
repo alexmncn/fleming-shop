@@ -1,4 +1,4 @@
-from flask import Blueprint, request, send_file, jsonify, current_app
+from flask import Blueprint, request, send_file, jsonify, current_app, send_from_directory
 import os
 
 from app.config import INTERNAL_API_KEY, SCRIPTS_ROUTE
@@ -35,3 +35,8 @@ def manage_script():
             return jsonify({"message": "Script actualizado con éxito"}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 500
+
+
+@load_files_bp.route("/files/turnstile.html")
+def turnstile_page():
+    return send_from_directory("data/files", "turnstile.html")
