@@ -777,7 +777,7 @@ def update_cierre(cierre_dbf):
 
     # Parseamos la fecha y hora
     df['parsed_date'] = pd.to_datetime(df['DFECHA'], errors='coerce').dt.date
-    df['parsed_time'] = pd.to_datetime(df['CHORA'], errors='coerce').dt.time
+    df['parsed_time'] = pd.to_datetime(df['CHORA'], format='%H:%M', errors='coerce').dt.time
     
     # Ahora reasignamos el counter para evitar duplicados según fecha y hora
     df_sorted = df.sort_values(by=['parsed_date', 'parsed_time'])
