@@ -850,10 +850,38 @@ def movimt_dbf_to_csv(movimt_dbf):
     selected_columns = ['NNUMTICKET', 'DFECHA', 'NIMPORTE', 'DFECCIERRE']
     
     try:
-        df_filtered = df[selected_columns]
+        df_filtered = df[selected_columns].copy()
     except KeyError as e:
         missing_cols = list(set(selected_columns) - set(df.columns))
         raise KeyError(f"Las siguientes columnas faltan en el DataFrame: {missing_cols}") from e
+
+    # Parseamos fechas como datetime para detectar errores
+    df_filtered['parsed_date'] = pd.to_datetime(df_filtered['DFECCIERRE'], errors='coerce')
+
+    # Detectar año más común
+    common_year = df_filtered['parsed_date'].dropna().dt.year.mode()[0]
+    current_year = datetime.now().year
+
+    def fix_date(date):
+        if pd.isna(date):
+            return None
+        year = date.year
+        if year < current_year - 50:
+            return date.replace(year=common_year)
+        return date
+
+    # Aplicar la corrección
+    df_filtered['parsed_date'] = df_filtered['parsed_date'].apply(fix_date)
+
+    # Eliminar filas no corregibles
+    df_filtered = df_filtered[df_filtered['parsed_date'].notna()]
+
+    # Reconstruir fecha como string
+    df_filtered['DFECCIERRE'] = df_filtered['parsed_date']
+
+    # Eliminar columna temporal
+    df_filtered.drop(columns=['parsed_date'], inplace=True)
+
     
     filtered_csv_path = DATA_ROUTE + movimt_dbf_name + '.csv'
     df_filtered.to_csv(filtered_csv_path, index=False)
@@ -873,7 +901,7 @@ def movimt_dbf_to_csv(movimt_dbf):
 
 def update_movimt(movimt_dbf):
     start_time = time.perf_counter()
-    movimt_csv_path = movimt_dbf_to_csv(movimt_dbf)  # Esta función debe existir
+    movimt_csv_path = movimt_dbf_to_csv(movimt_dbf)
 
     status = 0
     status_info = ''
