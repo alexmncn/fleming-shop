@@ -1,4 +1,5 @@
 import os, time, glob, re, math, uuid
+from datetime import datetime
 from flask_jwt_extended import get_jwt_identity
 import pandas as pd
 from dbfread import DBF
@@ -696,23 +697,51 @@ def cierre_dbf_to_csv(cierre_dbf):
     df = pd.DataFrame(iter(dbf_table))
     
     cierre_dbf_name, extension = os.path.splitext(cierre_dbf) # Clean (with date) filename and extension
-    clean_cierre_dbf_name = str.split(cierre_dbf_name,'_')[0]
+    clean_cierre_dbf_name = str.split(cierre_dbf_name, '_')[0]
     csv_path = DATA_ROUTE + 'no_filtered_' + cierre_dbf_name + '.csv'
     df.to_csv(csv_path, index=False)
-    
+
     df = pd.read_csv(csv_path)
     df.columns = df.columns.str.strip()
+
     selected_columns = ['DFECHA', 'NCONTADOR', 'CHORA', 'NTICKINI', 'NTICKFIN', 'NTOTAL', 'NSALDOANT', 'NSALDOACT']
-    
+
     try:
-        df_filtered = df[selected_columns]
+        df_filtered = df[selected_columns].copy()
     except KeyError as e:
         missing_cols = list(set(selected_columns) - set(df.columns))
         raise KeyError(f"Las siguientes columnas faltan en el DataFrame: {missing_cols}") from e
-    
+
+    # Parseamos fechas como datetime para detectar errores
+    df_filtered['parsed_date'] = pd.to_datetime(df_filtered['DFECHA'], errors='coerce')
+
+    # Detectar año más común
+    common_year = df_filtered['parsed_date'].dropna().dt.year.mode()[0]
+    current_year = datetime.now().year
+
+    def fix_date(date):
+        if pd.isna(date):
+            return None
+        year = date.year
+        if year < current_year - 50:
+            return date.replace(year=common_year)
+        return date
+
+    # Aplicar la corrección
+    df_filtered['parsed_date'] = df_filtered['parsed_date'].apply(fix_date)
+
+    # Eliminar filas no corregibles
+    df_filtered = df_filtered[df_filtered['parsed_date'].notna()]
+
+    # Reconstruir fecha como string
+    df_filtered['DFECHA'] = df_filtered['parsed_date']
+
+    # Eliminar columna temporal
+    df_filtered.drop(columns=['parsed_date'], inplace=True)
+
     filtered_csv_path = DATA_ROUTE + cierre_dbf_name + '.csv'
     df_filtered.to_csv(filtered_csv_path, index=False)
-    
+
     os.remove(csv_path) # Remove no filtered csv file
     
     pattern = os.path.join(DATA_ROUTE, f"{clean_cierre_dbf_name}_*.csv") # Get old file versions
@@ -720,8 +749,7 @@ def cierre_dbf_to_csv(cierre_dbf):
     for file_ in glob.glob(pattern):
         file_name = os.path.basename(file_)
         new_file_name = os.path.basename(filtered_csv_path)
-
-        if file_name != new_file_name: # Remove all except the new one
+        if file_name != new_file_name:
             os.remove(file_)
     
     return filtered_csv_path
@@ -747,22 +775,37 @@ def update_cierre(cierre_dbf):
     inserted = 0
     errors = 0
 
-    # Recogemos las fechas ya insertadas
-    existing_dates = { row.date for row in DailySales.query.with_entities(DailySales.date).all() }
-
+    # Parseamos la fecha y hora
+    df['parsed_date'] = pd.to_datetime(df['DFECHA'], errors='coerce').dt.date
+    df['parsed_time'] = pd.to_datetime(df['CHORA'], errors='coerce').dt.time
+    
+    # Ahora reasignamos el counter para evitar duplicados según fecha y hora
+    df_sorted = df.sort_values(by=['parsed_date', 'parsed_time'])
+    
+    # Creamos un nuevo counter por fecha basado en orden horario
+    df_sorted['new_counter'] = df_sorted.groupby('parsed_date').cumcount() + 1
+    
+    # Recogemos las claves existentes para evitar insertar duplicados
+    existing_keys = set(
+        (row.date, row.counter)
+        for row in DailySales.query.with_entities(DailySales.date, DailySales.counter).all()
+    )
+    
     new_records = []
-    for _, row in df.iterrows():
+    errors = 0
+    for _, row in df_sorted.iterrows():
         try:
-            # Parsear fecha y hora
-            date_ = pd.to_datetime(row['DFECHA']).date()
-            time_ = pd.to_datetime(row['CHORA']).time()
-
-            if date_ in existing_dates:
+            date_ = row['parsed_date']
+            time_ = row['parsed_time']
+            counter_ = int(row['new_counter'])
+            
+            if (date_, counter_) in existing_keys:
+                # Si existe, saltar
                 continue
 
             record = DailySales(
                 date=date_,
-                counter=int(row['NCONTADOR']),
+                counter=counter_,
                 time=time_,
                 first_ticket=int(row['NTICKINI']),
                 last_ticket=int(row['NTICKFIN']),
@@ -771,7 +814,7 @@ def update_cierre(cierre_dbf):
                 current_balance=float(row['NSALDOACT'])
             )
             new_records.append(record)
-        except Exception as e:
+        except Exception:
             errors += 1
 
     session = db.session
