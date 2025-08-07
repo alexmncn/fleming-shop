@@ -9,16 +9,22 @@ from app.extensions import db
 from app.models import ArticleImage
 
 
-def process_uploaded_image(file, codebar, is_main):
+def process_uploaded_image(file, codebar, is_main, convert, keep_original):
     # Validación, renombrado, guardado temporal
     image_id = str(uuid.uuid4())
     filename = f"{image_id}.webp"
-    tmp_filename = str(codebar) + '.' + file.filename.split('.')[-1]
-
-    # Convertir y procesar imagen
-    tmp_path = save_temp_image(file, tmp_filename)
-    processed_img = convert_to_webp_and_clean(tmp_path)
-    final_path = save_final_image(processed_img, filename)
+    
+    if convert:
+        # Convertir y procesar imagen
+        tmp_filename = str(codebar) + '.' + file.filename.split('.')[-1]
+        tmp_path = save_temp_image(file, tmp_filename)
+        processed_img = convert_to_webp_and_clean(tmp_path)
+        final_path = save_final_image(processed_img, filename, convert)
+        
+        if not keep_original:
+            os.remove(tmp_path)
+    else:
+        final_path = save_final_image(file, filename, convert)
 
     # Registrar en DB
     register_image_in_db(image_id, codebar, filename, is_main, final_path)

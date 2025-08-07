@@ -19,13 +19,15 @@ def upload_article_images():
     file = request.files.get('file')
     codebar = request.form.get('codebar')
     is_main = request.form.get('is_main', '0') in ['1', 'true', 'True']
+    convert = request.form.get('convert', '0') in ['1', 'true', 'True']
+    keep_original = request.form.get('keep_original', '0') in ['1', 'true', 'True']
 
     if not file or not codebar:
         return jsonify(error='Missing data'), 400
 
     try:
-        image_url = process_uploaded_image(file, codebar, is_main)
-        return jsonify(message='Imagen subida correctamente', image_url=image_url), 200
+        image_url = process_uploaded_image(file, codebar, is_main, convert, keep_original)
+        jsonify(message='Image uploaded successfully', image_url=image_url), 200
     except ValueError as e:
         return jsonify(error=str(e)), 400
     except Exception as e:

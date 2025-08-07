@@ -15,21 +15,27 @@ def save_temp_image(file, name):
     file.save(path)
     return path
 
+def save_final_image(image, filename, convert):
+    images_directory = os.path.join(current_app.root_path, IMAGES_ROUTE)
+    articles_images_directory = os.path.join(images_directory, 'articles')
+    final_dir = articles_images_directory
+    os.makedirs(final_dir, exist_ok=True)
+    final_path = os.path.join(final_dir, filename)
+    if convert:
+        if not filename.endswith('.webp'):
+            filename += '.webp'
+        image.save(final_path, format='WEBP', quality=100)
+    else:
+        image.save(final_path)
+
+    return final_path
+
 def convert_to_webp_and_clean(input_path):
     image = remove_background(input_path)
     image = crop_to_content(image)
     image = resize_and_center(image, size=(1000, 1000))
     
     return image
-
-def save_final_image(image, filename):
-    images_directory = os.path.join(current_app.root_path, IMAGES_ROUTE)
-    articles_images_directory = os.path.join(images_directory, 'articles')
-    final_dir = articles_images_directory
-    os.makedirs(final_dir, exist_ok=True)
-    final_path = os.path.join(final_dir, filename)
-    image.save(final_path, format='WEBP', quality=85)
-    return final_path
 
 def remove_background(input_path):
     with open(input_path, 'rb') as f:
