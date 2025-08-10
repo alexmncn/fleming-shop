@@ -27,9 +27,7 @@ def upload_article_images():
 
     try:
         image_url = process_uploaded_image(file, codebar, is_main, convert, keep_original)
-        jsonify(message='Image uploaded successfully', image_url=image_url), 200
-    except ValueError as e:
-        return jsonify(error=str(e)), 400
+        return jsonify(message='Image uploaded successfully', image_url=image_url), 200
     except Exception as e:
         send_alert(f"Error procesando imagen: {e}", 1)
         return jsonify(error="Internal server error"), 500
