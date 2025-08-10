@@ -19,7 +19,7 @@ def upload_article_images():
     file = request.files.get('file')
     codebar = request.form.get('codebar')
     is_main = request.form.get('is_main', '0') in ['1', 'true', 'True']
-    convert = request.form.get('convert', '0') in ['1', 'true', 'True']
+    convert = request.form.get('convert', '1') in ['1', 'true', 'True']
     keep_original = request.form.get('keep_original', '0') in ['1', 'true', 'True']
 
     if not file or not codebar:
@@ -35,7 +35,10 @@ def upload_article_images():
 
 @images_bp.route('/images/articles/<image_id>', methods=['GET'])
 def get_article_image(image_id):
-    image = ArticleImage.query.get_or_404(image_id)
+    image = ArticleImage.query.get(image_id)
+    if not image:
+        return jsonify(error='Image not found'), 404
+    
     images_directory = os.path.join(current_app.root_path, IMAGES_ROUTE)
     articles_images_directory = os.path.join(images_directory, 'articles')
     return send_file(os.path.join(articles_images_directory, image.filename))
@@ -44,7 +47,10 @@ def get_article_image(image_id):
 @images_bp.route('/images/articles/<image_id>', methods=['DELETE'])
 @jwt_required()
 def delete_article_image(image_id):
-    image = ArticleImage.query.get_or_404(image_id)
+    image = ArticleImage.query.get(image_id)
+    if not image:
+        return jsonify(error='Image not found'), 404
+    
     images_directory = os.path.join(current_app.root_path, IMAGES_ROUTE)
     articles_images_directory = os.path.join(images_directory, 'articles')
     image_path = os.path.join(articles_images_directory, image.filename)
@@ -58,3 +64,17 @@ def delete_article_image(image_id):
     except Exception as e:
         send_alert(f"Error eliminando imagen con id {image_id}: {e}", 1)
         return jsonify(error="Internal server error"), 500
+    
+@images_bp.route('/images/article', methods=['GET'])
+@jwt_required()
+def get_all_article_images():
+    codebar = request.args.get('codebar', None)
+
+    if not codebar:
+        return jsonify(error='Missing article codebar'), 400
+
+    images = ArticleImage.query.filter_by(article_codebar=codebar).all()
+    if not images:
+        return jsonify(error='No images found for this article'), 404
+
+    return jsonify(images=[image.to_dict() for image in images]), 200

@@ -103,6 +103,15 @@ class ArticleImage(db.Model):
     @property
     def url(self):
         return url_for('images.get_article_image', image_id=self.id, _external=True, _scheme="https")
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'article_codebar': self.article_codebar,
+            'filename': self.filename,
+            'is_main': bool(self.is_main),
+            'url': self.url
+        }
 
 class Family(db.Model):
     __tablename__= "family"
