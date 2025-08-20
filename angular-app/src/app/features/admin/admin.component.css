@@ -1,0 +1,32 @@
+main {
+  display: flex;
+  flex-direction: row;
+  min-height: calc(100svh - var(--header-height));
+}
+
+.sidebar {
+  background: white; /* gris oscuro */
+  color: black;
+  overflow: hidden;
+  width: 64px;
+  &.expanded {
+    width: 240px;
+  }
+  transition: width 0.3s ease;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.content {
+  width: 100%;
+  background: #f9fafb; /* fondo claro */
+  padding: 1rem;
+}
+
+.messages {
+  width: 100%;
+}

@@ -1,14 +1,19 @@
 <main>
-  <aside>
-    <div class="menu">
-      <h2 [class.active]="loginActive" [routerLink]="['/auth/login']" routerLinkActive="router-link-active" (click)="changeActive('login')">Inicia Sesión</h2>
-      <div class="separator">
-        <mat-divider class="mat-divider"></mat-divider>
-        <p class="o">o</p>
-        <mat-divider class="mat-divider"></mat-divider>
+  <div class="messages">
+    <app-floating-message/>
+  </div>
+  <div class="content">
+    <aside>
+      <div class="menu">
+        <h2 [class.active]="loginActive" [routerLink]="['/auth/login']" routerLinkActive="router-link-active" (click)="changeActive('login')">Inicia Sesión</h2>
+        <div class="separator">
+          <mat-divider class="mat-divider"></mat-divider>
+          <p class="o">o</p>
+          <mat-divider class="mat-divider"></mat-divider>
+        </div>
+        <h2 [class.active]="registerActive" [routerLink]="['/auth/register']" routerLinkActive="router-link-active" (click)="changeActive('register')">Regístrate</h2>
       </div>
-      <h2 [class.active]="registerActive" [routerLink]="['/auth/register']" routerLinkActive="router-link-active" (click)="changeActive('register')">Regístrate</h2>
-    </div>
-  </aside>
-  <router-outlet/>
+    </aside>
+    <router-outlet/>
+  </div>
 </main>

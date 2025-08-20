@@ -2,10 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet, RouterLink } from '@angular/router';
 import { MatDivider } from '@angular/material/divider';
+import { FloatingMessageComponent } from "../../shared/floating-message/floating-message.component";
 
 @Component({
     selector: 'app-auth',
-    imports: [CommonModule, RouterOutlet, RouterLink, MatDivider],
+    imports: [CommonModule, RouterOutlet, RouterLink, MatDivider, FloatingMessageComponent],
     templateUrl: './auth.component.html',
     styleUrl: './auth.component.css'
 })

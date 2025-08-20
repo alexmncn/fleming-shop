@@ -1,2 +1,24 @@
-<router-outlet/>
-<button (click)="logout()">Cerrar sesión</button>
+<main>
+  <aside class="sidebar" [class.expanded]="expanded">
+    <button (click)="toggleDrawer()">
+      {{ expanded ? '<<' : '>>' }}
+    </button>
+    <ul>
+      @for (item of menuItems; track item.label) {
+        <li>
+          <i [class]="item.icon"></i>
+          @if (expanded) {
+            <span>{{ item.label }}</span>
+          }
+        </li>
+      }
+    </ul>
+  </aside>
+
+  <section class="content">
+    <div class="messages">
+      <app-floating-message/>
+    </div>
+    <router-outlet/>
+  </section>
+</main>

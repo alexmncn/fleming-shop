@@ -1,16 +1,41 @@
 main {
+    margin: 0rem auto;
+}
+
+.messages {
+    max-width: 100rem;
+    width: 100%;
+    padding: 0 1rem;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+
+.content {
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 85svh;
+    height: calc(100vh - var(--header-height));
     gap: 3%;
 }
 
+@media (min-width: 100rem) {
+    .messages {
+        min-width: 100rem;
+        padding: 0;
+    }
+}
+
 @media (max-width: 600px) {
-    main {
+    .messages {
+        width: 100%;
+        padding: 0 0.5rem;
+    }
+
+    .content {
         flex-direction: column;
-        height: 85svh;
         gap: 1rem;
     }
 }
