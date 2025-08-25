@@ -1,3 +1,5 @@
+import re
+import math
 import os, time, glob, re, math, uuid
 from datetime import datetime
 from flask_jwt_extended import get_jwt_identity
@@ -64,9 +66,6 @@ def articles_dbf_to_csv(articles_dbf):
     
     return filtered_csv_path
 
-
-import re
-import math
 
 def validate_clean_article_data(row):
     """
