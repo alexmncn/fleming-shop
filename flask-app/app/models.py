@@ -78,7 +78,7 @@ class Article(db.Model):
             'codebar': self.codebar, 
             'detalle': self.detalle, 
             'codfam': self.codfam,  
-            'pvp': self.pvp,
+            'pvp': f"{self.pvp:.2f}" if self.pvp is not None else None,
             'stock': self.stock,
             'destacado': bool(self.destacado),
             'has_image': self.has_image,
