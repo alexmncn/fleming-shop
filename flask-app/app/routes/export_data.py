@@ -30,7 +30,7 @@ def export_articles_csv():
 
 
 @export_data_bp.route("/data/export/articles.xlsx")
-@jwt_required(optional=True)
+@jwt_required()
 def export_articles_xlsx():
     # Obtener artículos (lista de dicts)
     articles = export_data.all_articles()
