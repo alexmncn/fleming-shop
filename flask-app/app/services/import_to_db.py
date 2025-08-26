@@ -127,7 +127,8 @@ def validate_clean_article_data(row):
             if value is not None:
                 value = float(value)
                 if value >= 0:
-                    row[key] = math.trunc(value * 100) / 100  # Truncar a 2 decimales
+                    # Corrige a 2 decimales ANTES de mandarlo al FLOAT de la BD
+                    row[key] = round(value + 1e-9, 2)
                 else:
                     errors.append(f"El campo '{key}' debe ser un número positivo.")
         except (ValueError, TypeError):
