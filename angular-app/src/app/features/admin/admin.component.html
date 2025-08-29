@@ -1,24 +1,40 @@
 <main>
-  <aside class="sidebar" [class.expanded]="expanded">
-    <button (click)="toggleDrawer()">
-      {{ expanded ? '<<' : '>>' }}
-    </button>
-    <ul>
-      @for (item of menuItems; track item.label) {
-        <li>
-          <i [class]="item.icon"></i>
-          @if (expanded) {
-            <span>{{ item.label }}</span>
-          }
-        </li>
-      }
-    </ul>
-  </aside>
-
   <section class="content">
     <div class="messages">
       <app-floating-message/>
     </div>
     <router-outlet/>
   </section>
+
+  <aside class="sidebar" [class.expanded]="expanded">
+    <div class="top">
+      <i (click)="toggleDrawer()" [ngClass]="expanded ? 'pi pi-angle-double-right' : 'pi pi-angle-double-left'"></i>
+    </div>
+
+    <div class="middle">
+      <ul>
+        @for (item of menuItems; track item.label) {
+          <li class="option" [routerLink]="item.routerLink" [class.active]="isActive(item)">
+            <div class="content">
+              <i [class]="item.icon"></i>
+              @if (expanded) {
+                <span>{{ item.label }}</span>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    </div>
+
+    <div class="bottom">
+      <div class="option logout" (click)="logout()">
+        <div class="content">
+          <i class="pi pi-sign-out"></i>
+          @if (expanded) {
+            <span>Cerrar sesión</span>
+          }
+        </div>
+      </div>
+    </div>
+  </aside>
 </main>
