@@ -27,6 +27,14 @@
   --header-height: 5rem;      /* tamaño por defecto */
   --header-height-lg: 5.5rem;   /* pantallas grandes */
   --header-height-sm: 3rem;   /* pantallas pequeñas */
+
+  @media (min-width: 100rem) {
+    --header-height: var(--header-height-lg);
+  }
+
+  @media (max-width: 600px) {
+    --header-height: var(--header-height-sm);
+  }
 }
 
 html, body { height: 100%;}

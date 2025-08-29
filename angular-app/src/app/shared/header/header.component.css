@@ -22,31 +22,19 @@ img {
 }
 
 @media (min-width: 100rem) {
-    header {
-        height: var(--header-height-lg);
-    }
 
     .container {
         margin: 0 auto;
     }
 
-    img {
-        height: calc(var(--header-height-lg) * 0.5);
-    }
 }
 
 @media (max-width: 600px) {
-    header {
-        height: var(--header-height-sm);
-    }
 
     .container {
         margin: 0 0.5rem;
     }
 
-    img {
-        height: calc(var(--header-height-sm) * 0.5);
-    }
 }
 
 .admin-menu {
