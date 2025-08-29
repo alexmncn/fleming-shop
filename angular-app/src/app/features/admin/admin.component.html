@@ -11,6 +11,8 @@
       <i (click)="toggleDrawer()" [ngClass]="expanded ? 'pi pi-angle-double-right' : 'pi pi-angle-double-left'"></i>
     </div>
 
+    <div class="divider"></div>
+    
     <div class="middle">
       <ul>
         @for (item of menuItems; track item.label) {
@@ -25,7 +27,9 @@
         }
       </ul>
     </div>
-
+    
+    <div class="divider"></div>
+    
     <div class="bottom">
       <div class="option logout" (click)="logout()">
         <div class="content">

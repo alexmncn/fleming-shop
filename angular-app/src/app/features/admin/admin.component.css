@@ -23,6 +23,14 @@ aside.sidebar {
 
 .sidebar > .top {
   flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+}
+
+.sidebar > .top i {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  cursor: pointer;
 }
 
 .sidebar > .middle {
@@ -99,6 +107,13 @@ aside.sidebar {
   flex: 0 0 auto;
 }
 
+.sidebar > .divider {
+  height: 1px;
+  width: 90%;
+  align-self: center;
+  background: var(--p-slate-300);
+  margin: 1rem 0;
+}
 
 section.content {
   flex: 1 1 auto;
