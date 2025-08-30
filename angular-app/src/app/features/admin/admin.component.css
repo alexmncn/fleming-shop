@@ -27,10 +27,15 @@ aside.sidebar {
   justify-content: center;
 }
 
+.sidebar.expanded > .top {
+  justify-content: left;
+}
+
 .sidebar > .top i {
   font-size: 1.4rem;
   flex-shrink: 0;
   cursor: pointer;
+  color: var(--p-slate-400);
 }
 
 .sidebar > .middle {

@@ -1,1 +1,14 @@
-<p>data-export works!</p>
+<main>
+    <section class="articles">
+        <h2>Exportar articulos</h2>
+        <p>Selecciona el formato deseado para exportar</p>
+        <div class="formats">
+            @for (option of formatOptions; track option.value) {
+                <div class="option" [class]="option.value" (click)="downloadFile()">
+                    <i [class]="option.icon"></i>
+                    <span>{{ option.viewValue }}</span>
+                </div>
+            }
+        </div>
+    </section>
+</main>
