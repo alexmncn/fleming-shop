@@ -14,6 +14,6 @@ export class DataExportService {
   constructor(private http: HttpClient) { }
 
   getArticlesFile(format: string) {
-    return this.http.get(this.articleExportUrl + '.' + format, { responseType: 'blob' });
+    return this.http.get(this.articleExportUrl, { params: { "format": format }, responseType: 'blob' });
   }
 }

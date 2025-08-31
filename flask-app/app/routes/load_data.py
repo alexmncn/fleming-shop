@@ -1,6 +1,6 @@
 import os, glob
 from datetime import datetime
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from app.services.import_to_db import update_articles, update_families, update_stocks, update_cierre, update_movimt, update_hticketl
@@ -40,7 +40,8 @@ def upload_file(filetype):
     clean_filename, extension = os.path.splitext(filename)
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     new_filename = f"{clean_filename}_{timestamp}{extension}"
-    file_path = os.path.join(UPLOAD_ROUTE, new_filename)
+    data_path = os.path.join(current_app.root_path, UPLOAD_ROUTE)
+    file_path = os.path.join(data_path, new_filename)
 
     try:
         file.save(file_path)
