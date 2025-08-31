@@ -10,6 +10,7 @@ export_data_bp = Blueprint('export_data', __name__)
 
 
 @export_data_bp.route('/data/export/articles')
+@jwt_required()
 def export_articles():
     format = request.args.get('format')
     
@@ -38,3 +39,5 @@ def export_articles():
         return send_file(file_path, as_attachment=True, download_name=file_name, mimetype="application/octet-stream")
     
     return response
+
+
