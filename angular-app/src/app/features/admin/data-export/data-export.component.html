@@ -1,12 +1,16 @@
 <main>
     <section class="articles">
         <h2>Exportar articulos</h2>
-        <p>Selecciona el formato deseado para exportar</p>
+        <p>Selecciona el formato deseado para exportar los artículos</p>
         <div class="formats">
             @for (option of formatOptions; track option.value) {
-                <div class="option" [class]="option.value" (click)="downloadFile()">
-                    <i [class]="option.icon"></i>
-                    <span>{{ option.viewValue }}</span>
+                <div class="option" [class]="option.value" (click)="downloadFile('articles', option.value)">
+                    @if ('articles' == lastFile && option.value === lastFormat && isDownloading) {
+                        <i class="pi pi-spin pi-spinner"></i>
+                    } @else {
+                        <i [class]="option.icon"></i>
+                        <span>{{ option.viewValue }}</span>
+                    }
                 </div>
             }
         </div>
