@@ -1,14 +1,15 @@
 main {
   display: flex;
   flex-direction: row;
-  min-height: calc(100svh - var(--header-height));
+  height: calc(100svh - var(--header-height));
+  overflow: hidden;
 }
 
 aside.sidebar {
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: stretch; /* los hijos ocupan todo el ancho */
+  align-items: stretch;
   box-sizing: border-box;
   padding: 0.5rem;
   background: white;
@@ -124,6 +125,8 @@ section.content {
   flex: 1 1 auto;
   background: var(--background-white);
   padding: 1rem;
+  box-sizing: border-box;
+  overflow: auto;
 }
 
 .messages {

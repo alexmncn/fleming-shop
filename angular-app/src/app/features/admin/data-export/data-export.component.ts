@@ -46,6 +46,94 @@ export class DataExportComponent {
           this.messageService.showMessage('error', 'Error al descargar el archivo');
         }
       });
+    } else if (filename === 'families' ) {
+      this.lastFile = filename;
+      this.lastFormat = format;
+      this.isDownloading = true;
+      
+      this.dataExportService.getFamiliesFile(format).subscribe({
+        next: (file: Blob) => {
+          const url = window.URL.createObjectURL(file);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `families.${format}`;
+          a.click();
+          window.URL.revokeObjectURL(url);
+          this.isDownloading = false;
+          this.messageService.showMessage('success', 'Archivo descargado correctamente', 5);
+        },
+        error: (err) => {
+          console.error('Error al descargar el archivo:', err);
+          this.isDownloading = false;
+          this.messageService.showMessage('error', 'Error al descargar el archivo');
+        }
+      });
+    } else if (filename === 'cierres' ) {
+      this.lastFile = filename;
+      this.lastFormat = format;
+      this.isDownloading = true;
+      
+      this.dataExportService.getCierresFile(format).subscribe({
+        next: (file: Blob) => {
+          const url = window.URL.createObjectURL(file);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `cierres.${format}`;
+          a.click();
+          window.URL.revokeObjectURL(url);
+          this.isDownloading = false;
+          this.messageService.showMessage('success', 'Archivo descargado correctamente', 5);
+        },
+        error: (err) => {
+          console.error('Error al descargar el archivo:', err);
+          this.isDownloading = false;
+          this.messageService.showMessage('error', 'Error al descargar el archivo');
+        }
+      });
+    } else if (filename === 'movimientos' ) {
+      this.lastFile = filename;
+      this.lastFormat = format;
+      this.isDownloading = true;
+      
+      this.dataExportService.getMovimientosFile(format).subscribe({
+        next: (file: Blob) => {
+          const url = window.URL.createObjectURL(file);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `movimientos.${format}`;
+          a.click();
+          window.URL.revokeObjectURL(url);
+          this.isDownloading = false;
+          this.messageService.showMessage('success', 'Archivo descargado correctamente', 5);
+        },
+        error: (err) => {
+          console.error('Error al descargar el archivo:', err);
+          this.isDownloading = false;
+          this.messageService.showMessage('error', 'Error al descargar el archivo');
+        }
+      });
+    } else if (filename === 'tickets' ) {
+      this.lastFile = filename;
+      this.lastFormat = format;
+      this.isDownloading = true;
+      
+      this.dataExportService.getTicketsFile(format).subscribe({
+        next: (file: Blob) => {
+          const url = window.URL.createObjectURL(file);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `tickets.${format}`;
+          a.click();
+          window.URL.revokeObjectURL(url);
+          this.isDownloading = false;
+          this.messageService.showMessage('success', 'Archivo descargado correctamente', 5);
+        },
+        error: (err) => {
+          console.error('Error al descargar el archivo:', err);
+          this.isDownloading = false;
+          this.messageService.showMessage('error', 'Error al descargar el archivo');
+        }
+      });
     }
-    }
+  }
 }

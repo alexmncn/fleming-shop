@@ -15,4 +15,72 @@
             }
         </div>
     </section>
+
+    <section class="families">
+        <h2>Exportar familias</h2>
+        <p>Selecciona el formato deseado para exportar las familias</p>
+        <div class="formats">
+            @for (option of formatOptions; track option.value) {
+                <div class="option" [class]="option.value" (click)="downloadFile('families', option.value)">
+                    @if ('articles' == lastFile && option.value === lastFormat && isDownloading) {
+                        <i class="pi pi-spin pi-spinner"></i>
+                    } @else {
+                        <i [class]="option.icon"></i>
+                        <span>{{ option.viewValue }}</span>
+                    }
+                </div>
+            }
+        </div>
+    </section>
+
+    <section class="cierres">
+        <h2>Exportar cierres</h2>
+        <p>Selecciona el formato deseado para exportar los cierres</p>
+        <div class="formats">
+            @for (option of formatOptions; track option.value) {
+                <div class="option" [class]="option.value" (click)="downloadFile('cierres', option.value)">
+                    @if ('articles' == lastFile && option.value === lastFormat && isDownloading) {
+                        <i class="pi pi-spin pi-spinner"></i>
+                    } @else {
+                        <i [class]="option.icon"></i>
+                        <span>{{ option.viewValue }}</span>
+                    }
+                </div>
+            }
+        </div>
+    </section>
+
+    <section class="movimientos">
+        <h2>Exportar movimientos</h2>
+        <p>Selecciona el formato deseado para exportar los movimientos</p>
+        <div class="formats">
+            @for (option of formatOptions; track option.value) {
+                <div class="option" [class]="option.value" (click)="downloadFile('movimientos', option.value)">
+                    @if ('articles' == lastFile && option.value === lastFormat && isDownloading) {
+                        <i class="pi pi-spin pi-spinner"></i>
+                    } @else {
+                        <i [class]="option.icon"></i>
+                        <span>{{ option.viewValue }}</span>
+                    }
+                </div>
+            }
+        </div>
+    </section>
+
+     <section class="tickets">
+        <h2>Exportar tickets</h2>
+        <p>Selecciona el formato deseado para exportar los tickets</p>
+        <div class="formats">
+            @for (option of formatOptions; track option.value) {
+                <div class="option" [class]="option.value" (click)="downloadFile('tickets', option.value)">
+                    @if ('articles' == lastFile && option.value === lastFormat && isDownloading) {
+                        <i class="pi pi-spin pi-spinner"></i>
+                    } @else {
+                        <i [class]="option.icon"></i>
+                        <span>{{ option.viewValue }}</span>
+                    }
+                </div>
+            }
+        </div>
+    </section>
 </main>
