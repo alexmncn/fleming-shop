@@ -1,4 +1,5 @@
-<main>
+@if (messages.length > 0) {
+  <main>
     <ng-container *ngFor="let message of messages">
       <section [ngClass]="message.type" @slideInRight>
         <!-- Íconos condicionales -->
@@ -14,5 +15,6 @@
         <div class="progress-bar" [ngStyle]="{ 'animation-duration': message.duration * 1000 + 'ms' }"></div>
       </section>
     </ng-container>
-</main>
+  </main>
+}
   

@@ -123,12 +123,17 @@ aside.sidebar {
 
 section.content {
   flex: 1 1 auto;
-  background: var(--background-white);
-  padding: 1rem;
-  box-sizing: border-box;
-  overflow: auto;
 }
 
 .messages {
   width: 100%;
+  padding: 0 1rem;
+}
+
+section.content > .main-content {
+  background: var(--background-white);
+  height: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+  overflow: auto;
 }

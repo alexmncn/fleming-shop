@@ -1,6 +1,11 @@
 <main>
   <section class="content">
-    <router-outlet/>
+    <div class="messages">
+      <app-floating-message/>
+    </div>
+   <div class="main-content">
+      <router-outlet></router-outlet>
+   </div>
   </section>
 
   <aside class="sidebar" [class.expanded]="expanded">
