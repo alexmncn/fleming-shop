@@ -41,3 +41,97 @@ def export_articles():
     return response
 
 
+@export_data_bp.route('/data/export/families')
+@jwt_required()
+def export_families():
+    format = request.args.get('format')
+    
+    if format == 'csv':
+        return abort(501, "csv export not implemented yet")
+    elif format == 'xlsx':
+        return abort(501, "xlsx export not implemented yet")
+    elif format == 'pdf':
+        return abort(501, "PDF export not implemented yet")
+    elif format == 'dbf':
+        data_path = os.path.join(current_app.root_path, UPLOAD_ROUTE)
+        files = [f for f in os.listdir(data_path) if f.startswith("familias") and f.endswith(".dbf")]
+
+        if not files:
+            return abort(404, "Archivo de familias no encontrado")
+
+        file_name = files[0]
+        file_path = os.path.join(data_path, file_name)
+
+        return send_file(file_path, as_attachment=True, download_name=file_name, mimetype="application/octet-stream")
+    
+    
+@export_data_bp.route('/data/export/cierres')
+@jwt_required()
+def export_cierres():
+    format = request.args.get('format')
+    
+    if format == 'csv':
+        return abort(501, "csv export not implemented yet")
+    elif format == 'xlsx':
+        return abort(501, "xlsx export not implemented yet")
+    elif format == 'pdf':
+        return abort(501, "PDF export not implemented yet")
+    elif format == 'dbf':
+        data_path = os.path.join(current_app.root_path, UPLOAD_ROUTE)
+        files = [f for f in os.listdir(data_path) if f.startswith("cierre") and f.endswith(".dbf")]
+
+        if not files:
+            return abort(404, "Archivo de cierres no encontrado")
+
+        file_name = files[0]
+        file_path = os.path.join(data_path, file_name)
+
+        return send_file(file_path, as_attachment=True, download_name=file_name, mimetype="application/octet-stream")
+    
+    
+@export_data_bp.route('/data/export/movimientos')
+@jwt_required()
+def export_movimientos():
+    format = request.args.get('format')
+    
+    if format == 'csv':
+        return abort(501, "csv export not implemented yet")
+    elif format == 'xlsx':
+        return abort(501, "xlsx export not implemented yet")
+    elif format == 'pdf':
+        return abort(501, "PDF export not implemented yet")
+    elif format == 'dbf':
+        data_path = os.path.join(current_app.root_path, UPLOAD_ROUTE)
+        files = [f for f in os.listdir(data_path) if f.startswith("movimt") and f.endswith(".dbf")]
+
+        if not files:
+            return abort(404, "Archivo de movimientos no encontrado")
+
+        file_name = files[0]
+        file_path = os.path.join(data_path, file_name)
+
+        return send_file(file_path, as_attachment=True, download_name=file_name, mimetype="application/octet-stream")
+    
+    
+@export_data_bp.route('/data/export/tickets')
+@jwt_required()
+def export_tickets():
+    format = request.args.get('format')
+    
+    if format == 'csv':
+        return abort(501, "csv export not implemented yet")
+    elif format == 'xlsx':
+        return abort(501, "xlsx export not implemented yet")
+    elif format == 'pdf':
+        return abort(501, "PDF export not implemented yet")
+    elif format == 'dbf':
+        data_path = os.path.join(current_app.root_path, UPLOAD_ROUTE)
+        files = [f for f in os.listdir(data_path) if f.startswith("hticketl") and f.endswith(".dbf")]
+
+        if not files:
+            return abort(404, "Archivo de tickets no encontrado")
+
+        file_name = files[0]
+        file_path = os.path.join(data_path, file_name)
+
+        return send_file(file_path, as_attachment=True, download_name=file_name, mimetype="application/octet-stream")
