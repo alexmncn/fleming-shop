@@ -22,7 +22,7 @@
         <div class="formats">
             @for (option of formatOptions; track option.value) {
                 <div class="option" [class]="option.value" (click)="downloadFile('families', option.value)">
-                    @if ('articles' == lastFile && option.value === lastFormat && isDownloading) {
+                    @if ('families' == lastFile && option.value === lastFormat && isDownloading) {
                         <i class="pi pi-spin pi-spinner"></i>
                     } @else {
                         <i [class]="option.icon"></i>
@@ -39,7 +39,7 @@
         <div class="formats">
             @for (option of formatOptions; track option.value) {
                 <div class="option" [class]="option.value" (click)="downloadFile('cierres', option.value)">
-                    @if ('articles' == lastFile && option.value === lastFormat && isDownloading) {
+                    @if ('cierres' == lastFile && option.value === lastFormat && isDownloading) {
                         <i class="pi pi-spin pi-spinner"></i>
                     } @else {
                         <i [class]="option.icon"></i>
@@ -56,7 +56,7 @@
         <div class="formats">
             @for (option of formatOptions; track option.value) {
                 <div class="option" [class]="option.value" (click)="downloadFile('movimientos', option.value)">
-                    @if ('articles' == lastFile && option.value === lastFormat && isDownloading) {
+                    @if ('movimientos' == lastFile && option.value === lastFormat && isDownloading) {
                         <i class="pi pi-spin pi-spinner"></i>
                     } @else {
                         <i [class]="option.icon"></i>
@@ -73,7 +73,7 @@
         <div class="formats">
             @for (option of formatOptions; track option.value) {
                 <div class="option" [class]="option.value" (click)="downloadFile('tickets', option.value)">
-                    @if ('articles' == lastFile && option.value === lastFormat && isDownloading) {
+                    @if ('tickets' == lastFile && option.value === lastFormat && isDownloading) {
                         <i class="pi pi-spin pi-spinner"></i>
                     } @else {
                         <i [class]="option.icon"></i>
