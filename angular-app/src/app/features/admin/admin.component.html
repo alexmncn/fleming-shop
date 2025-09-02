@@ -18,7 +18,7 @@
     <div class="middle">
       <ul>
         @for (item of menuItems; track item.label) {
-          <li class="option" [routerLink]="item.routerLink" [class.active]="isActive(item)">
+          <li class="option" [routerLink]="item.routerLink" [class.active]="isActive(item)" [title]="item.label">
             <div class="content">
               <i [class]="item.icon"></i>
               @if (expanded) {
