@@ -18,8 +18,13 @@ export class AdminComponent {
 
   menuItems = [
     { label: 'Catálogo', icon: 'pi pi-home', routerLink: '/catalog/home' },
+    { label: 'Artículos', icon: 'pi pi-box', routerLink: '/admin/articles' },
+    { label: 'Familias', icon: 'pi pi-tags', routerLink: '/admin/families' },
     { label: 'Ventas', icon: 'pi pi-dollar', routerLink: '/admin/sales' },
-    { label: 'Exportar datos', icon: 'pi pi-file-export', routerLink: '/admin/data-export' },
+    { label: 'Estadísticas', icon: 'pi pi-chart-bar', routerLink: '/admin/statistics' },
+    { label: 'Imágenes', icon: 'pi pi-image', routerLink: '/admin/images' },
+    { label: 'Importar datos', icon: 'pi pi-file-import', routerLink: '/admin/data-import' },
+    { label: 'Exportar datos', icon: 'pi pi-file-export', routerLink: '/admin/data-export' }    
   ];
 
   constructor(private authService: AuthService, private router: Router, private messageService: MessageService) {}
