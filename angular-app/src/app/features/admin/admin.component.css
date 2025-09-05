@@ -5,6 +5,29 @@ main {
   overflow: hidden;
 }
 
+section.content {
+  flex: 1 1 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.messages {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  padding: 0 1rem;
+  z-index: 10;
+}
+
+section.content > .main-content {
+  flex: 1 1 auto; /* ocupa todo lo que queda */
+  background: var(--background-white);
+  padding: 1rem;
+  box-sizing: border-box;
+  overflow: auto;
+}
+
 aside.sidebar {
   flex: 0 0 auto;
   display: flex;
@@ -23,26 +46,60 @@ aside.sidebar {
   width: 260px;
 }
 
+.sidebar > .divider {
+  height: 1px;
+  width: 95%;
+  align-self: center;
+  background: var(--p-slate-300);
+}
+
+
 .sidebar > .top {
   flex: 0 0 auto;
-  display: flex;
-  justify-content: center;
+  margin-bottom: 0.5rem;
 }
 
 .sidebar.expanded > .top {
-  justify-content: left;
+  justify-content: flex-start;
 }
 
-.sidebar > .top i {
-  font-size: 1.4rem;
-  flex-shrink: 0;
+.toggle-btn {
+  background: var(--p-slate-100);
+  border: none;
+  border-radius: 8px;
+  height: 35px;
+  width: 50px;
   cursor: pointer;
-  color: var(--p-slate-400);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.2s;
 }
+
+.toggle-btn:hover {
+  background: var(--p-slate-200);
+  transform: translateX(-3px);
+}
+
+.sidebar.expanded .toggle-btn:hover {
+  transform: translateX(3px);
+}
+
+.toggle-btn i {
+  font-size: 1.4rem;
+  color: var(--p-slate-600);
+  transition: transform 0.3s;
+}
+
+.sidebar.expanded .toggle-btn i {
+  transform: rotate(180deg);
+}
+
 
 .sidebar > .middle {
   flex: 1 1 auto;
   overflow: auto;
+  padding: 0.5rem 0;
 }
 
 .sidebar > .middle ul {
@@ -75,9 +132,13 @@ aside.sidebar {
 
 .sidebar .option.active {
   background: var(--primary-accent-50);
+  border-color: var(--primary-accent-200);
   border-left: 3px solid var(--primary-accent-500);
   font-weight: 600;
   color: var(--primary-accent-700);
+  position: sticky;
+  top: 0.25rem;
+  bottom: 0.25rem;
 }
 
 .sidebar .option i {
@@ -97,7 +158,7 @@ aside.sidebar {
 
 /* En contraído → solo icono visible y centrado */
 .sidebar:not(.expanded) .option .content {
-  justify-content: center;
+  justify-content: left;
 }
 
 .sidebar .option.logout {
@@ -112,31 +173,8 @@ aside.sidebar {
   background: var(--error-accent);
 }
 
+
 .sidebar > .bottom {
   flex: 0 0 auto;
-}
-
-.sidebar > .divider {
-  height: 1px;
-  width: 90%;
-  align-self: center;
-  background: var(--p-slate-300);
-  margin: 1rem 0;
-}
-
-section.content {
-  flex: 1 1 auto;
-}
-
-.messages {
-  width: 100%;
-  padding: 0 1rem;
-}
-
-section.content > .main-content {
-  background: var(--background-white);
-  height: 100%;
-  padding: 1rem;
-  box-sizing: border-box;
-  overflow: auto;
+  margin-top: 0.5rem;
 }

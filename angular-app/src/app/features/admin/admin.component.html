@@ -3,14 +3,16 @@
     <div class="messages">
       <app-floating-message/>
     </div>
-   <div class="main-content">
-      <router-outlet></router-outlet>
-   </div>
+    <div class="main-content">
+        <router-outlet></router-outlet>
+    </div>
   </section>
 
   <aside class="sidebar" [class.expanded]="expanded">
     <div class="top">
-      <i (click)="toggleDrawer()" [ngClass]="expanded ? 'pi pi-angle-double-right' : 'pi pi-angle-double-left'"></i>
+      <button class="toggle-btn" (click)="toggleDrawer()">
+        <i class="pi pi-angle-double-left"></i>
+      </button>
     </div>
 
     <div class="divider"></div>
