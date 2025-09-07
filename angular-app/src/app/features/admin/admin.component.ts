@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { RouterOutlet } from '@angular/router';
 import { RouterLink } from '@angular/router';
+
 import { AuthService } from '../../services/auth/auth.service';
 import { MessageService } from '../../services/message/message.service';
 import { FloatingMessageComponent } from "../../shared/floating-message/floating-message.component";
@@ -14,7 +15,7 @@ import { FloatingMessageComponent } from "../../shared/floating-message/floating
     styleUrl: './admin.component.css'
 })
 export class AdminComponent {
-  expanded = true;
+  expanded = signal(false);
 
   menuItems = [
     { label: 'Catálogo', icon: 'pi pi-home', routerLink: '/catalog/home' },
@@ -30,7 +31,7 @@ export class AdminComponent {
   constructor(private authService: AuthService, private router: Router, private messageService: MessageService) {}
 
   toggleDrawer() {
-    this.expanded = !this.expanded;
+    this.expanded.set(!this.expanded());
   }
 
   isActive(item: any) {

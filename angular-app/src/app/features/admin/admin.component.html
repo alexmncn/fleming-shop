@@ -8,7 +8,7 @@
     </div>
   </section>
 
-  <aside class="sidebar" [class.expanded]="expanded">
+  <aside class="sidebar" [class.expanded]="expanded()">
     <div class="top">
       <button class="toggle-btn" (click)="toggleDrawer()">
         <i class="pi pi-angle-double-left"></i>
@@ -23,7 +23,7 @@
           <li class="option" [routerLink]="item.routerLink" [class.active]="isActive(item)" [title]="item.label">
             <div class="content">
               <i [class]="item.icon"></i>
-              @if (expanded) {
+              @if (expanded()) {
                 <span>{{ item.label }}</span>
               }
             </div>
@@ -38,7 +38,7 @@
       <div class="option logout" (click)="logout()">
         <div class="content">
           <i class="pi pi-sign-out"></i>
-          @if (expanded) {
+          @if (expanded()) {
             <span>Cerrar sesión</span>
           }
         </div>
