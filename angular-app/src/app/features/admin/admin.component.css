@@ -21,7 +21,7 @@ section.content {
 }
 
 section.content > .main-content {
-  flex: 1 1 auto; /* ocupa todo lo que queda */
+  flex: 1 1 auto;
   background: var(--background-white);
   padding: 1rem;
   box-sizing: border-box;
@@ -92,7 +92,7 @@ aside.sidebar {
 }
 
 .sidebar.expanded .toggle-btn i {
-  transform: rotate(180deg);
+  transform: rotateY(180deg);
 }
 
 
