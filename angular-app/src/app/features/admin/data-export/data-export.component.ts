@@ -23,117 +23,42 @@ export class DataExportComponent {
 
   constructor(private dataExportService: DataExportService, private messageService: MessageService) {}
 
+  private fileServiceMap: { [key: string]: (format: string) => any } = {
+    articles: (format) => this.dataExportService.getArticlesFile(format),
+    families: (format) => this.dataExportService.getFamiliesFile(format),
+    cierres: (format) => this.dataExportService.getCierresFile(format),
+    movimientos: (format) => this.dataExportService.getMovimientosFile(format),
+    tickets: (format) => this.dataExportService.getTicketsFile(format),
+  };
+
   downloadFile(filename: string, format: string) {
-    if (filename === 'articles') {
-      this.lastFile = filename;
-      this.lastFormat = format;
-      this.isDownloading = true;
-      
-      this.dataExportService.getArticlesFile(format).subscribe({
-        next: (file: Blob) => {
-          const url = window.URL.createObjectURL(file);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `articles.${format}`;
-          a.click();
-          window.URL.revokeObjectURL(url);
-          this.isDownloading = false;
-          this.messageService.showMessage('success', 'Archivo descargado correctamente', 5);
-        },
-        error: (err) => {
+    const serviceFn = this.fileServiceMap[filename];
+    if (!serviceFn) return;
+
+    this.lastFile = filename;
+    this.lastFormat = format;
+    this.isDownloading = true;
+
+    serviceFn(format).subscribe({
+      next: (file: Blob) => {
+      const url = window.URL.createObjectURL(file);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${filename}.${format}`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+      this.isDownloading = false;
+      this.messageService.showMessage('success', 'Archivo descargado correctamente', 5);
+      },
+      error: (err: any) => {
+        this.isDownloading = false;
+        if (err?.status === 404) {
+          this.messageService.showMessage('warn', 'No existen datos o archivo para descargar');
+        } else {
           console.error('Error al descargar el archivo:', err);
-          this.isDownloading = false;
           this.messageService.showMessage('error', 'Error al descargar el archivo');
         }
-      });
-    } else if (filename === 'families' ) {
-      this.lastFile = filename;
-      this.lastFormat = format;
-      this.isDownloading = true;
-      
-      this.dataExportService.getFamiliesFile(format).subscribe({
-        next: (file: Blob) => {
-          const url = window.URL.createObjectURL(file);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `families.${format}`;
-          a.click();
-          window.URL.revokeObjectURL(url);
-          this.isDownloading = false;
-          this.messageService.showMessage('success', 'Archivo descargado correctamente', 5);
-        },
-        error: (err) => {
-          console.error('Error al descargar el archivo:', err);
-          this.isDownloading = false;
-          this.messageService.showMessage('error', 'Error al descargar el archivo');
-        }
-      });
-    } else if (filename === 'cierres' ) {
-      this.lastFile = filename;
-      this.lastFormat = format;
-      this.isDownloading = true;
-      
-      this.dataExportService.getCierresFile(format).subscribe({
-        next: (file: Blob) => {
-          const url = window.URL.createObjectURL(file);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `cierres.${format}`;
-          a.click();
-          window.URL.revokeObjectURL(url);
-          this.isDownloading = false;
-          this.messageService.showMessage('success', 'Archivo descargado correctamente', 5);
-        },
-        error: (err) => {
-          console.error('Error al descargar el archivo:', err);
-          this.isDownloading = false;
-          this.messageService.showMessage('error', 'Error al descargar el archivo');
-        }
-      });
-    } else if (filename === 'movimientos' ) {
-      this.lastFile = filename;
-      this.lastFormat = format;
-      this.isDownloading = true;
-      
-      this.dataExportService.getMovimientosFile(format).subscribe({
-        next: (file: Blob) => {
-          const url = window.URL.createObjectURL(file);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `movimientos.${format}`;
-          a.click();
-          window.URL.revokeObjectURL(url);
-          this.isDownloading = false;
-          this.messageService.showMessage('success', 'Archivo descargado correctamente', 5);
-        },
-        error: (err) => {
-          console.error('Error al descargar el archivo:', err);
-          this.isDownloading = false;
-          this.messageService.showMessage('error', 'Error al descargar el archivo');
-        }
-      });
-    } else if (filename === 'tickets' ) {
-      this.lastFile = filename;
-      this.lastFormat = format;
-      this.isDownloading = true;
-      
-      this.dataExportService.getTicketsFile(format).subscribe({
-        next: (file: Blob) => {
-          const url = window.URL.createObjectURL(file);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `tickets.${format}`;
-          a.click();
-          window.URL.revokeObjectURL(url);
-          this.isDownloading = false;
-          this.messageService.showMessage('success', 'Archivo descargado correctamente', 5);
-        },
-        error: (err) => {
-          console.error('Error al descargar el archivo:', err);
-          this.isDownloading = false;
-          this.messageService.showMessage('error', 'Error al descargar el archivo');
-        }
-      });
-    }
+      }
+    });
   }
 }
