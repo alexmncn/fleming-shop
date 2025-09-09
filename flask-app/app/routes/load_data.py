@@ -46,7 +46,7 @@ def upload_file(filetype):
     try:
         file.save(file_path)
 
-        pattern = os.path.join(UPLOAD_ROUTE, f"{clean_filename}_*.dbf")
+        pattern = os.path.join(data_path, f"{clean_filename}_*.dbf")
         for file_ in glob.glob(pattern):
             if os.path.basename(file_) != new_filename:
                 os.remove(file_)

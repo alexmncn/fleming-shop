@@ -2,6 +2,7 @@ import re
 import math
 import os, time, glob, re, math, uuid
 from datetime import datetime
+from flask import current_app
 from flask_jwt_extended import get_jwt_identity
 import pandas as pd
 from dbfread import DBF
@@ -26,7 +27,8 @@ article_column_to_attribute_map = {
 
 
 def articles_dbf_to_csv(articles_dbf):
-    dbf_table = DBF(os.path.join(UPLOAD_ROUTE, articles_dbf), encoding='latin1') # Read dbf as a table
+    upload_path = os.path.join(current_app.root_path, UPLOAD_ROUTE)
+    dbf_table = DBF(os.path.join(upload_path, articles_dbf), encoding='latin1') # Read dbf as a table
     df = pd.DataFrame(iter(dbf_table)) # dbf table to pandas dataframe
     
     articles_dbf_name, extension = os.path.splitext(articles_dbf) # Clean (with date) filename and extension
@@ -408,7 +410,8 @@ def save_article_import_log(import_id, user, status, info, n_new, n_updated, n_d
     
 
 def families_dbf_to_csv(families_dbf):
-    dbf_table = DBF(UPLOAD_ROUTE + families_dbf, encoding='latin1')
+    upload_path = os.path.join(current_app.root_path, UPLOAD_ROUTE)
+    dbf_table = DBF(os.path.join(upload_path, families_dbf), encoding='latin1')
     df = pd.DataFrame(iter(dbf_table))
     
     families_dbf_name, extension = os.path.splitext(families_dbf) # Clean (with date) filename and extension
@@ -534,7 +537,8 @@ def update_families(families_dbf):
 
 
 def stocks_dbf_to_csv(stocks_dbf):
-    dbf_table = DBF(UPLOAD_ROUTE + stocks_dbf, encoding='latin1')
+    upload_path = os.path.join(current_app.root_path, UPLOAD_ROUTE)
+    dbf_table = DBF(os.path.join(upload_path, stocks_dbf), encoding='latin1')
     df = pd.DataFrame(iter(dbf_table))
     
     stocks_dbf_name, extension = os.path.splitext(stocks_dbf) # Clean (with date) filename and extension
@@ -693,7 +697,8 @@ def update_stocks(stocks_dbf):
 
 
 def cierre_dbf_to_csv(cierre_dbf):
-    dbf_table = DBF(UPLOAD_ROUTE + cierre_dbf, encoding='latin1')
+    upload_path = os.path.join(current_app.root_path, UPLOAD_ROUTE)
+    dbf_table = DBF(os.path.join(upload_path, cierre_dbf), encoding='latin1')
     df = pd.DataFrame(iter(dbf_table))
     
     cierre_dbf_name, extension = os.path.splitext(cierre_dbf) # Clean (with date) filename and extension
@@ -837,7 +842,8 @@ def update_cierre(cierre_dbf):
 
 
 def movimt_dbf_to_csv(movimt_dbf):
-    dbf_table = DBF(UPLOAD_ROUTE + movimt_dbf, encoding='latin1')
+    upload_path = os.path.join(current_app.root_path, UPLOAD_ROUTE)
+    dbf_table = DBF(os.path.join(upload_path, movimt_dbf), encoding='latin1')
     df = pd.DataFrame(iter(dbf_table))
     
     movimt_dbf_name, extension = os.path.splitext(movimt_dbf) # Clean (with date) filename and extension
@@ -990,7 +996,8 @@ def update_movimt(movimt_dbf):
 
 
 def hticketl_dbf_to_csv(hticketl_dbf):
-    dbf_table = DBF(UPLOAD_ROUTE + hticketl_dbf, encoding='latin1')
+    upload_path = os.path.join(current_app.root_path, UPLOAD_ROUTE)
+    dbf_table = DBF(os.path.join(upload_path, hticketl_dbf), encoding='latin1')
     df = pd.DataFrame(iter(dbf_table))
     
     hticketl_dbf_name, extension = os.path.splitext(hticketl_dbf) # Clean (with date) filename and extension
