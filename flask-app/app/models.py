@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime, timedelta
 from flask import url_for
 from flask_login import UserMixin
-from sqlalchemy import Column, Integer, String, Boolean, Text, Float, DateTime, Date, Time, ForeignKey, Index
+from sqlalchemy import Column, Integer, String, Boolean, Text, Float, DateTime, Date, Time, ForeignKey, Index, Enum
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.dialects.mysql import TINYINT
@@ -87,6 +87,46 @@ class Article(db.Model):
         if include_images:
             data['image_urls'] = self.image_urls
         return data
+    
+    
+class Article_import(db.Model):
+    __tablename__="article_imports"
+    __table_args__ = {
+        'mysql_charset': 'utf8mb4',
+        'mysql_collate': 'utf8mb4_unicode_ci'
+    }
+    
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(Integer, db.ForeignKey('users.id'), index=True, nullable=True)
+    status = Column(TINYINT(1), default=1, nullable=True)
+    info = Column(Text, nullable=True)
+    new_rows = Column(Integer, default=0)
+    updated_rows = Column(Integer, default=0)
+    deleted_rows = Column(Integer, default=0)
+    duplicated_rows = Column(Integer, default=0)
+    errors = Column(Integer, default=0)
+    corrected = Column(Integer, default=0)
+    elapsed_time = Column(Float, nullable=True)
+    date = Column(DateTime, default=lambda: datetime.now(pytz.timezone('Europe/Madrid')), nullable=False)
+    
+    logs = relationship('Article_import_log', back_populates='import_record')
+    
+class Article_import_log(db.Model):
+    __tablename__="article_import_logs"
+    __table_args__ = {
+        'mysql_charset': 'utf8mb4',
+        'mysql_collate': 'utf8mb4_unicode_ci'
+    }
+    
+    id = db.Column(Integer, primary_key=True, autoincrement=True)
+    import_id = Column(String(36), ForeignKey('article_imports.id'), nullable=False)
+    type = Column(Integer, nullable=False)
+    ref = Column(String(50), nullable=True)
+    codebar = Column(String(50), nullable=True)
+    detalle = Column(String(100), nullable=True)
+    info = Column(Text, nullable=True)
+    
+    import_record = relationship('Article_import', back_populates='logs')
         
 class ArticleImage(db.Model):
     __tablename__ = "article_images"
@@ -136,46 +176,6 @@ class Family(db.Model):
             'codfam': self.codfam,
             'nomfam': self.nomfam
         }
-
-        
-class Article_import(db.Model):
-    __tablename__="article_imports"
-    __table_args__ = {
-        'mysql_charset': 'utf8mb4',
-        'mysql_collate': 'utf8mb4_unicode_ci'
-    }
-    
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id = Column(Integer, db.ForeignKey('users.id'), index=True, nullable=True)
-    status = Column(TINYINT(1), default=1, nullable=True)
-    info = Column(Text, nullable=True)
-    new_rows = Column(Integer, default=0)
-    updated_rows = Column(Integer, default=0)
-    deleted_rows = Column(Integer, default=0)
-    duplicated_rows = Column(Integer, default=0)
-    errors = Column(Integer, default=0)
-    corrected = Column(Integer, default=0)
-    elapsed_time = Column(Float, nullable=True)
-    date = Column(DateTime, default=lambda: datetime.now(pytz.timezone('Europe/Madrid')), nullable=False)
-    
-    logs = relationship('Article_import_log', back_populates='import_record')
-    
-class Article_import_log(db.Model):
-    __tablename__="article_import_logs"
-    __table_args__ = {
-        'mysql_charset': 'utf8mb4',
-        'mysql_collate': 'utf8mb4_unicode_ci'
-    }
-    
-    id = db.Column(Integer, primary_key=True, autoincrement=True)
-    import_id = Column(String(36), ForeignKey('article_imports.id'), nullable=False)
-    type = Column(Integer, nullable=False)
-    ref = Column(String(50), nullable=True)
-    codebar = Column(String(50), nullable=True)
-    detalle = Column(String(100), nullable=True)
-    info = Column(Text, nullable=True)
-    
-    import_record = relationship('Article_import', back_populates='logs')
         
         
 class DailySales(db.Model):
@@ -259,7 +259,28 @@ class TicketItem(db.Model):
             'unit_price': self.unit_price
         }
 
-        
+
+class ImportFile(db.Model):
+    __tablename__ = "import_files"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    filetype = Column(
+        Enum("articles", "families", "stocks", "cierre", "movimt", "hticketl"), 
+        nullable=False
+    )
+    filepath = Column(String(512), nullable=False)
+    uploaded_at = Column(DateTime, default=lambda: datetime.now(pytz.timezone('Europe/Madrid')), nullable=False)
+    status = Column(
+        Enum("pending", "processing", "done", "error"),
+        nullable=False,
+        default="pending"
+    )
+    attempts = Column(Integer, nullable=False, default=0)
+    last_attempt = Column(DateTime, nullable=True)
+    error_message = Column(Text, nullable=True)
+    processed_at = Column(DateTime, nullable=True)
+
+
 class User(UserMixin,db.Model):
     __tablename__ = "users"
     __table_args__ = {
