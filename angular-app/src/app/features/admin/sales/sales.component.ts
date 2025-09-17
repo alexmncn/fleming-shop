@@ -7,13 +7,13 @@ import { Ticket } from '../../../models/ticket.model';
 import { TicketItem } from '../../../models/ticketItem.model';
 
 import { SalesService } from '../../../services/admin/data/sales/sales.service';
+import { CapitalizePipe } from "../../../pipes/capitalize/capitalize.pipe";
 import { DailySales } from '../../../models/dailySales.model';
-import { timeout } from 'rxjs';
 
 
 @Component({
   selector: 'app-sales',
-  imports: [CommonModule, CalendarComponent],
+  imports: [CommonModule, CalendarComponent, CapitalizePipe],
   templateUrl: './sales.component.html',
   styleUrl: './sales.component.css'
 })

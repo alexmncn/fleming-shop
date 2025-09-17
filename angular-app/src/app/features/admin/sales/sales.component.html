@@ -49,7 +49,7 @@
         </thead>
         <tbody>
           <tr *ngFor="let item of ticketItems">
-            <td>{{ item.detalle }}</td>
+            <td>{{ item.detalle | capitalize }}</td>
             <td>{{ item.quantity }}</td>
             <td>{{ item.unit_price }} €</td>
             <td>{{ item.unit_price * item.quantity }} €</td>
