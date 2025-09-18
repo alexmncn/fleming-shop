@@ -2,16 +2,15 @@ import re
 import math
 import os, time, glob, re, math, uuid
 from datetime import datetime
-from flask import current_app
-from flask_jwt_extended import get_jwt_identity
 import pandas as pd
 from dbfread import DBF
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
-from app.models import Article, Family, Article_import_log, Article_import, DailySales, Ticket, TicketItem, User
+from app.models import Article, Family, Article_import_log, Article_import, DailySales, Ticket, TicketItem, User, ImportFile
+from app.services.pushover_alerts import send_alert
 
-from app.config import UPLOAD_ROUTE, DATA_ROUTE, DATA_LOGS_ROUTE
+from app.config import DATA_ROUTE, DATA_LOGS_ROUTE
 
 
 # dbf to equivalent DB keys names
@@ -26,13 +25,89 @@ article_column_to_attribute_map = {
 }
 
 
-def articles_dbf_to_csv(articles_dbf):
-    upload_path = os.path.join(current_app.root_path, UPLOAD_ROUTE)
-    dbf_table = DBF(os.path.join(upload_path, articles_dbf), encoding='latin1') # Read dbf as a table
+def process_import_file(import_file_id, username, max_retries=0):
+    valid_import_file_types = {
+        'articles': update_articles,
+        'families': update_families,
+        'stocks': update_stocks,
+        'cierre': update_cierre,
+        'movimt': update_movimt,
+        'hticketl': update_hticketl,
+    }
+
+    session = db.session
+
+    # Recuperar registro
+    import_file = session.get(ImportFile, import_file_id)
+    if not import_file:
+        raise ValueError(f"No se encontró ImportFile con id={import_file_id}")
+    # Inicializamos
+    import_file.status = "processing"
+    import_file.status_message = None
+    import_file.attempts = 0
+    session.commit()
+
+    # Datos del archivo
+    file_path = import_file.filepath
+    file_name = import_file.filename
+    filetype = import_file.filetype
+
+    # Determinar la función de procesamiento
+    task_func = valid_import_file_types[filetype]
+
+    # Bucle de intentos
+    while import_file.attempts <= max_retries:
+        try:
+            status, status_info, import_resume = task_func(file_path, file_name, filetype, username)
+            if status == 0:
+                # Exito
+                import_file = session.get(ImportFile, import_file_id)
+                import_file.status = "done"
+                import_file.status_message = import_resume
+                import_file.attempts += 1
+                date = datetime.now()
+                import_file.last_attempt = date
+                import_file.processed_at = date
+                session.commit()
+                
+                message = f"✅ <b>Importacion de {filetype.capitalize()}</b>\n{import_resume}"
+                send_alert(message, 0)
+                return True
+            else:
+                # Error, comprobamos si toca reintentar
+                import_file = session.get(ImportFile, import_file_id)
+                import_file.attempts += 1
+                import_file.last_attempt = datetime.now()
+                if import_file.attempts > max_retries:
+                    import_file.status = "failed"
+
+                import_file.status_message = status_info
+                session.commit()
+                
+                message = f"⚠️ <b>Importacion de {filetype.capitalize()}</b>\n{status_info}"
+                send_alert(message, 0)
+                
+        except Exception as e:
+            # Excepción inesperada
+            import_file = session.get(ImportFile, import_file_id)
+            import_file.attempts += 1
+            import_file.last_attempt = datetime.now()
+            if import_file.attempts > max_retries:
+                import_file.status = "failed"
+
+            import_file.status_message = f"Error inesperado: {str(e)}"
+            session.commit()
+            
+            message = f"❌ Error inesperado en la importación de <b>{filetype}</b>: {str(e)}"
+            send_alert(message, 1)
+
+    return False
+
+
+def articles_dbf_to_csv(articles_dbf_path, articles_dbf_name, filetype):
+    dbf_table = DBF(articles_dbf_path, encoding='latin1') # Read dbf as a table
     df = pd.DataFrame(iter(dbf_table)) # dbf table to pandas dataframe
     
-    articles_dbf_name, extension = os.path.splitext(articles_dbf) # Clean (with date) filename and extension
-    clean_articles_dbf_name = str.split(articles_dbf_name,'_')[0]
     csv_path = os.path.join(DATA_ROUTE, f'no_filtered_{articles_dbf_name}.csv') # No filtered csv path
     df.to_csv(csv_path, index=False) # Save raw data as csv
     
@@ -58,7 +133,7 @@ def articles_dbf_to_csv(articles_dbf):
     
     os.remove(csv_path) # Remove no filtered csv file
     
-    pattern = os.path.join(DATA_ROUTE, f"{clean_articles_dbf_name}_*.csv") # Get old file versions
+    pattern = os.path.join(DATA_ROUTE, f"{filetype}_*.csv") # Get old file versions
 
     for file_ in glob.glob(pattern):
         file_name = os.path.basename(file_)
@@ -149,12 +224,11 @@ def clean_nan_value(value):
         return None
     return value
 
-def update_articles(articles_dbf):
+def update_articles(articles_dbf_path, articles_dbf_name, filetype, username):
     start_time = time.perf_counter() # Inicializar contador de tiempo
-    username = get_jwt_identity()
-    
-    articles_csv_path = articles_dbf_to_csv(articles_dbf) # DBF to CSV
-    import_id = str(uuid.uuid4()) # Genera uuid de importación
+        
+    articles_csv_path = articles_dbf_to_csv(articles_dbf_path, articles_dbf_name, filetype) # DBF to CSV
+    import_id = str(uuid.uuid4()) # Genera uuid de importación para logs
     status = 0
     status_info = ''
 
@@ -409,14 +483,11 @@ def save_article_import_log(import_id, user, status, info, n_new, n_updated, n_d
         
     
 
-def families_dbf_to_csv(families_dbf):
-    upload_path = os.path.join(current_app.root_path, UPLOAD_ROUTE)
-    dbf_table = DBF(os.path.join(upload_path, families_dbf), encoding='latin1')
+def families_dbf_to_csv(families_dbf_path, families_dbf_name, filetype):
+    dbf_table = DBF(families_dbf_path, encoding='latin1')
     df = pd.DataFrame(iter(dbf_table))
     
-    families_dbf_name, extension = os.path.splitext(families_dbf) # Clean (with date) filename and extension
-    clean_families_dbf_name = str.split(families_dbf_name,'_')[0]
-    csv_path = DATA_ROUTE + 'no_filtered_' + families_dbf_name + '.csv'
+    csv_path = os.path.join(DATA_ROUTE, f'no_filtered_{families_dbf_name}.csv')
     df.to_csv(csv_path, index=False)
     
     df = pd.read_csv(csv_path)
@@ -434,7 +505,7 @@ def families_dbf_to_csv(families_dbf):
     
     os.remove(csv_path) # Remove no filtered csv file
     
-    pattern = os.path.join(DATA_ROUTE, f"{clean_families_dbf_name}_*.csv") # Get old file versions
+    pattern = os.path.join(DATA_ROUTE, f"{filetype}_*.csv") # Get old file versions
 
     for file_ in glob.glob(pattern):
         file_name = os.path.basename(file_)
@@ -446,9 +517,9 @@ def families_dbf_to_csv(families_dbf):
     return filtered_csv_path
 
     
-def update_families(families_dbf):
+def update_families(families_dbf_path, families_dbf_name, filetype, username):
     start_time = time.perf_counter() # Inicializar contador de tiempo
-    families_csv_path = families_dbf_to_csv(families_dbf) # DBF to CSV
+    families_csv_path = families_dbf_to_csv(families_dbf_path, families_dbf_name, filetype) # DBF to CSV
     
     status = 0
     status_info = ''
@@ -536,14 +607,11 @@ def update_families(families_dbf):
     return status, status_info, import_resume        
 
 
-def stocks_dbf_to_csv(stocks_dbf):
-    upload_path = os.path.join(current_app.root_path, UPLOAD_ROUTE)
-    dbf_table = DBF(os.path.join(upload_path, stocks_dbf), encoding='latin1')
+def stocks_dbf_to_csv(stocks_dbf_path, stocks_dbf_name, filetype):
+    dbf_table = DBF(stocks_dbf_path, encoding='latin1')
     df = pd.DataFrame(iter(dbf_table))
-    
-    stocks_dbf_name, extension = os.path.splitext(stocks_dbf) # Clean (with date) filename and extension
-    clean_stocks_dbf_name = str.split(stocks_dbf_name,'_')[0]
-    csv_path = DATA_ROUTE + 'no_filtered_' + stocks_dbf_name + '.csv'
+
+    csv_path = os.path.join(DATA_ROUTE, f'no_filtered_{stocks_dbf_name}.csv')
     df.to_csv(csv_path, index=False)
     
     df = pd.read_csv(csv_path)
@@ -561,7 +629,7 @@ def stocks_dbf_to_csv(stocks_dbf):
     
     os.remove(csv_path) # Remove no filtered csv file
     
-    pattern = os.path.join(DATA_ROUTE, f"{clean_stocks_dbf_name}_*.csv") # Get old file versions
+    pattern = os.path.join(DATA_ROUTE, f"{filetype}_*.csv") # Get old file versions
 
     for file_ in glob.glob(pattern):
         file_name = os.path.basename(file_)
@@ -606,9 +674,9 @@ def validate_clean_stocks_data(row):
     
     return True, row, fixes
 
-def update_stocks(stocks_dbf):
+def update_stocks(stocks_dbf_path, stocks_dbf_name,  filetype, username):
     start_time = time.perf_counter() # Inicializar contador de tiempo
-    stocks_csv_path = stocks_dbf_to_csv(stocks_dbf) # DBF to CSV
+    stocks_csv_path = stocks_dbf_to_csv(stocks_dbf_path, stocks_dbf_name, filetype) # DBF to CSV
     
     status = 0
     status_info = ''
@@ -696,14 +764,11 @@ def update_stocks(stocks_dbf):
     return status, status_info, import_resume
 
 
-def cierre_dbf_to_csv(cierre_dbf):
-    upload_path = os.path.join(current_app.root_path, UPLOAD_ROUTE)
-    dbf_table = DBF(os.path.join(upload_path, cierre_dbf), encoding='latin1')
+def cierre_dbf_to_csv(cierre_dbf_path, cierre_dbf_name, filetype):
+    dbf_table = DBF(cierre_dbf_path, encoding='latin1')
     df = pd.DataFrame(iter(dbf_table))
     
-    cierre_dbf_name, extension = os.path.splitext(cierre_dbf) # Clean (with date) filename and extension
-    clean_cierre_dbf_name = str.split(cierre_dbf_name, '_')[0]
-    csv_path = DATA_ROUTE + 'no_filtered_' + cierre_dbf_name + '.csv'
+    csv_path = os.path.join(DATA_ROUTE, f'no_filtered_{cierre_dbf_name}.csv')
     df.to_csv(csv_path, index=False)
 
     df = pd.read_csv(csv_path)
@@ -749,7 +814,7 @@ def cierre_dbf_to_csv(cierre_dbf):
 
     os.remove(csv_path) # Remove no filtered csv file
     
-    pattern = os.path.join(DATA_ROUTE, f"{clean_cierre_dbf_name}_*.csv") # Get old file versions
+    pattern = os.path.join(DATA_ROUTE, f"{filetype}_*.csv") # Get old file versions
 
     for file_ in glob.glob(pattern):
         file_name = os.path.basename(file_)
@@ -759,9 +824,9 @@ def cierre_dbf_to_csv(cierre_dbf):
     
     return filtered_csv_path
 
-def update_cierre(cierre_dbf):
+def update_cierre(cierre_dbf_path, cierre_dbf_name, filetype, username):
     start_time = time.perf_counter()
-    cierre_csv_path = cierre_dbf_to_csv(cierre_dbf)
+    cierre_csv_path = cierre_dbf_to_csv(cierre_dbf_path, cierre_dbf_name, filetype)
 
     timeout = 5.0   # segundos
     interval = 0.1  # segundos
@@ -841,14 +906,11 @@ def update_cierre(cierre_dbf):
     return status, status_info, resume
 
 
-def movimt_dbf_to_csv(movimt_dbf):
-    upload_path = os.path.join(current_app.root_path, UPLOAD_ROUTE)
-    dbf_table = DBF(os.path.join(upload_path, movimt_dbf), encoding='latin1')
+def movimt_dbf_to_csv(movimt_dbf_path, movimt_dbf_name, filetype):
+    dbf_table = DBF(movimt_dbf_path, encoding='latin1')
     df = pd.DataFrame(iter(dbf_table))
     
-    movimt_dbf_name, extension = os.path.splitext(movimt_dbf) # Clean (with date) filename and extension
-    clean_movimt_dbf_name = str.split(movimt_dbf_name,'_')[0]
-    csv_path = DATA_ROUTE + 'no_filtered_' + movimt_dbf_name + '.csv'
+    csv_path = os.path.join(DATA_ROUTE, f'no_filtered_{movimt_dbf_name}.csv')
     df.to_csv(csv_path, index=False)
     
     df = pd.read_csv(csv_path)
@@ -894,7 +956,7 @@ def movimt_dbf_to_csv(movimt_dbf):
     
     os.remove(csv_path) # Remove no filtered csv file
     
-    pattern = os.path.join(DATA_ROUTE, f"{clean_movimt_dbf_name}_*.csv") # Get old file versions
+    pattern = os.path.join(DATA_ROUTE, f"{filetype}_*.csv") # Get old file versions
 
     for file_ in glob.glob(pattern):
         file_name = os.path.basename(file_)
@@ -905,9 +967,9 @@ def movimt_dbf_to_csv(movimt_dbf):
     
     return filtered_csv_path
 
-def update_movimt(movimt_dbf):
+def update_movimt(movimt_dbf_path, movimt_dbf_name, filetype, username):
     start_time = time.perf_counter()
-    movimt_csv_path = movimt_dbf_to_csv(movimt_dbf)
+    movimt_csv_path = movimt_dbf_to_csv(movimt_dbf_path, movimt_dbf_name, filetype)
 
     status = 0
     status_info = ''
@@ -995,14 +1057,11 @@ def update_movimt(movimt_dbf):
     return status, status_info, import_resume
 
 
-def hticketl_dbf_to_csv(hticketl_dbf):
-    upload_path = os.path.join(current_app.root_path, UPLOAD_ROUTE)
-    dbf_table = DBF(os.path.join(upload_path, hticketl_dbf), encoding='latin1')
+def hticketl_dbf_to_csv(hticketl_dbf_path, hticketl_dbf_name, filetype):
+    dbf_table = DBF(hticketl_dbf_path, encoding='latin1')
     df = pd.DataFrame(iter(dbf_table))
-    
-    hticketl_dbf_name, extension = os.path.splitext(hticketl_dbf) # Clean (with date) filename and extension
-    clean_hticketl_dbf_name = str.split(hticketl_dbf_name,'_')[0]
-    csv_path = DATA_ROUTE + 'no_filtered_' + hticketl_dbf_name + '.csv'
+
+    csv_path = os.path.join(DATA_ROUTE, f'no_filtered_{hticketl_dbf_name}.csv')
     df.to_csv(csv_path, index=False)
     
     df = pd.read_csv(csv_path)
@@ -1027,7 +1086,7 @@ def hticketl_dbf_to_csv(hticketl_dbf):
     
     os.remove(csv_path) # Remove no filtered csv file
     
-    pattern = os.path.join(DATA_ROUTE, f"{clean_hticketl_dbf_name}_*.csv") # Get old file versions
+    pattern = os.path.join(DATA_ROUTE, f"{filetype}_*.csv") # Get old file versions
 
     for file_ in glob.glob(pattern):
         file_name = os.path.basename(file_)
@@ -1092,9 +1151,9 @@ def validate_clean_hticketl_data(row):
         
     return True, row, fixes
 
-def update_hticketl(hticketl_dbf):
+def update_hticketl(hticketl_dbf_path, hticketl_dbf_name, filetype, username):
     start_time = time.perf_counter()
-    hticketl_csv_path = hticketl_dbf_to_csv(hticketl_dbf)
+    hticketl_csv_path = hticketl_dbf_to_csv(hticketl_dbf_path, hticketl_dbf_name, filetype)
 
     status = 0
     status_info = ''

@@ -263,11 +263,12 @@ class TicketItem(db.Model):
 class ImportFile(db.Model):
     __tablename__ = "import_files"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     filetype = Column(
         Enum("articles", "families", "stocks", "cierre", "movimt", "hticketl"), 
         nullable=False
     )
+    filename = Column(String(128), nullable=False)
     filepath = Column(String(512), nullable=False)
     uploaded_at = Column(DateTime, default=lambda: datetime.now(pytz.timezone('Europe/Madrid')), nullable=False)
     status = Column(
@@ -275,9 +276,9 @@ class ImportFile(db.Model):
         nullable=False,
         default="pending"
     )
+    status_message = Column(Text, nullable=True)
     attempts = Column(Integer, nullable=False, default=0)
     last_attempt = Column(DateTime, nullable=True)
-    error_message = Column(Text, nullable=True)
     processed_at = Column(DateTime, nullable=True)
 
 
