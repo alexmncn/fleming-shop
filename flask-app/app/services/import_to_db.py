@@ -83,7 +83,7 @@ def process_import_file(import_file_id, username, max_retries=0):
                     import_file.attempts += 1
                     import_file.last_attempt = datetime.now()
                     if import_file.attempts > max_retries:
-                        import_file.status = "failed"
+                        import_file.status = "error"
 
                     import_file.status_message = status_info
                     session.commit()
@@ -97,7 +97,7 @@ def process_import_file(import_file_id, username, max_retries=0):
                 import_file.attempts += 1
                 import_file.last_attempt = datetime.now()
                 if import_file.attempts > max_retries:
-                    import_file.status = "failed"
+                    import_file.status = "error"
 
                 import_file.status_message = f"Error inesperado: {str(e)}"
                 session.commit()
