@@ -12,8 +12,6 @@ from app.models import ImportFile
 
 from app.config import UPLOAD_ROUTE
 
-os.makedirs(UPLOAD_ROUTE, exist_ok=True)
-
 load_data_bp = Blueprint('load_data', __name__)
 
 
@@ -42,6 +40,8 @@ def upload_file(filetype):
     
     # Save file
     try:
+        os.makedirs(file_path, exist_ok=True)
+        
         file.save(file_path)
         
         import_file = ImportFile(
