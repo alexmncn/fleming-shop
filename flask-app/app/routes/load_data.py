@@ -56,7 +56,7 @@ def upload_file(filetype):
         db.session.add(import_file)
         db.session.commit()
     except Exception as e:
-        send_alert(f"❌ Error inesperado al guardar el archivo de datos <b>{filetype}</b>: {e}")
+        send_alert(f"❌ Error inesperado al guardar el archivo de datos <b>{filetype}</b>: {e}", 1)
         return jsonify(error='Error saving file'), 500
     
     # Clean old files
