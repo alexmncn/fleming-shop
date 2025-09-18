@@ -40,7 +40,7 @@ def upload_file(filetype):
     
     # Save file
     try:
-        os.makedirs(file_path, exist_ok=True)
+        os.makedirs(data_path, exist_ok=True)
         
         file.save(file_path)
         
