@@ -70,7 +70,7 @@ def upload_file(filetype):
     
     # Add task to redis queue
     try:
-        redis_conn = Redis(host="localhost", port=6379)
+        redis_conn = Redis(host="redis", port=6379)
         q = Queue(connection=redis_conn)
         
         job = q.enqueue(process_import_file, import_file_id, username)
