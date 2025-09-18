@@ -26,82 +26,86 @@ article_column_to_attribute_map = {
 
 
 def process_import_file(import_file_id, username, max_retries=0):
-    valid_import_file_types = {
-        'articles': update_articles,
-        'families': update_families,
-        'stocks': update_stocks,
-        'cierre': update_cierre,
-        'movimt': update_movimt,
-        'hticketl': update_hticketl,
-    }
+    from app.app import create_app
+    app = create_app()
+    with app.app_context():
+        
+        valid_import_file_types = {
+            'articles': update_articles,
+            'families': update_families,
+            'stocks': update_stocks,
+            'cierre': update_cierre,
+            'movimt': update_movimt,
+            'hticketl': update_hticketl,
+        }
 
-    session = db.session
+        session = db.session
 
-    # Recuperar registro
-    import_file = session.get(ImportFile, import_file_id)
-    if not import_file:
-        raise ValueError(f"No se encontró ImportFile con id={import_file_id}")
-    # Inicializamos
-    import_file.status = "processing"
-    import_file.status_message = None
-    import_file.attempts = 0
-    session.commit()
+        # Recuperar registro
+        import_file = session.get(ImportFile, import_file_id)
+        if not import_file:
+            raise ValueError(f"No se encontró ImportFile con id={import_file_id}")
+        # Inicializamos
+        import_file.status = "processing"
+        import_file.status_message = None
+        import_file.attempts = 0
+        session.commit()
 
-    # Datos del archivo
-    file_path = import_file.filepath
-    file_name = import_file.filename
-    filetype = import_file.filetype
+        # Datos del archivo
+        file_path = import_file.filepath
+        file_name = import_file.filename
+        filetype = import_file.filetype
 
-    # Determinar la función de procesamiento
-    task_func = valid_import_file_types[filetype]
+        # Determinar la función de procesamiento
+        task_func = valid_import_file_types[filetype]
 
-    # Bucle de intentos
-    while import_file.attempts <= max_retries:
-        try:
-            status, status_info, import_resume = task_func(file_path, file_name, filetype, username)
-            if status == 0:
-                # Exito
-                import_file = session.get(ImportFile, import_file_id)
-                import_file.status = "done"
-                import_file.status_message = import_resume
-                import_file.attempts += 1
-                date = datetime.now()
-                import_file.last_attempt = date
-                import_file.processed_at = date
-                session.commit()
-                
-                message = f"✅ <b>Importacion de {filetype.capitalize()}</b>\n{import_resume}"
-                send_alert(message, 0)
-                return True
-            else:
-                # Error, comprobamos si toca reintentar
+        # Bucle de intentos
+        while import_file.attempts <= max_retries:
+            try:
+                status, status_info, import_resume = task_func(file_path, file_name, filetype, username)
+                if status == 0:
+                    # Exito
+                    import_file = session.get(ImportFile, import_file_id)
+                    import_file.status = "done"
+                    import_file.status_message = import_resume
+                    import_file.attempts += 1
+                    date = datetime.now()
+                    import_file.last_attempt = date
+                    import_file.processed_at = date
+                    session.commit()
+                    
+                    message = f"✅ <b>Importacion de {filetype.capitalize()}</b>\n{import_resume}"
+                    send_alert(message, 0)
+                    return True
+                else:
+                    # Error, comprobamos si toca reintentar
+                    import_file = session.get(ImportFile, import_file_id)
+                    import_file.attempts += 1
+                    import_file.last_attempt = datetime.now()
+                    if import_file.attempts > max_retries:
+                        import_file.status = "failed"
+
+                    import_file.status_message = status_info
+                    session.commit()
+                    
+                    message = f"⚠️ <b>Importacion de {filetype.capitalize()}</b>\n{status_info}"
+                    send_alert(message, 0)
+                    
+            except Exception as e:
+                # Excepción inesperada
                 import_file = session.get(ImportFile, import_file_id)
                 import_file.attempts += 1
                 import_file.last_attempt = datetime.now()
                 if import_file.attempts > max_retries:
                     import_file.status = "failed"
 
-                import_file.status_message = status_info
+                import_file.status_message = f"Error inesperado: {str(e)}"
                 session.commit()
                 
-                message = f"⚠️ <b>Importacion de {filetype.capitalize()}</b>\n{status_info}"
-                send_alert(message, 0)
-                
-        except Exception as e:
-            # Excepción inesperada
-            import_file = session.get(ImportFile, import_file_id)
-            import_file.attempts += 1
-            import_file.last_attempt = datetime.now()
-            if import_file.attempts > max_retries:
-                import_file.status = "failed"
+                message = f"❌ Error inesperado en la importación de <b>{filetype}</b>: {str(e)}"
+                send_alert(message, 1)
 
-            import_file.status_message = f"Error inesperado: {str(e)}"
-            session.commit()
-            
-            message = f"❌ Error inesperado en la importación de <b>{filetype}</b>: {str(e)}"
-            send_alert(message, 1)
-
-    return False
+        return False
 
 
 def articles_dbf_to_csv(articles_dbf_path, articles_dbf_name, filetype):
