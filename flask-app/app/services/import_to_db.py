@@ -109,7 +109,22 @@ def process_import_file(import_file_id, username, max_retries=0):
 
 
 def articles_dbf_to_csv(articles_dbf_path, articles_dbf_name, filetype):
-    dbf_table = DBF(articles_dbf_path, encoding='latin1') # Read dbf as a table
+    dbf_table = None
+    try:
+        start_time = time.perf_counter()
+        timeout = 5 # 5 segundos
+        interval = 0.1 # 0.1 segundos
+        while True:
+            if os.path.exists(articles_dbf_path) and os.path.getsize(articles_dbf_path) > 0:
+                break
+            if time.perf_counter() - start_time > timeout:
+                raise TimeoutError(f"El archivo {articles_dbf_path} no estuvo disponible en {timeout} segundos.")
+            time.sleep(interval)
+        
+        dbf_table = DBF(articles_dbf_path, encoding='latin1') # Read dbf as a table
+    except Exception as e:
+        raise Exception(f"Error al leer el DBF de Artículos. {str(e)}")
+    
     df = pd.DataFrame(iter(dbf_table)) # dbf table to pandas dataframe
     
     csv_path = os.path.join(DATA_ROUTE, f'no_filtered_{articles_dbf_name}.csv') # No filtered csv path
@@ -488,7 +503,22 @@ def save_article_import_log(import_id, user, status, info, n_new, n_updated, n_d
     
 
 def families_dbf_to_csv(families_dbf_path, families_dbf_name, filetype):
-    dbf_table = DBF(families_dbf_path, encoding='latin1')
+    dbf_table = None
+    try:
+        start_time = time.perf_counter()
+        timeout = 5 # 5 segundos
+        interval = 0.1 # 0.1 segundos
+        while True:
+            if os.path.exists(families_dbf_path) and os.path.getsize(families_dbf_path) > 0:
+                break
+            if time.perf_counter() - start_time > timeout:
+                raise TimeoutError(f"El archivo {families_dbf_path} no estuvo disponible en {timeout} segundos.")
+            time.sleep(interval)
+        
+        dbf_table = DBF(families_dbf_path, encoding='latin1') # Read dbf as a table
+    except Exception as e:
+        raise Exception(f"Error al leer el DBF de Familias. {str(e)}")
+    
     df = pd.DataFrame(iter(dbf_table))
     
     csv_path = os.path.join(DATA_ROUTE, f'no_filtered_{families_dbf_name}.csv')
@@ -612,7 +642,22 @@ def update_families(families_dbf_path, families_dbf_name, filetype, username):
 
 
 def stocks_dbf_to_csv(stocks_dbf_path, stocks_dbf_name, filetype):
-    dbf_table = DBF(stocks_dbf_path, encoding='latin1')
+    dbf_table = None
+    try:
+        start_time = time.perf_counter()
+        timeout = 5 # 5 segundos
+        interval = 0.1 # 0.1 segundos
+        while True:
+            if os.path.exists(stocks_dbf_path) and os.path.getsize(stocks_dbf_path) > 0:
+                break
+            if time.perf_counter() - start_time > timeout:
+                raise TimeoutError(f"El archivo {stocks_dbf_path} no estuvo disponible en {timeout} segundos.")
+            time.sleep(interval)
+        
+        dbf_table = DBF(stocks_dbf_path, encoding='latin1') # Read dbf as a table
+    except Exception as e:
+        raise Exception(f"Error al leer el DBF de Stocks. {str(e)}")
+    
     df = pd.DataFrame(iter(dbf_table))
 
     csv_path = os.path.join(DATA_ROUTE, f'no_filtered_{stocks_dbf_name}.csv')
@@ -769,7 +814,22 @@ def update_stocks(stocks_dbf_path, stocks_dbf_name,  filetype, username):
 
 
 def cierre_dbf_to_csv(cierre_dbf_path, cierre_dbf_name, filetype):
-    dbf_table = DBF(cierre_dbf_path, encoding='latin1')
+    dbf_table = None
+    try:
+        start_time = time.perf_counter()
+        timeout = 5 # 5 segundos
+        interval = 0.1 # 0.1 segundos
+        while True:
+            if os.path.exists(cierre_dbf_path) and os.path.getsize(cierre_dbf_path) > 0:
+                break
+            if time.perf_counter() - start_time > timeout:
+                raise TimeoutError(f"El archivo {cierre_dbf_path} no estuvo disponible en {timeout} segundos.")
+            time.sleep(interval)
+        
+        dbf_table = DBF(cierre_dbf_path, encoding='latin1') # Read dbf as a table
+    except Exception as e:
+        raise Exception(f"Error al leer el DBF de Cierre. {str(e)}")
+
     df = pd.DataFrame(iter(dbf_table))
     
     csv_path = os.path.join(DATA_ROUTE, f'no_filtered_{cierre_dbf_name}.csv')
@@ -911,7 +971,22 @@ def update_cierre(cierre_dbf_path, cierre_dbf_name, filetype, username):
 
 
 def movimt_dbf_to_csv(movimt_dbf_path, movimt_dbf_name, filetype):
-    dbf_table = DBF(movimt_dbf_path, encoding='latin1')
+    dbf_table = None
+    try:
+        start_time = time.perf_counter()
+        timeout = 5 # 5 segundos
+        interval = 0.1 # 0.1 segundos
+        while True:
+            if os.path.exists(movimt_dbf_path) and os.path.getsize(movimt_dbf_path) > 0:
+                break
+            if time.perf_counter() - start_time > timeout:
+                raise TimeoutError(f"El archivo {movimt_dbf_path} no estuvo disponible en {timeout} segundos.")
+            time.sleep(interval)
+        
+        dbf_table = DBF(movimt_dbf_path, encoding='latin1') # Read dbf as a table
+    except Exception as e:
+        raise Exception(f"Error al leer el DBF de Movimt. {str(e)}")
+    
     df = pd.DataFrame(iter(dbf_table))
     
     csv_path = os.path.join(DATA_ROUTE, f'no_filtered_{movimt_dbf_name}.csv')
@@ -1062,7 +1137,22 @@ def update_movimt(movimt_dbf_path, movimt_dbf_name, filetype, username):
 
 
 def hticketl_dbf_to_csv(hticketl_dbf_path, hticketl_dbf_name, filetype):
-    dbf_table = DBF(hticketl_dbf_path, encoding='latin1')
+    dbf_table = None
+    try:
+        start_time = time.perf_counter()
+        timeout = 5 # 5 segundos
+        interval = 0.1 # 0.1 segundos
+        while True:
+            if os.path.exists(hticketl_dbf_path) and os.path.getsize(hticketl_dbf_path) > 0:
+                break
+            if time.perf_counter() - start_time > timeout:
+                raise TimeoutError(f"El archivo {hticketl_dbf_path} no estuvo disponible en {timeout} segundos.")
+            time.sleep(interval)
+        
+        dbf_table = DBF(hticketl_dbf_path, encoding='latin1') # Read dbf as a table
+    except Exception as e:
+        raise Exception(f"Error al leer el DBF de Hticketl. {str(e)}")
+    
     df = pd.DataFrame(iter(dbf_table))
 
     csv_path = os.path.join(DATA_ROUTE, f'no_filtered_{hticketl_dbf_name}.csv')
