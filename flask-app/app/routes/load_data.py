@@ -76,7 +76,7 @@ def upload_file(filetype):
         job = q.enqueue(process_import_file, import_file_id, username)
     except Exception as e:
         send_alert(f"⚠️ Recibido un nuevo archivo de datos <b>{filetype}</b>: Error al poner en cola, prueba a hacerlo manualmente: {e}", 1)
-        return jsonify(message="Error queuing task, try adding it manually"), 206
+        return jsonify(message="File saved successfully but failed queuing task, try adding it manually"), 206
     
     send_alert(f"Recibido un nuevo archivo de datos <b>{filetype}</b>. Será procesado en unos instantes...", 0)
     return jsonify(message="File saved successfully: will be processed as soon as possible"), 202
