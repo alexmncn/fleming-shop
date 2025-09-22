@@ -10,7 +10,7 @@ from app.services.pushover_alerts import send_alert
 from app.extensions import db
 from app.models import ImportFile
 
-from app.config import UPLOAD_ROUTE
+from app.config import UPLOAD_ROUTE, REDIS_DATABASE_HOST, REDIS_DATABASE_PORT
 
 load_data_bp = Blueprint('load_data', __name__)
 
@@ -70,7 +70,7 @@ def upload_file(filetype):
     
     # Add task to redis queue
     try:
-        redis_conn = Redis(host="redis", port=6379)
+        redis_conn = Redis(host=REDIS_DATABASE_HOST, port=REDIS_DATABASE_PORT)
         q = Queue(connection=redis_conn)
         
         job = q.enqueue(process_import_file, import_file_id, username)
