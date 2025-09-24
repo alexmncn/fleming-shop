@@ -1,4 +1,4 @@
-import os, glob, uuid
+import os, glob, uuid, shutil, time
 from datetime import datetime
 from redis import Redis
 from rq import Queue
@@ -42,7 +42,22 @@ def upload_file(filetype):
     try:
         os.makedirs(data_path, exist_ok=True)
         
-        file.save(file_path)
+        start_time = time.perf_counter()
+        with open(file_path, "wb") as f:
+            file.stream.seek(0)
+            shutil.copyfileobj(file.stream, f)
+            f.flush()
+            os.fsync(f.fileno())
+        
+        end_time = time.perf_counter()
+        elapsed_time = end_time - start_time
+
+        
+        if os.path.exists(file_path):
+            size = os.path.getsize(file_path)
+            current_app.logger.info(f"✅ Saved {file_path} in {elapsed_time:.2f} seconds, size={size} bytes")
+        else:
+            current_app.logger.error(f"❌ File {file_path} missing right after save")
         
         import_file = ImportFile(
             id=import_file_id,
