@@ -42,24 +42,15 @@ def upload_file(filetype):
     try:
         os.makedirs(data_path, exist_ok=True)
         
-        start_time = time.perf_counter()
         with open(file_path, "wb") as f:
             file.stream.seek(0)
             shutil.copyfileobj(file.stream, f)
             f.flush()
             os.fsync(f.fileno())
-        
-        end_time = time.perf_counter()
-        elapsed_time = end_time - start_time
 
-        
-        if os.path.exists(file_path):
-            size = os.path.getsize(file_path)
-            send_alert(f"✅ Saved {file_path} in {elapsed_time:.2f} seconds, size={size} bytes", 0)
-            current_app.logger.info(f"✅ Saved {file_path} in {elapsed_time:.2f} seconds, size={size} bytes")
-        else:
-            send_alert(f"❌ File {file_path} missing right after save", 1)
-            current_app.logger.error(f"❌ File {file_path} missing right after save")
+        if not os.path.exists(file_path):
+            send_alert(f"❌ Error al guardar el archivo de datos <b>{filetype}</b>: El archivo no se guardo y no lanzó ningún error", 1)
+            return jsonify(error='File save failed without throw error'), 500
         
         import_file = ImportFile(
             id=import_file_id,
