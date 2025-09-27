@@ -55,8 +55,10 @@ def upload_file(filetype):
         
         if os.path.exists(file_path):
             size = os.path.getsize(file_path)
+            send_alert(f"✅ Saved {file_path} in {elapsed_time:.2f} seconds, size={size} bytes", 0)
             current_app.logger.info(f"✅ Saved {file_path} in {elapsed_time:.2f} seconds, size={size} bytes")
         else:
+            send_alert(f"❌ File {file_path} missing right after save", 1)
             current_app.logger.error(f"❌ File {file_path} missing right after save")
         
         import_file = ImportFile(
