@@ -26,6 +26,7 @@
             class="day-number"
             [class.marked]="isMarked(day) && day.getMonth() === currentDate.getMonth()"
             [class.selected]="isSelected(day)"
+            [class.today]="isToday(day)"
             [class.inactive]="day.getMonth() !== currentDate.getMonth()">
               {{ day.getDate() }}
           </span>

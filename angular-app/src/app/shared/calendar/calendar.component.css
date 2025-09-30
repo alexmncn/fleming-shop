@@ -69,15 +69,22 @@
   cursor: pointer;
 
   &.marked {
-    border: 1px solid var(--primary-accent-700);
+    border: 1px solid var(--primary-accent-600);
+    background-color: var(--primary-accent-50);
   }
 
   &.inactive {
     color: #bbb;
   }
 
+  &.today {
+    font-weight: 700;
+    color: inherit;
+  }
+
   &:hover {
     background-color: var(--p-slate-200);
+    color: inherit;
   }
 
   &.selected {

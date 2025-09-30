@@ -98,5 +98,12 @@ export class CalendarComponent implements OnInit {
   getMonthName(): string {
     return this.currentDate.toLocaleString('default', { month: 'long', year: 'numeric' });
   }
+
+  isToday(date: Date): boolean {
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+           date.getMonth() === today.getMonth() &&
+           date.getFullYear() === today.getFullYear();
+  }
 }
 
