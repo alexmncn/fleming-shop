@@ -1,24 +1,36 @@
 <div class="calendar-container">
     <div class="calendar-header">
-      <button (click)="changeMonth(-1)">◀</button>
-      <span>{{ getMonthName() }}</span>
-      <button (click)="changeMonth(1)">▶</button>
+      <div class="button back" (click)="changeMonth(-1)">
+        <mat-icon class="material-icons-outlined">arrow_back_ios_new</mat-icon>
+      </div>
+      <span>{{ getMonthName() | capitalize }}</span>
+      <div class="button forward" (click)="changeMonth(1)">
+        <mat-icon class="material-icons-outlined">arrow_forward_ios_new</mat-icon>
+      </div>
     </div>
+
+    <div class="divider"></div>
   
     <div class="calendar-grid">
-      <div class="calendar-day-name" *ngFor="let d of ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']">
-        {{ d }}
-      </div>
+      @for (day of daysOfWeek; track $index) {
+        <div class="calendar-day-name">
+          {{ day }}
+        </div>
+      }
   
-      <div 
-        class="calendar-day"
-        *ngFor="let day of currentMonthDays"
-        [class.marked]="isMarked(day)"
-        [class.selected]="isSelected(day)"
-        [class.inactive]="day.getMonth() !== currentDate.getMonth()"
-        (click)="selectDate(day)">
-        {{ day.getDate() }}
-      </div>
+      @for (day of currentMonthDays; track $index) {
+        <div 
+          class="calendar-day"
+          (click)="selectDate(day)">
+          <span
+            class="day-number"
+            [class.marked]="isMarked(day) && day.getMonth() === currentDate.getMonth()"
+            [class.selected]="isSelected(day)"
+            [class.inactive]="day.getMonth() !== currentDate.getMonth()">
+              {{ day.getDate() }}
+          </span>
+        </div>
+      }
     </div>
   </div>
   

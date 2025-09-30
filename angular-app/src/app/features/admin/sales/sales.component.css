@@ -33,10 +33,10 @@
   .day-sales li,
   .tickets-list li {
     padding: 0.5rem;
-    border: 1px solid #ccc;
+    border: var(--border-1-3);
     border-radius: 8px;
     margin-bottom: 0.5rem;
-    background-color: #f9f9f9;
+    background-color: white;
   }
   
   .sale-header {
@@ -79,16 +79,21 @@
   
   .ticket-table th,
   .ticket-table td {
-    border: 1px solid #ccc;
+    border: var(--border-1-3);
     padding: 0.5rem;
     text-align: center;
   }
   
   .ticket-table th {
-    background-color: #f0f0f0;
+    background-color: var(--primary-accent-500);
+    color: white;
+  }
+
+  .ticket-table td {
+    background-color: white;
   }
   
   .ticket-table tfoot td {
-    background-color: #fafafa;
+    background-color: white;
   }
   
