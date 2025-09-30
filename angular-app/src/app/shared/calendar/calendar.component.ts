@@ -2,17 +2,17 @@ import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 
-import { CapitalizePipe } from '../../pipes/capitalize/capitalize.pipe';
+import { CapitalizeFirstPipe } from '../../pipes/capitalize/capitalize-first-pipe';
 
 @Component({
   selector: 'app-calendar',
-  imports: [CommonModule, MatIcon, CapitalizePipe],
+  imports: [CommonModule, MatIcon, CapitalizeFirstPipe],
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.css']
 })
 export class CalendarComponent implements OnInit {
   @Input() markedDates: string[] = [];
-  @Output() dateSelected = new EventEmitter<string>();
+  @Output() dateSelected = new EventEmitter<Date>();
 
   daysOfWeek: string[] = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
@@ -76,8 +76,7 @@ export class CalendarComponent implements OnInit {
   }
 
   selectDate(date: Date) {
-    const formatted = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
-
+    // Si se hace click en una fecha de otro mes, cambiar de mes
     const currentYear = this.currentDate.getFullYear();
     const currentMonth = this.currentDate.getMonth();
 
@@ -91,8 +90,9 @@ export class CalendarComponent implements OnInit {
       this.changeMonth(offset);
     }
 
+    // Seleccionar y emitir la fecha
     this.selectedDate = date;
-    this.dateSelected.emit(formatted);
+    this.dateSelected.emit(date);
   }
 
   getMonthName(): string {

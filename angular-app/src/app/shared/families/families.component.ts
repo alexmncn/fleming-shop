@@ -5,7 +5,7 @@ import { Router, NavigationExtras } from '@angular/router';
 import { SkeletonModule } from 'primeng/skeleton';
 import { trigger, style, transition, animate, state } from '@angular/animations';
 
-import { CapitalizePipe } from '../../pipes/capitalize/capitalize.pipe';
+import { CapitalizePipe } from '../../pipes/capitalize/capitalize-pipe';
 
 import { environment } from '../../../environments/environment';
 import { catchError, of, throwError, timeout } from 'rxjs';

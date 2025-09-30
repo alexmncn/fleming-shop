@@ -11,7 +11,7 @@ import { Article } from '../../models/article.model';
 import { AuthService } from '../../services/auth/auth.service';
 import { MessageService } from '../../services/message/message.service';
 
-import { CapitalizePipe } from '../../pipes/capitalize/capitalize.pipe';
+import { CapitalizePipe } from '../../pipes/capitalize/capitalize-pipe';
 
 import { environment } from '../../../environments/environment';
 

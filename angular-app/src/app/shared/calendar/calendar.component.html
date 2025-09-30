@@ -3,7 +3,7 @@
       <div class="button back" (click)="changeMonth(-1)">
         <mat-icon class="material-icons-outlined">arrow_back_ios_new</mat-icon>
       </div>
-      <span>{{ getMonthName() | capitalize }}</span>
+      <span>{{ getMonthName() | capitalizeFirst }}</span>
       <div class="button forward" (click)="changeMonth(1)">
         <mat-icon class="material-icons-outlined">arrow_forward_ios_new</mat-icon>
       </div>
