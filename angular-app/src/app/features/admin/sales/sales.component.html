@@ -1,15 +1,16 @@
 <main>
   <div class="top-section">
-    <app-calendar
-      class="calendar-box"
+    <div class="calendar-box">
+      <app-calendar
       [markedDates]="dailySalesDates"
       (dateSelected)="onDateSelected($event)">
     </app-calendar>
+    </div>
     
     @if (selectedDate) {
       <section class="sales">
         <h3>{{ formatDateToLongString(selectedDate) | capitalizeFirst }}</h3>
-        @if (daySales!.length > 0) {
+        @if (daySales != null && daySales.length > 0) {
           <ul class="day-sales">
             @for (sale of daySales; track $index) {
               <li class="sale">
@@ -37,10 +38,15 @@
               </li>
             }
           </ul>
+        } @else {
+          <div class="no-sales-box">
+            <mat-icon class="material-symbols-outlined">database_off</mat-icon>
+            <span class="no-sales-message">No hay ventas registradas para este día.</span>
+          </div>
         }
       </section>
 
-      @if (tickets.length > 0) {
+      @if (tickets != null && tickets.length > 0) {
         <section class="tickets-list-box">
           <h3>Tickets</h3>
           <ul class="tickets-list">
@@ -56,7 +62,7 @@
     }
   </div>
 
-  @if (selectedTicket && ticketItems.length > 0) {
+  @if (selectedTicket && ticketItems != null && ticketItems.length > 0) {
     <section id="ticketDetails" class="ticket-details">
       <h4>Artículos del ticket #{{ selectedTicket.number }}</h4>
       <table class="ticket-table">

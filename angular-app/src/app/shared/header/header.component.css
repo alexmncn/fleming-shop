@@ -37,18 +37,18 @@ img {
 
 }
 
-.admin-menu {
+.user-info {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: clamp(0.1rem, 1vw, 0.5rem);
 }
 
-.admin-menu:hover {
+.user-info :hover {
     cursor: pointer;
 }
 
-.admin-menu mat-icon {
+.user-info  mat-icon {
     display: flex;
     font-size: clamp(0.9rem, 3vw, 1.3rem);
     width: clamp(0.9rem, 3vw, 1.3rem);
@@ -56,12 +56,31 @@ img {
     font-variation-settings: 'FILL' 0, 'wght' 400;
 }
 
-.admin-menu p {
+.user-info  p {
     font-size: clamp(0.75rem, 2.5vw, 1.1rem);
     margin: 0;
     font-variation-settings: 'wght' 500;
 }
 
-.admin-menu p:hover {
+.user-info  p:hover {
     text-decoration: underline;
+}
+
+
+.admin-menu .drawer-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: background 0.3s ease;
+    cursor: pointer;
+}
+
+.admin-menu .drawer-button:hover {
+    background: var(--p-slate-200);
+}
+
+.admin-menu .drawer-button mat-icon {
+    scale: 0.9;
 }

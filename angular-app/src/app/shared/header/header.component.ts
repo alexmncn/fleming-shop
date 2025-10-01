@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
 
 import { AuthService } from '../../services/auth/auth.service';
+import { DrawerService } from '../../services/drawer/drawer.service';
 
 @Component({
     selector: 'app-header',
@@ -12,10 +13,11 @@ import { AuthService } from '../../services/auth/auth.service';
     styleUrl: './header.component.css'
 })
 export class HeaderComponent implements OnInit {
+  isScreenSmall: boolean = window.innerWidth <= 600;
   isAuth: boolean = false;
   username: string | null = '';
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, public drawerService: DrawerService) {}
 
   ngOnInit(): void {
     this.authService.isAuthenticated$.subscribe((auth: boolean) => {
@@ -26,5 +28,10 @@ export class HeaderComponent implements OnInit {
       this.username = name;
     });
     
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event) {
+    this.isScreenSmall = window.innerWidth <= 600;
   }
 }

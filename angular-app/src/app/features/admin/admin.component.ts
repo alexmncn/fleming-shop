@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { RouterOutlet } from '@angular/router';
@@ -7,6 +7,7 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
 import { MessageService } from '../../services/message/message.service';
 import { FloatingMessageComponent } from "../../shared/floating-message/floating-message.component";
+import { DrawerService } from '../../services/drawer/drawer.service';
 
 @Component({
     selector: 'app-admin',
@@ -15,7 +16,7 @@ import { FloatingMessageComponent } from "../../shared/floating-message/floating
     styleUrl: './admin.component.css'
 })
 export class AdminComponent {
-  expanded = signal(false);
+  isScreenSmall: boolean = window.innerWidth <= 600;
 
   menuItems = [
     { label: 'Catálogo', icon: 'pi pi-home', routerLink: '/catalog/home' },
@@ -28,11 +29,7 @@ export class AdminComponent {
     { label: 'Exportar datos', icon: 'pi pi-file-export', routerLink: '/admin/data-export' }    
   ];
 
-  constructor(private authService: AuthService, private router: Router, private messageService: MessageService) {}
-
-  toggleDrawer() {
-    this.expanded.set(!this.expanded());
-  }
+  constructor(private authService: AuthService, private router: Router, private messageService: MessageService, public drawerService: DrawerService) {}
 
   isActive(item: any) {
     return this.router.url === item.routerLink;
@@ -52,5 +49,10 @@ export class AdminComponent {
         complete: () => {
         }
       });
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event) {
+    this.isScreenSmall = window.innerWidth <= 600;
   }
 }

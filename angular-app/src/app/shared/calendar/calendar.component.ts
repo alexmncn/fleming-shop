@@ -23,6 +23,11 @@ export class CalendarComponent implements OnInit {
 
   ngOnInit(): void {
     this.generateCalendar();
+    this.selectDate(this.normalizeDate(this.currentDate));
+  }
+
+  normalizeDate(date: Date): Date {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
   }
 
   isMarked(date: Date): boolean {
@@ -106,4 +111,3 @@ export class CalendarComponent implements OnInit {
            date.getFullYear() === today.getFullYear();
   }
 }
-
