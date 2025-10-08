@@ -34,4 +34,9 @@ export class HeaderComponent implements OnInit {
   onResize(event: Event) {
     this.isScreenSmall = window.innerWidth <= 600;
   }
+
+  toggleSideMenu(e: Event) {
+    e.stopPropagation()
+    this.drawerService.toggle();
+  }
 }

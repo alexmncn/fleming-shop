@@ -10,7 +10,7 @@
                         <p>{{ username }}</p>
                     </div>
                 } @else {
-                    <div class="drawer-button" (click)="drawerService.toggle()">
+                    <div class="drawer-button" (click)="toggleSideMenu($event)">
                         <mat-icon class="material-symbols-outlined">side_navigation</mat-icon>
                     </div>
                 }
