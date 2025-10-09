@@ -1,67 +1,56 @@
 section {
     display: flex;
     align-items: center;
-}
-
-i {
-    position: absolute;
-    padding-left: 1.1rem;
-    color: var(--p-slate-400);
-    font-size: clamp(0.75rem, 2.5vw, 1rem);
-}
-
-@media (max-width: 600px) {
-    i  {
-        padding-left: 0.75rem;
-    }
-}
-
-input {
-    color: var(--p-slate-900);
-    width: 100%;
-    padding: 1rem;
     border-radius: 8px;
     border: var(--border-1-2);
     box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.05);
-    font-size: clamp(0.75rem, 2.5vw, 1rem);
+    background-color: white;
     transition: border-color 0.2s ease;
+}
+
+@media (min-width: 768px) {
+    section:hover {
+        border-color: var(--p-slate-400);
+    }    
+}
+
+section.focused {
+    outline: none;
+    border-color: var(--primary-accent-500);
+}
+
+i {
+    flex: 0 0 auto;
+    color: var(--p-slate-400);
+    font-size: clamp(0.75rem, 2.5vw, 1rem);
+    padding: 1rem 0rem 1rem 1rem;
+}
+
+input {
+    flex: 1 1 auto;
+    width: 100%;
+    padding: 1rem;
+    color: var(--p-slate-900);
+    font-size: clamp(0.75rem, 2.5vw, 1rem);
+    border: none;
+    border-radius: 8px;
 }
 
 input::placeholder {
     color: var(--p-slate-400);
 }
 
-@media (min-width: 768px) {
-    input:hover {
-        border-color: var(--p-slate-400);
-    }    
-}
-
 input:focus {
     outline: none;
-    border-color: var(--primary-accent-500);
 }
 
-::ng-deep .p-input-icon {
-    left: 1rem;
-}
-
-::ng-deep #search {
-    padding-left: 3rem;
-}
 
 @media (max-width: 600px) {
+    i {
+        padding: 0.5rem 0rem 0.5rem 0.5rem;
+    }
+
     input {
         padding: 0.5rem;
     }
-
-    ::ng-deep .p-input-icon {
-        left: 0.75rem;
-        font-size: 0.75rem;
-    }
-    
-    ::ng-deep #search {
-        padding-left: 2rem;
-    }
-
 }
