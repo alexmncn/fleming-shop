@@ -13,11 +13,17 @@ main {
 }
 
 .content {
+    height: calc(100vh - var(--header-height));
+    display: flex;
+    flex-direction: column;
+}
+
+.content-wrapper {
+    flex: 1 1 auto;
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: calc(100vh - var(--header-height));
     gap: 3%;
 }
 
@@ -34,7 +40,7 @@ main {
         padding: 0 0.5rem;
     }
 
-    .content {
+    .content-wrapper {
         flex-direction: column;
         gap: 1rem;
     }
@@ -80,4 +86,31 @@ h2.active {
     width: 3rem;
     border-width: 2px;
     color: var(--p-slate-200);
+}
+
+footer {
+    flex: 0 0 auto;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+footer > .footer-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--p-slate-500);
+    font-weight: 500;
+    cursor: pointer;
+    white-space: no-wrap;
+}
+
+footer > .footer-content:hover {
+    text-decoration: underline;
+    color: var(--primary-accent-500);
+}
+
+footer > .footer-content mat-icon {
+    scale: 0.95;
 }

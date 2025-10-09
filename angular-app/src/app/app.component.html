@@ -1,5 +1,10 @@
 <app-header/>
 <main>
-    <router-outlet/>
+    <section class="main-content">
+        <router-outlet/>
+        @if (showFooter) {
+            <app-footer/>
+        }
+    </section>
+    <app-side-menu/>
 </main>
-<app-footer/>

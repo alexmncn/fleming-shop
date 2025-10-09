@@ -1,0 +1,80 @@
+@if (isAuth) {
+    @if (this.drawerService.isDrawer) {
+        <!-- Drawer overlay -->
+        <div class="drawer" [class.open]="drawerService.drawerOpen()">
+        <div class="drawer-overlay" (click)="drawerService.toggle()"></div>
+        <aside class="drawer-panel">
+            <div class="top">
+            <button class="close-btn" (click)="drawerService.toggle()">
+                <i class="pi pi-times"></i>
+            </button>
+            </div>
+
+            <div class="divider"></div>
+        
+            <div class="middle">
+            <ul>
+                @for (item of menuItems; track item.label) {
+                <li class="option" [class.active]="isActive(item)" [title]="item.label" (click)="navigateTo(item.routerLink)">
+                    <div class="content">
+                    <i [class]="item.icon"></i>
+                    <span>{{ item.label }}</span>
+                    </div>
+                </li>
+                }
+            </ul>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="bottom">
+            <div class="option logout" (click)="logout()">
+                <div class="content">
+                <i class="pi pi-sign-out"></i>
+                <span>Cerrar sesión</span>
+                </div>
+            </div>
+            </div>
+            
+        </aside>
+        </div>
+    } @else {
+        <aside class="sidebar" [class.expanded]="drawerService.drawerOpen()">
+        <div class="top">
+            <button class="toggle-btn" (click)="drawerService.toggle()">
+            <i class="pi pi-angle-double-left"></i>
+            </button>
+        </div>
+
+        <div class="divider"></div>
+        
+        <div class="middle">
+            <ul>
+            @for (item of menuItems; track item.label) {
+                <li class="option" [class.active]="isActive(item)" [title]="item.label" (click)="navigateTo(item.routerLink)">
+                <div class="content">
+                    <i [class]="item.icon"></i>
+                    @if (drawerService.drawerOpen()) {
+                    <span>{{ item.label }}</span>
+                    }
+                </div>
+                </li>
+            }
+            </ul>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="bottom">
+            <div class="option logout" (click)="logout()">
+            <div class="content">
+                <i class="pi pi-sign-out"></i>
+                @if (drawerService.drawerOpen()) {
+                <span>Cerrar sesión</span>
+                }
+            </div>
+            </div>
+        </div>
+        </aside>
+    }
+}

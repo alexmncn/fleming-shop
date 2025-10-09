@@ -3,15 +3,15 @@
         <img [routerLink]="['/auth/login']"  src="assets/logos/fleming_logo.webp" alt="Fleming Logo">
         
         @if (isAuth) {
-            <section class="admin-menu" [routerLink]="['/admin']">
-                @if (!isScreenSmall) {
+            <section class="admin-menu">
+                @if (this.drawerService.isDrawer) {
+                    <div class="drawer-button" (click)="toggleSideMenu($event)">
+                        <mat-icon class="material-symbols-outlined">menu</mat-icon>
+                    </div>
+                } @else {
                     <div class="user-info">
                         <mat-icon class="material-symbols-outlined">person</mat-icon>
                         <p>{{ username }}</p>
-                    </div>
-                } @else {
-                    <div class="drawer-button" (click)="toggleSideMenu($event)">
-                        <mat-icon class="material-symbols-outlined">side_navigation</mat-icon>
                     </div>
                 }
             </section>

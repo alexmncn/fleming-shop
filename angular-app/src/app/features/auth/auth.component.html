@@ -3,17 +3,26 @@
     <app-floating-message/>
   </div>
   <div class="content">
-    <aside>
-      <div class="menu">
-        <h2 [class.active]="loginActive" [routerLink]="['/auth/login']" routerLinkActive="router-link-active" (click)="changeActive('login')">Inicia Sesión</h2>
-        <div class="separator">
-          <mat-divider class="mat-divider"></mat-divider>
-          <p class="o">o</p>
-          <mat-divider class="mat-divider"></mat-divider>
+    <div class="content-wrapper">
+      <aside>
+        <div class="menu">
+          <h2 [class.active]="loginActive" [routerLink]="['/auth/login']" routerLinkActive="router-link-active" (click)="changeActive('login')">Inicia Sesión</h2>
+          <div class="separator">
+            <mat-divider class="mat-divider"></mat-divider>
+            <p class="o">o</p>
+            <mat-divider class="mat-divider"></mat-divider>
+          </div>
+          <h2 [class.active]="registerActive" [routerLink]="['/auth/register']" routerLinkActive="router-link-active" (click)="changeActive('register')">Regístrate</h2>
         </div>
-        <h2 [class.active]="registerActive" [routerLink]="['/auth/register']" routerLinkActive="router-link-active" (click)="changeActive('register')">Regístrate</h2>
+      </aside>
+      <router-outlet/>
+    </div>
+
+    <footer>
+      <div class="footer-content" routerLink="['/catalog']">
+        <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+        <span>Volver al catálogo</span>
       </div>
-    </aside>
-    <router-outlet/>
+    </footer>
   </div>
 </main>

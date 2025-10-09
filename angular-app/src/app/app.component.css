@@ -1,0 +1,18 @@
+main {
+  display: flex;
+  flex-direction: row;
+  height: calc(100svh - var(--header-height));
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1 1 auto;
+  background: var(--background-white);
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+app-side-menu {
+  flex: 0 0 auto;
+  display: flex;
+}
