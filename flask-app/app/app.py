@@ -32,4 +32,4 @@ def register_blueprints(app):
 
 def set_CORS(app):
     # Set CORS allowed domains
-    CORS(app, origins=['https://tiendafleming.es', 'https://www.tiendafleming.es'])
+    CORS(app, origins=['https://tiendafleming.es', 'https://www.tiendafleming.es', 'http://localhost:4200'])
