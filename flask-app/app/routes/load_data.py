@@ -1,5 +1,5 @@
 import os, glob, uuid, shutil, time
-from datetime import datetime
+from datetime import datetime, timedelta
 from redis import Redis
 from rq import Queue
 from flask import Blueprint, jsonify, request, current_app
@@ -81,7 +81,7 @@ def upload_file(filetype):
         redis_conn = Redis(host=REDIS_DATABASE_HOST, port=REDIS_DATABASE_PORT)
         q = Queue(connection=redis_conn)
         
-        job = q.enqueue(process_import_file, import_file_id, username)
+        job = q.enqueue_in(timedelta(minutes=1), process_import_file, import_file_id, username)
     except Exception as e:
         send_alert(f"⚠️ Recibido un nuevo archivo de datos <b>{filetype}</b>: Error al poner en cola, prueba a hacerlo manualmente: {e}", 1)
         return jsonify(message="File saved successfully but failed queuing task, try adding it manually"), 206
