@@ -46,17 +46,24 @@
         }
       </section>
 
-      @if (tickets != null && tickets.length > 0) {
+      @if (selectedDate && daySales != null && daySales.length > 0) {
         <section class="tickets-list-box">
           <h3>Tickets</h3>
-          <ul class="tickets-list">
-            @for (ticket of tickets; track $index) {
-              <li class="ticket-item" [class.selected]="ticket === selectedTicket" (click)="onTicketSelected(ticket)">
-                <span># {{ ticket.number }}</span>
-                <span class="amount">{{ ticket.amount }} €</span>
-              </li>
-            }
-          </ul>
+          @if (tickets != null && tickets.length > 0) {
+            <ul class="tickets-list">
+              @for (ticket of tickets; track $index) {
+                <li class="ticket-item" [class.selected]="ticket === selectedTicket" (click)="onTicketSelected(ticket)">
+                  <span># {{ ticket.number }}</span>
+                  <span class="amount">{{ ticket.amount }} €</span>
+                </li>
+              }
+            </ul>
+          } @else {
+            <div class="no-sales-box">
+              <mat-icon class="material-symbols-outlined">playlist_remove</mat-icon>
+              <span class="no-sales-message">No hay tickets asociados a este cierre.</span>
+            </div>
+          }
         </section>
       }
     }
