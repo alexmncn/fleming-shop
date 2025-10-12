@@ -108,7 +108,7 @@ aside.sidebar {
 }
 
 .option i {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   flex-shrink: 0;
 }
 
@@ -123,6 +123,7 @@ aside.sidebar {
 }
 
 .sidebar .option span {
+  font-size: 0.95rem;
   display: inline-block;
   opacity: 0;
   transform: translateX(-10px);
