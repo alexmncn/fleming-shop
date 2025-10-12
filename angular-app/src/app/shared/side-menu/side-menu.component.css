@@ -18,7 +18,7 @@ aside.sidebar {
 
 .divider {
   height: 1px;
-  width: 95%;
+  width: 100%;
   align-self: center;
   background: var(--p-slate-300);
 }
@@ -85,9 +85,9 @@ aside.sidebar {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 50px;
+  height: 45px;
   width: 100%;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
   box-sizing: border-box;
   overflow: hidden;
@@ -120,6 +120,10 @@ aside.sidebar {
   padding: 0 1rem;
   justify-content: flex-start;
   white-space: nowrap;
+}
+
+.sidebar:not(.visible) .option .content {
+  justify-content: center;
 }
 
 .sidebar .option span {

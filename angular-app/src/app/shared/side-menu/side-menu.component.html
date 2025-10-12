@@ -41,7 +41,7 @@
             </div>
         }
     } @else {
-        <aside class="sidebar" [class.expanded]="drawerService.isOpen()">
+        <aside class="sidebar" [class.visible]="drawerVisible()" [class.expanded]="drawerService.isOpen()">
         <div class="top">
             <button class="toggle-btn" (click)="drawerService.toggle()">
             <i class="pi pi-angle-double-left"></i>
@@ -56,7 +56,9 @@
                 <li class="option" [class.active]="isActive(item)" [title]="item.label" (click)="navigateTo(item.routerLink)">
                 <div class="content">
                     <i [class]="item.icon"></i>
-                    <span>{{ item.label }}</span>
+                    @if (drawerVisible()) {
+                        <span>{{ item.label }}</span>
+                    }
                 </div>
                 </li>
             }
