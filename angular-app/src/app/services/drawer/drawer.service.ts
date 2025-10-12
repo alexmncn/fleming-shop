@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class DrawerService {
-  drawerOpen = signal(false);
+  isOpen = signal(false);
   isScreenSmall: boolean = window.innerWidth <= 600;
 
   constructor(private router: Router) {}
@@ -17,15 +17,15 @@ export class DrawerService {
   }
 
   open() {
-    this.drawerOpen.set(true);
+    this.isOpen.set(true);
   }
 
   close() {
-    this.drawerOpen.set(false);
+    this.isOpen.set(false);
   }
 
   toggle() {
-    this.drawerOpen.update(v => !v);
+    this.isOpen.update(v => !v);
   }
 
   @HostListener('window:resize', ['$event'])

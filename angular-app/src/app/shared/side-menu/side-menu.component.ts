@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, effect, signal } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { AuthService } from '../../services/auth/auth.service';
@@ -15,6 +15,7 @@ export class SideMenuComponent {
   isAuth: boolean = false;
   isScreenSmall: boolean = window.innerWidth <= 600;
   currentRoute: string = "";
+  drawerVisible = signal(false);
 
   menuItems = [
     { label: 'Catálogo', icon: 'pi pi-home', routerLink: '/catalog/home' },
@@ -28,6 +29,14 @@ export class SideMenuComponent {
   ];
 
   constructor(private authService: AuthService, private router: Router, private messageService: MessageService, public drawerService: DrawerService) {
+    effect(() => {
+      if (this.drawerService.isOpen()) {
+        this.drawerVisible.set(true);
+      } else {
+        console.log("cerrar")
+        setTimeout(() => this.drawerVisible.set(false), 250); // 250ms = duración animación salida
+      }
+    });
   }
 
   ngOnInit(): void {
