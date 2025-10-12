@@ -221,3 +221,7 @@ ul {
 .ticket-table tbody tr:nth-child(odd) td {
   background-color: white;
 }
+
+.ticket-table tr td:first-child {
+  text-align: start;
+}

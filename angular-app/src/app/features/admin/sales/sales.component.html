@@ -80,7 +80,7 @@
               <td>{{ item.detalle | capitalize }}</td>
               <td>{{ item.quantity }}</td>
               <td>{{ item.unit_price }} €</td>
-              <td>{{ item.unit_price * item.quantity }} €</td>
+              <td>{{ (item.unit_price * item.quantity) | number:'1.2-2' }} €</td>
             </tr>
           }
         </tbody>
