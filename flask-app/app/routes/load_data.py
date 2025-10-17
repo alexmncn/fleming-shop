@@ -10,7 +10,7 @@ from app.services.pushover_alerts import send_alert
 from app.extensions import db
 from app.models import ImportFile
 
-from app.config import UPLOAD_ROUTE, REDIS_DATABASE_HOST, REDIS_DATABASE_PORT
+from app.config import UPLOAD_ROUTE, REDIS_DATABASE_HOST, REDIS_DATABASE_PORT, REDIS_IMPORTS_QUEUE
 
 load_data_bp = Blueprint('load_data', __name__)
 
@@ -79,12 +79,12 @@ def upload_file(filetype):
     # Add task to redis queue
     try:
         redis_conn = Redis(host=REDIS_DATABASE_HOST, port=REDIS_DATABASE_PORT)
-        q = Queue(connection=redis_conn)
+        q = Queue(REDIS_IMPORTS_QUEUE, connection=redis_conn)
         
         job = q.enqueue_in(timedelta(minutes=1), process_import_file, import_file_id, username)
     except Exception as e:
-        send_alert(f"⚠️ Recibido un nuevo archivo de datos <b>{filetype}</b>: Error al poner en cola, prueba a hacerlo manualmente: {e}", 1)
+        send_alert(f"⚠️ Archivo recibido: <b>{filetype.capitalize()}</b>: Error al poner en cola, prueba a hacerlo manualmente: {e}", 1)
         return jsonify(message="File saved successfully but failed queuing task, try adding it manually"), 206
     
-    send_alert(f"Recibido un nuevo archivo de datos <b>{filetype}</b>. Será procesado en unos instantes...: JOB ->{job} - ID: {job.id}", 0)
+    send_alert(f"Archivo recibido: <b>{filetype.capitalize()}</b>. Será procesado en unos instantes...\nJob ID: {job.id}", 0)
     return jsonify(message="File saved successfully: will be processed as soon as possible"), 202
