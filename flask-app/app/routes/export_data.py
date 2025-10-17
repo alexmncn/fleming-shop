@@ -31,7 +31,7 @@ def export_articles():
         response.headers = {"Content-Disposition": "attachment; filename=articulos.pdf"}
     elif format == 'dbf':
         data_path = os.path.join(current_app.root_path, UPLOAD_ROUTE)
-        files = [f for f in os.listdir(data_path) if f.startswith("articulo") and f.endswith(".dbf")]
+        files = [f for f in os.listdir(data_path) if f.startswith("articles") and f.endswith(".dbf")]
 
         if not files:
             return abort(404, "Archivo de artículos no encontrado")
@@ -66,7 +66,7 @@ def export_families():
         response.headers = {"Content-Disposition": "attachment; filename=familias.pdf"}
     elif format == 'dbf':
         data_path = os.path.join(current_app.root_path, UPLOAD_ROUTE)
-        files = [f for f in os.listdir(data_path) if f.startswith("familias") and f.endswith(".dbf")]
+        files = [f for f in os.listdir(data_path) if f.startswith("families") and f.endswith(".dbf")]
 
         if not files:
             return abort(404, "Archivo de familias no encontrado")
