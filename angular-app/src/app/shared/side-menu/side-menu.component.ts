@@ -33,7 +33,6 @@ export class SideMenuComponent {
       if (this.drawerService.isOpen()) {
         this.drawerVisible.set(true);
       } else {
-        console.log("cerrar")
         setTimeout(() => this.drawerVisible.set(false), 250); // 250ms = duración animación salida
       }
     });
