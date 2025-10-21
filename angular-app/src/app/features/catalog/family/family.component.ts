@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { catchError, timeout } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { ArticlesService } from '../../../services/catalog/articles/articles.service';
+
+import { CatalogService } from '../../../services/catalog/catalog.service';
 
 import { ArticlesComponent } from "../../../shared/articles/articles.component";
 
@@ -25,7 +26,7 @@ export class FamilyComponent {
   loadingArticles: boolean = false;
   statusCode: number = -1;
 
-  constructor(private route: ActivatedRoute, private articlesService: ArticlesService) { }
+  constructor(private route: ActivatedRoute, private catalogService: CatalogService) { }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
@@ -39,7 +40,7 @@ export class FamilyComponent {
   }
 
   loadTotalFamilyArticles(): void {
-    this.articlesService.getTotalFamilyArticles(this.codfam).subscribe({
+    this.catalogService.getTotalFamilyArticles(this.codfam).subscribe({
       next: (res) => this.totalArticles = res.total,
       error: (err) => {
         this.statusCode = err.status || 500;
@@ -50,7 +51,7 @@ export class FamilyComponent {
 
   loadFamilyArticles(): void {
     this.loadingArticles = true;
-    this.articlesService.getFamilyArticles(this.codfam, this.articlesPage, this.perPage, this.articlesOrderBy, this.articlesDirection)
+    this.catalogService.getFamilyArticles(this.codfam, this.articlesPage, this.perPage, this.articlesOrderBy, this.articlesDirection)
       .pipe(
         timeout(10000),
         catchError(err => {

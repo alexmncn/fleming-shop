@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { catchError, timeout } from 'rxjs/operators';
 import { of } from 'rxjs';
 
-import { ArticlesService } from '../../../services/catalog/articles/articles.service';
-import { ArticlesStoreService } from '../../../services/catalog/articles/articles-store.service';
+import { CatalogService } from '../../../services/catalog/catalog.service';
+import { CatalogStoreService } from '../../../services/catalog/catalog-store.service';
 
 import { ArticlesComponent } from '../../../shared/articles/articles.component';
 import { FamiliesComponent } from "../../../shared/families/families.component";
@@ -16,16 +16,16 @@ import { FamiliesComponent } from "../../../shared/families/families.component";
     styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit {
-  perPage = this.articlesStore.perPage;
+  perPage = this.catalogStore.perPage;
 
   featuredHeaderTitle = 'Destacado';
-  featuredArticles = this.articlesStore.visibleFeaturedArticles;
-  totalFeaturedArticles = this.articlesStore.totalFeaturedArticles;
-  featuredPage = this.articlesStore.featuredPage;
-  featuredOrderBy = this.articlesStore.featuredOrderBy;
-  featuredDirection = this.articlesStore.featuredDirection;
-  loadingFeatured = this.articlesStore.loadingFeatured;
-  featuredStatusCode = this.articlesStore.featuredStatusCode;
+  featuredArticles = this.catalogStore.visibleFeaturedArticles;
+  totalFeaturedArticles = this.catalogStore.totalFeaturedArticles;
+  featuredPage = this.catalogStore.featuredPage;
+  featuredOrderBy = this.catalogStore.featuredOrderBy;
+  featuredDirection = this.catalogStore.featuredDirection;
+  loadingFeatured = this.catalogStore.loadingFeatured;
+  featuredStatusCode = this.catalogStore.featuredStatusCode;
 
   newHeaderTitle: string = 'Novedades';
   newArticles: any[] = [];
@@ -36,16 +36,16 @@ export class HomeComponent implements OnInit {
   loadingNewArticles: boolean = false;
   newStatusCode: number = 0;
 
-  constructor(private articlesService: ArticlesService, private articlesStore: ArticlesStoreService) { }
+  constructor(private catalogService: CatalogService, private catalogStore: CatalogStoreService) { }
 
   ngOnInit(): void {
     // Si no hay artículos, carga todo
-    if (this.articlesStore.featuredArticles().length === 0) {
-      this.articlesStore.loadTotalFeaturedArticles();
-      this.articlesStore.loadFeaturedArticles(true); // reset cache + visiblePages
+    if (this.catalogStore.featuredArticles().length === 0) {
+      this.catalogStore.loadTotalFeaturedArticles();
+      this.catalogStore.loadFeaturedArticles(true); // reset cache + visiblePages
     } else {
       // Solo reset de ventana visible
-      this.articlesStore.visiblePages.set(1);
+      this.catalogStore.visiblePages.set(1);
     }
 
     this.loadTotalNewArticles();
@@ -54,19 +54,19 @@ export class HomeComponent implements OnInit {
 
 
   onLoadMoreFeatured() {
-    this.articlesStore.loadFeaturedArticles(false);
+    this.catalogStore.loadFeaturedArticles(false);
   }
 
 
   onSortChangeFeaturedArticles(orderBy: string, direction: string): void {
     this.featuredOrderBy.set(orderBy);
     this.featuredDirection.set(direction);
-    this.articlesStore.forceReloadFeatured();
+    this.catalogStore.forceReloadFeatured();
   }
   
 
   loadTotalNewArticles(): void {
-    this.articlesService.getTotalNewArticles().subscribe({
+    this.catalogService.getTotalNewArticles().subscribe({
       next: (res) => this.totalNewArticles = res.total,
       error: (err) => {
         this.newStatusCode = err.status || 500;
@@ -77,7 +77,7 @@ export class HomeComponent implements OnInit {
 
   loadNewArticles(): void {
     this.loadingNewArticles = true;
-    this.articlesService.getNewArticles(this.newArticlesPage, this.perPage(), this.newArticlesOrderBy, this.newArticlesDirection)
+    this.catalogService.getNewArticles(this.newArticlesPage, this.perPage(), this.newArticlesOrderBy, this.newArticlesDirection)
       .pipe(
         timeout(10000),
         catchError(err => {

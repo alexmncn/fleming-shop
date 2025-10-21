@@ -1,12 +1,12 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { ArticlesService } from './articles.service';
-import { Article } from '../../../models/article.model';
+import { CatalogService } from './catalog.service';
+import { Article } from '../../models/article.model';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ArticlesStoreService {
+export class CatalogStoreService {
   // ====== STATE SIGNALS ======
   perPage = signal(20)
 
@@ -38,7 +38,7 @@ export class ArticlesStoreService {
   // si según el total declarado quedan más por pedir al backend
   hasMoreRemote = computed(() => this.featuredArticles().length < this.totalFeaturedArticles());
 
-  constructor(private api: ArticlesService) {}
+  constructor(private api: CatalogService) {}
 
   // carga total (si tu endpoint lo usa)
   async loadTotalFeaturedArticles() {

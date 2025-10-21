@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../environments/environment';
 import { catchError, of, timeout, throwError } from 'rxjs';
-import { Article } from '../../../models/article.model';
+import { Article } from '../../models/article.model';
 
 @Injectable({ providedIn: 'root' })
-export class ArticlesService {
+export class CatalogService {
   private baseUrl = environment.apiUrl;
   private totalArticlesUrl: string = environment.apiUrl + '/articles/total';
   private featuredArticlesUrl: string = this.baseUrl + '/articles/featured';
