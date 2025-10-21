@@ -9,14 +9,14 @@
         </div>
     </header>
     <section *ngIf="!noFamilies && !serverError" class="scroller" [class.unfold]="familiesUnfold" (wheel)="onFamilyScroll($event)">
-        <ng-container *ngIf="!loading; else loadingTemplate">
-            <div class="family" *ngFor="let family of families" (click)="showFamily(family.nomfam, family.codfam)">
+        <ng-container *ngIf="!loading(); else loadingTemplate">
+            <div class="family" *ngFor="let family of families()" (click)="showFamily(family.nomfam, family.codfam)">
                 <p>{{ family.nomfam | capitalize }}</p>
             </div>
         </ng-container>
     
         <ng-template pTemplate="loader" #loadingTemplate>
-            <div class="family" *ngFor="let placeholder of placeholders">
+            <div class="family" *ngFor="let placeholder of placeholders()">
                 <div class="placeholder-text">
                     <p-skeleton height="100%" styleClass="mb-2" borderRadius="4px"/>
                 </div>

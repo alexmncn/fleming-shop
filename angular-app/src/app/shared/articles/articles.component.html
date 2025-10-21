@@ -29,7 +29,7 @@
     
     <div *ngIf="!noArticles && !serverError">
         <section class="articles" [class.grid]="gridDisplay" [class.list]="listDisplay">
-            <app-article *ngFor="let article of (articles.length ? articles : placeholders)" [article]="article" [gridDisplay]="gridDisplay" [listDisplay]="listDisplay"></app-article>
+            <app-article *ngFor="let article of (articles.length ? articles : placeholders())" [article]="article" [gridDisplay]="gridDisplay" [listDisplay]="listDisplay"></app-article>
         </section>
 
         <div class="footer">

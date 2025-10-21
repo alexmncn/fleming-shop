@@ -1,14 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, effect, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Router, NavigationExtras } from '@angular/router';
 import { SkeletonModule } from 'primeng/skeleton';
 import { trigger, style, transition, animate, state } from '@angular/animations';
 
 import { CapitalizePipe } from '../../pipes/capitalize/capitalize-pipe';
 
-import { environment } from '../../../environments/environment';
-import { catchError, of, throwError, timeout } from 'rxjs';
+import { CatalogStoreService } from '../../services/catalog/catalog-store.service';
 
 @Component({
     selector: 'app-families',
@@ -49,49 +47,39 @@ import { catchError, of, throwError, timeout } from 'rxjs';
     ]
 })
 export class FamiliesComponent implements OnInit {
-  families: any[] = [];
-  placeholders: any[] = new Array(20).fill('');
-  loading: boolean = true;
-  familiesUnfold: boolean = false;
-  statusCode: number = -1;
+  perPage = this.catalogStore.families.perPage;
+  families = this.catalogStore.families.items;
+  total = this.catalogStore.families.total;
+  loading = this.catalogStore.families.loading;
+  statusCode = this.catalogStore.families.statusCode;
 
-  constructor(private http: HttpClient, private router: Router) { }
+  placeholders = signal<string[]>(new Array(this.perPage()).fill(''));
+  familiesUnfold: boolean = false;
+
+  constructor(private catalogStore: CatalogStoreService, private router: Router) {
+    effect(() => {
+      const total = this.total();
+      const perPage = this.perPage();
+
+      if (total > 0) {
+        const count = Math.min(total, perPage);
+        console.log('Updating placeholders to count:', count);
+        this.placeholders.set(new Array(count).fill(''));
+      }
+    });
+  }
 
   ngOnInit(): void {
-    this.loadFamilies();
+    // Si no hay artículos, carga todo
+    if (this.catalogStore.families.items().length === 0) {
+      this.catalogStore.families.loadTotal();
+      this.catalogStore.families.load(true);
+    } else {
+      // Solo reset de ventana visible
+      this.catalogStore.families.visiblePages.set(1);
+    }
   }
 
-  loadFamilies(): void {
-    this.http.get(environment.apiUrl + '/articles/families')
-      .pipe(
-        timeout(10000),
-        catchError(error => {
-          this.loading = false;
-          if (error.name === 'TimeoutError') {
-            console.error('Request timed out');
-            this.statusCode = 408;
-            return of([]);
-          }
-          const status = error.status || 500;
-          const message = error.message || 'An unknown error occurred';
-
-          return throwError(() => ({
-            status,
-            message
-          }));
-        })
-      )
-      .subscribe({
-        next:(response) => {
-          this.families = this.families.concat(response);
-          this.loading = false;  
-        },
-        error: (error) => {
-          this.loading = false;
-          this.statusCode = error.status;
-        },
-      });
-  }
   
   onFamilyScroll(event: WheelEvent): void {
     if (!this.familiesUnfold) {
@@ -120,11 +108,11 @@ export class FamiliesComponent implements OnInit {
   }
 
   get noFamilies(): boolean {
-    return this.statusCode == 404 && this.families.length == 0 && !this.loading;
+    return this.statusCode() == 404 && this.families.length == 0 && !this.loading;
   }
 
   get serverError(): boolean {
-    return (this.statusCode == 408 || this.statusCode.toString().startsWith('5')) && this.families.length == 0 && !this.loading;
+    return (this.statusCode() == 408 || this.statusCode.toString().startsWith('5')) && this.families.length == 0 && !this.loading;
   }
 
 }

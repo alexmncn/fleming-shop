@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, effect, EventEmitter, Input, Output, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -28,7 +28,7 @@ export class ArticlesComponent {
 
   gridDisplay: boolean = true;
   listDisplay: boolean = false;
-  placeholders: Article[] = new Array(this.perPage).fill('');
+  placeholders = signal<string[]>(new Array(this.perPage).fill(''));
 
   sortOptions = [
     { name: 'Nombre: A a Z', order_by: 'detalle', direction: 'asc' },
@@ -41,10 +41,19 @@ export class ArticlesComponent {
 
   selectedSort = this.sortOptions[0];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+    effect(() => {
+      const total = this.totalArticles;
+      const perPage = this.perPage;
+
+      if (total > 0) {
+        const count = Math.min(total, perPage);
+        this.placeholders.set(new Array(count).fill(''));
+      }
+    });
+  }
 
   ngOnInit(): void {
-
     this.checkRouteAndModifySortOptions();
   }
 
