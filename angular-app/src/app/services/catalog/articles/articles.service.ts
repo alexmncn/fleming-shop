@@ -16,6 +16,8 @@ export class ArticlesService {
   private searchUrl: string = environment.apiUrl + '/articles/search';
   private searchTotalUrl: string = this.searchUrl + '/total';
 
+  private timeoutDuration = 5000; // 5 seconds
+
   constructor(private http: HttpClient) {}
 
 
@@ -38,7 +40,7 @@ export class ArticlesService {
     const params = new HttpParams({ fromObject: rawParams });
 
     return this.http.get<Article[]>(this.featuredArticlesUrl, { params }).pipe(
-      timeout(10000),
+      timeout(this.timeoutDuration),
       catchError(error => {
         if (error.name === 'TimeoutError') {
           console.error('Request timed out');
@@ -67,7 +69,7 @@ export class ArticlesService {
     const params = new HttpParams({ fromObject: rawParams });
 
     return this.http.get<Article[]>(this.newArticlesUrl, { params }).pipe(
-      timeout(10000),
+      timeout(this.timeoutDuration),
       catchError(error => {
         if (error.name === 'TimeoutError') {
           console.error('Request timed out');
@@ -96,7 +98,7 @@ export class ArticlesService {
     const params = new HttpParams({ fromObject: rawParams });
 
     return this.http.get<Article[]>(this.familiesUrl + '/' + codfam, { params }).pipe(
-      timeout(10000),
+      timeout(this.timeoutDuration),
       catchError(error => {
         if (error.name === 'TimeoutError') {
           console.error('Request timed out');
@@ -138,7 +140,7 @@ export class ArticlesService {
     const params = new HttpParams({ fromObject: rawParams });
 
     return this.http.get<Article[]>(this.searchUrl, { params }).pipe(
-      timeout(10000),
+      timeout(this.timeoutDuration),
       catchError(error => {
         if (error.name === 'TimeoutError') {
           console.error('Request timed out');

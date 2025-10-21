@@ -4,6 +4,7 @@ import { catchError, timeout } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 import { ArticlesService } from '../../../services/catalog/articles/articles.service';
+import { ArticlesStoreService } from '../../../services/catalog/articles/articles-store.service';
 
 import { ArticlesComponent } from '../../../shared/articles/articles.component';
 import { FamiliesComponent } from "../../../shared/families/families.component";
@@ -15,16 +16,16 @@ import { FamiliesComponent } from "../../../shared/families/families.component";
     styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit {
-  perPage: number = 20;
+  perPage = this.articlesStore.perPage;
 
-  featuredArticles: any[] = [];
-  featuredHeaderTitle: string = 'Destacado';
-  featuredArticlesPage: number = 1;
-  featuredArticlesOrderBy: string = 'detalle';
-  featuredArticlesDirection: string = 'asc';
-  totalFeaturedArticles: number = 0;
-  loadingFeaturedArticles: boolean = false;
-  featuredStatusCode: number = 0;
+  featuredHeaderTitle = 'Destacado';
+  featuredArticles = this.articlesStore.visibleFeaturedArticles;
+  totalFeaturedArticles = this.articlesStore.totalFeaturedArticles;
+  featuredPage = this.articlesStore.featuredPage;
+  featuredOrderBy = this.articlesStore.featuredOrderBy;
+  featuredDirection = this.articlesStore.featuredDirection;
+  loadingFeatured = this.articlesStore.loadingFeatured;
+  featuredStatusCode = this.articlesStore.featuredStatusCode;
 
   newHeaderTitle: string = 'Novedades';
   newArticles: any[] = [];
@@ -35,57 +36,32 @@ export class HomeComponent implements OnInit {
   loadingNewArticles: boolean = false;
   newStatusCode: number = 0;
 
-  constructor(private articlesService: ArticlesService) { }
+  constructor(private articlesService: ArticlesService, private articlesStore: ArticlesStoreService) { }
 
   ngOnInit(): void {
-    this.loadTotalFeaturedArticles();
-    this.loadFeaturedArticles();
+    // Si no hay artículos, carga todo
+    if (this.articlesStore.featuredArticles().length === 0) {
+      this.articlesStore.loadTotalFeaturedArticles();
+      this.articlesStore.loadFeaturedArticles(true); // reset cache + visiblePages
+    } else {
+      // Solo reset de ventana visible
+      this.articlesStore.visiblePages.set(1);
+    }
 
-    this.loadTotalNewArticles()
-    this.loadNewArticles()
+    this.loadTotalNewArticles();
+    this.loadNewArticles();
   }
 
 
-  loadTotalFeaturedArticles(): void {
-    this.articlesService.getTotalFeaturedArticles().subscribe({
-      next: (res) => this.totalFeaturedArticles = res.total,
-      error: (err) => {
-        this.featuredStatusCode = err.status || 500;
-        console.error('Error fetching total:', err);
-      }
-    });
+  onLoadMoreFeatured() {
+    this.articlesStore.loadFeaturedArticles(false);
   }
 
-  loadFeaturedArticles(): void {
-    this.loadingFeaturedArticles = true;
-    this.articlesService.getFeaturedArticles(this.featuredArticlesPage, this.perPage, this.featuredArticlesOrderBy, this.featuredArticlesDirection)
-      .pipe(
-        timeout(10000),
-        catchError(err => {
-          this.loadingFeaturedArticles = false;
-          this.featuredStatusCode = err.status || 500;
-          return of([]);
-        })
-      )
-      .subscribe({
-        next: (articles) => {
-          this.featuredArticles = [...this.featuredArticles, ...articles];
-          this.featuredArticlesPage++;
-          this.loadingFeaturedArticles = false;
-        },
-        error: (err) => {
-          this.loadingFeaturedArticles = false;
-          this.featuredStatusCode = err.status;
-        }
-      });
-  }
 
   onSortChangeFeaturedArticles(orderBy: string, direction: string): void {
-    this.featuredArticlesOrderBy = orderBy;
-    this.featuredArticlesDirection = direction;
-    this.featuredArticlesPage = 1;
-    this.featuredArticles = [];
-    this.loadFeaturedArticles();
+    this.featuredOrderBy.set(orderBy);
+    this.featuredDirection.set(direction);
+    this.articlesStore.forceReloadFeatured();
   }
   
 
@@ -101,7 +77,7 @@ export class HomeComponent implements OnInit {
 
   loadNewArticles(): void {
     this.loadingNewArticles = true;
-    this.articlesService.getNewArticles(this.newArticlesPage, this.perPage, this.newArticlesOrderBy, this.newArticlesDirection)
+    this.articlesService.getNewArticles(this.newArticlesPage, this.perPage(), this.newArticlesOrderBy, this.newArticlesDirection)
       .pipe(
         timeout(10000),
         catchError(err => {

@@ -16,7 +16,8 @@ import { Article } from '../../models/article.model';
 export class ArticlesComponent {
   @Output() loadArticles = new EventEmitter();
   @Output() sortChanged = new EventEmitter<{ order_by: string, direction: string }>();
-  @Input() articles: any[]= [];
+
+  @Input() articles: any[] = [];
   @Input() headerTitle: string = '';
   @Input() totalArticles: number = 0;
   @Input() perPage: number = 20;
@@ -24,6 +25,7 @@ export class ArticlesComponent {
   @Input() statusCode: number = -1;
   @Input() defOrderBy: string = '';
   @Input() defDirection: string = '';
+
   gridDisplay: boolean = true;
   listDisplay: boolean = false;
   placeholders: Article[] = new Array(this.perPage).fill('');
@@ -65,7 +67,7 @@ export class ArticlesComponent {
     }
   }
 
-  onSortChange(clear: boolean): void {
+  onSortChange(): void {
     this.sortChanged.emit({
       order_by: this.selectedSort.order_by,
       direction: this.selectedSort.direction
