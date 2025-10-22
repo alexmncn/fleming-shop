@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { CatalogService } from './catalog.service';
 import { Article } from '../../models/article.model';
-import { Family } from '../../models/family.model';
 
 import { PaginatedListStore } from './paginated-list-store.catalog';
 import { FamilyArticlesStore } from './family-articles-store.catalog';
