@@ -1,9 +1,11 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { CatalogService } from './catalog.service';
 import { Article } from '../../models/article.model';
 import { Family } from '../../models/family.model';
 
 import { PaginatedListStore } from './paginated-list-store.catalog';
+import { FamilyArticlesStore } from './family-articles-store.catalog';
+import { FamilyStore } from './family-store.catalog';
 
 @Injectable({
   providedIn: 'root'
@@ -23,8 +25,7 @@ export class CatalogStoreService {
     () => this.api.getTotalNewArticles()
   );
 
-  families = new PaginatedListStore<Family>(
-    () => this.api.getFamilies(),
-    () => this.api.getTotalFamilies()
-  );
+  families = inject(FamilyStore);
+
+  familyArticles = inject(FamilyArticlesStore);
 }

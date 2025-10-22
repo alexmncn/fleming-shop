@@ -47,35 +47,20 @@ import { CatalogStoreService } from '../../services/catalog/catalog-store.servic
     ]
 })
 export class FamiliesComponent implements OnInit {
-  perPage = this.catalogStore.families.perPage;
-  families = this.catalogStore.families.items;
+  families = this.catalogStore.families.families;
   total = this.catalogStore.families.total;
   loading = this.catalogStore.families.loading;
   statusCode = this.catalogStore.families.statusCode;
 
-  placeholders = signal<string[]>(new Array(this.perPage()).fill(''));
+  placeholders = signal<string[]>(new Array(20).fill(''));
   familiesUnfold: boolean = false;
 
-  constructor(private catalogStore: CatalogStoreService, private router: Router) {
-    effect(() => {
-      const total = this.total();
-      const perPage = this.perPage();
-
-      if (total > 0) {
-        const count = Math.min(total, perPage);
-        this.placeholders.set(new Array(count).fill(''));
-      }
-    });
-  }
+  constructor(private catalogStore: CatalogStoreService, private router: Router) {}
 
   ngOnInit(): void {
-    // Si no hay artículos, carga todo
-    if (this.catalogStore.families.items().length === 0) {
+    if (this.catalogStore.families.families().length === 0) {
       this.catalogStore.families.loadTotal();
-      this.catalogStore.families.load(true);
-    } else {
-      // Solo reset de ventana visible
-      this.catalogStore.families.visiblePages.set(1);
+      this.catalogStore.families.load();
     }
   }
 
