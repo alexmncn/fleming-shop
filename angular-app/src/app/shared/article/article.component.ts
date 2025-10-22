@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, signal, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -60,54 +60,55 @@ export class ArticleComponent implements OnInit {
   @Input() article!: Article;
   @Input() gridDisplay: boolean = false;
   @Input() listDisplay: boolean = false;
-  loading: boolean = true;
-  imgError: boolean = false;
-  imgUrl: string = '';
-  articleSelected: boolean = false;
-  isAuth: boolean = false;
-  adminMenuActive: boolean = false;
+
   featureURL: string = environment.apiUrl + '/articles/feature';
-  isFeatured: boolean = false;
   hideURL: string = environment.apiUrl + '/articles/hide';
-  isHidden: boolean = false;
   uploadImageURL: string = environment.apiUrl + '/images/articles/upload';
-  uploadImageMenuActive: boolean = false;
-  selectedFile: File | null = null;
-  uploadingImage: boolean = false;
-  uploadImagePreview: string | ArrayBuffer | null = null;
-  isUploadingImageMain: boolean = false;
+
+  loading = signal(true);
+  imgError = signal(false);
+  imgUrl = signal('');
+  articleSelected = signal(false);
+  isAuth = signal(false);
+  adminMenuActive = signal(false);
+  isFeatured = signal(false);
+  isHidden = signal(false);
+  uploadImageMenuActive = signal(false);
+  selectedFile = signal<File | null>(null);
+  uploadingImage = signal(false);
+  uploadImagePreview = signal<string | ArrayBuffer | null>(null);
+  isUploadingImageMain = signal(false);
 
   constructor(private http: HttpClient, private messageService: MessageService, private authService: AuthService, private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
     this.authService.isAuthenticated$.subscribe((auth: boolean) => {
-      this.isAuth = auth;
+      this.isAuth.set(auth);
     });
-
-    this.imgUrl = this.article.image_url;
   }
 
   ngOnChanges(): void {
-    this.loading = !this.article.detalle;
-    this.imgError = false;
-    this.isFeatured = this.article.destacado;
-    this.isHidden = this.article.hidden;
+    this.imgUrl.set(this.article.image_url);
+    this.loading.set(!this.article.detalle);
+    this.imgError.set(false);
+    this.isFeatured.set(this.article.destacado);
+    this.isHidden.set(this.article.hidden);
   }
 
   toggleSelection(): void {
-    if (this.articleSelected) {
-      this.articleSelected = false;
-      this.adminMenuActive = false;
-      this.uploadImageMenuActive = false;
+    if (this.articleSelected()) {
+      this.articleSelected.set(false);
+      this.adminMenuActive.set(false);
+      this.uploadImageMenuActive.set(false);
     } else {
-      if (!this.loading) {
-        this.articleSelected = true;
+      if (!this.loading()) {
+        this.articleSelected.set(true);
       }
     }
   }
 
   toggleAdminMenu(): void {
-    this.adminMenuActive = !this.adminMenuActive;
+    this.adminMenuActive.set(!this.adminMenuActive);
   }
 
   toggleFeatureArticle(event: Event): void {
@@ -116,27 +117,27 @@ export class ArticleComponent implements OnInit {
     const checkbox = event.target as HTMLInputElement;
 
     var confirmed = false;
-    if (!this.isFeatured) {
+    if (!this.isFeatured()) {
       confirmed = confirm('Seguro que quieres destacar el articulo?');
     } else {
       confirmed = confirm('Seguro que quieres eliminar de destacados el articulo?');
     }
     if (confirmed) {
-      this.featureArticle(!this.isFeatured)
+      this.featureArticle(!this.isFeatured())
         .subscribe({
           next: (response) => {
             this.article.destacado = !this.article.destacado;
-            this.isFeatured = this.article.destacado;
-            checkbox.checked = this.isFeatured;
+            this.isFeatured.set(this.article.destacado);
+            checkbox.checked = this.isFeatured();
 
             var s_message = '';
-            if (this.isFeatured) {
+            if (this.isFeatured()) {
               s_message = 'El articulo se ha destacado correctamente';
             } else {
               s_message = 'El articulo se ha eliminado de destacados correctamente';
             }
             this.messageService.showMessage('success', s_message)
-            this.articleSelected = false;
+            this.articleSelected.set(false);
           },
           error: (error) => {
             console.log(error)
@@ -158,27 +159,27 @@ export class ArticleComponent implements OnInit {
     const checkbox = event.target as HTMLInputElement;
 
     var confirmed = false;
-    if (!this.isHidden) {
+    if (!this.isHidden()) {
       confirmed = confirm('Seguro que quieres ocultar el articulo?');
     } else {
       confirmed = confirm('Seguro que quieres eliminar de ocultos el articulo?');
     }
     if (confirmed) {
-      this.hideArticle(!this.isHidden)
+      this.hideArticle(!this.isHidden())
         .subscribe({
           next: (response) => {
             this.article.hidden = !this.article.hidden;
-            this.isHidden = this.article.hidden;
-            checkbox.checked = this.isHidden;
+            this.isHidden.set(this.article.hidden);
+            checkbox.checked = this.isHidden();
 
             var s_message = '';
-            if (this.isHidden) {
+            if (this.isHidden()) {
               s_message = 'El articulo se ha ocultado correctamente';
             } else {
               s_message = 'El articulo se ha eliminado de ocultos correctamente';
             }
             this.messageService.showMessage('success', s_message)
-            this.articleSelected = false;
+            this.articleSelected.set(false);
           },
           error: (error) => {
             console.log(error)
@@ -195,8 +196,8 @@ export class ArticleComponent implements OnInit {
   }
 
   toggleImageUploadMenu(): void {
-    this.uploadImageMenuActive = !this.uploadImageMenuActive;
-    if (this.selectedFile) {
+    this.uploadImageMenuActive.set(!this.uploadImageMenuActive());
+    if (this.selectedFile()) {
       this.cleanFileSelected();
     }
   }
@@ -204,47 +205,47 @@ export class ArticleComponent implements OnInit {
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
-      this.selectedFile = input.files[0];
+      this.selectedFile.set(input.files[0]);
     
       const reader = new FileReader();
       reader.onload = () => {
-        this.uploadImagePreview = reader.result;
+        this.uploadImagePreview.set(reader.result);
       };
-      reader.readAsDataURL(this.selectedFile);
+      reader.readAsDataURL(this.selectedFile()!!);
     }
   }
 
   cleanFileSelected(): void {
-    this.selectedFile = null;
-    this.uploadImagePreview = null;
+    this.selectedFile.set(null);
+    this.uploadImagePreview.set(null);
   }
 
   toggleMainImage(event: Event): void {
     const checkbox = event.target as HTMLInputElement;
-    this.isUploadingImageMain = checkbox.checked;
+    this.isUploadingImageMain.set(checkbox.checked);
   }
 
   uploadImage(): void {
-    if (this.selectedFile) {
-      this.uploadingImage = true;
+    if (this.selectedFile()) {
+      this.uploadingImage.set(true);
 
       const formData = new FormData();
-      formData.append('file', this.selectedFile, this.selectedFile.name);
+      formData.append('file', this.selectedFile()!!, this.selectedFile.name);
       formData.append('codebar', this.article.codebar);
-      formData.append('is_main', this.isUploadingImageMain ? '1' : '0');
+      formData.append('is_main', this.isUploadingImageMain() ? '1' : '0');
 
       this.http.post<{ image_url: string }>(this.uploadImageURL, formData)
         .subscribe({
           next: (response) => {
-            this.imgUrl = response.image_url;
+            this.imgUrl.set(response.image_url);
             console.log('Imagen subida correctamente:', response);
-            this.uploadingImage = false;
+            this.uploadingImage.set(false);
             this.messageService.showMessage('success', 'La imagen se ha añadido correctamente')
             this.toggleSelection()
           },
           error: (error) => {
             console.log(error)
-            this.uploadingImage = false;
+            this.uploadingImage.set(false);
             this.messageService.showMessage('error', 'Ha ocurrido un error al subir la imagen')
           }
         });

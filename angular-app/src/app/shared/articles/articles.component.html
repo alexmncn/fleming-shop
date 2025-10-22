@@ -1,8 +1,8 @@
 <main>
     <div class="header">
-        <h2 *ngIf="headerTitle">{{ headerTitle }}</h2>
+        @if (headerTitle) { <h2>{{ headerTitle }}</h2> }
         
-        <div *ngIf="!noArticles && !serverError">
+        @if (!noArticles && !serverError) {
             <div class="toolbar">
                 <div class="info">
                     <h4>{{ totalArticles }} artículos</h4>
@@ -24,12 +24,14 @@
                     </div>
                 </div>
             </div>
-        </div>
+        }   
     </div>
     
-    <div *ngIf="!noArticles && !serverError">
+    @if (!noArticles && !serverError) {
         <section class="articles" [class.grid]="gridDisplay" [class.list]="listDisplay">
-            <app-article *ngFor="let article of (articles.length ? articles : placeholders())" [article]="article" [gridDisplay]="gridDisplay" [listDisplay]="listDisplay"></app-article>
+            @for (article of (articles.length ? articles : placeholders()); track $index) {
+                <app-article [article]="article" [gridDisplay]="gridDisplay" [listDisplay]="listDisplay"></app-article>
+            }
         </section>
 
         <div class="footer">
@@ -48,15 +50,19 @@
                 </ng-template>
             </button>
         </div>
-    </div>
+    }
 
-    <div *ngIf="noArticles" class="no-articles-info">
-        <span class="material-symbols-outlined">search_off</span>
-        <p>No se han encontrado artículos</p>
-    </div>
+    @if (noArticles) {
+        <div class="no-articles-info">
+            <span class="material-symbols-outlined">search_off</span>
+            <p>No se han encontrado artículos</p>
+        </div>
+    }
 
-    <div *ngIf="serverError" class="no-articles-info">
-        <span class="material-symbols-outlined">warning</span>
-        <p>Se ha producido un error</p>
-    </div>
+    @if (serverError) {
+        <div class="no-articles-info">
+            <span class="material-symbols-outlined">warning</span>
+            <p>Se ha producido un error</p>
+        </div>
+    }
 </main>
