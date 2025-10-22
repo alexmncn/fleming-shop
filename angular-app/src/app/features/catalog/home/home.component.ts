@@ -46,6 +46,8 @@ export class HomeComponent implements OnInit {
     }
 
     if (this.catalogStore.newArticles.items().length === 0) {
+      this.newOrderBy.set('date'); // Inicializa orden a reciente
+      this.newDirection.set('desc');
       this.catalogStore.newArticles.loadTotal();
       this.catalogStore.newArticles.load(true);
     } else {
