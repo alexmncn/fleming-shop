@@ -7,6 +7,7 @@ import { trigger, style, transition, animate, state } from '@angular/animations'
 import { CapitalizePipe } from '../../pipes/capitalize/capitalize-pipe';
 
 import { CatalogStoreService } from '../../services/catalog/catalog-store.service';
+import { Family } from '../../models/family.model';
 
 @Component({
     selector: 'app-families',
@@ -72,7 +73,6 @@ export class FamiliesComponent implements OnInit {
         event.preventDefault();
         const scrollAmount = event.deltaY * 2;
         scrollContainer.scrollLeft += scrollAmount;
-        
       }
     }
   }
@@ -81,14 +81,9 @@ export class FamiliesComponent implements OnInit {
     this.familiesUnfold = !this.familiesUnfold;
   }
 
-  showFamily(nomfam: string, codfam: number): void {
-    if (this.router.url !== '/catalog/family') {
-      const navigationExtras: NavigationExtras = {
-        queryParams: {'nomfam': nomfam, 'codfam': codfam }
-      };
-
-      this.router.navigate(['/catalog/family'], navigationExtras);;
-    }
+  navigateToFamily(family: Family): void {
+    const slug = family.nomfam.toLowerCase().replace(/\s+/g, '-');
+    this.router.navigate(['/catalog/family', `${family.codfam}-${slug}`]);
   }
 
   get noFamilies(): boolean {

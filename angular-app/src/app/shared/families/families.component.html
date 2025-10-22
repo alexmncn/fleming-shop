@@ -10,7 +10,7 @@
     </header>
     <section *ngIf="!noFamilies && !serverError" class="scroller" [class.unfold]="familiesUnfold" (wheel)="onFamilyScroll($event)">
         <ng-container *ngIf="!loading(); else loadingTemplate">
-            <div class="family" *ngFor="let family of families()" (click)="showFamily(family.nomfam, family.codfam)">
+            <div class="family" *ngFor="let family of families()" (click)="navigateToFamily(family)">
                 <p>{{ family.nomfam | capitalize }}</p>
             </div>
         </ng-container>

@@ -31,19 +31,25 @@ export class FamilyComponent {
   constructor(private route: ActivatedRoute, private router: Router, private catalogStore: CatalogStoreService, private messageService: MessageService) { }
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(async (params) => {
-      this.nomfam = params['nomfam'];
-      this.codfam = +params['codfam'];
-
-      // Valida que la familia exista
-      const validFamily = this.catalogStore.families.families()
-        .find(f => f.codfam === this.codfam && f.nomfam === this.nomfam);
-
-      if (!validFamily) {
-        this.messageService.showMessage('error', 'La familia solicitada no existe.');
+    this.route.paramMap.subscribe(async params => {
+      const param = params.get('codfamSlug') || '';
+      this.codfam = +param.split('-')[0];
+      if (!this.codfam) {
         this.router.navigate(['/catalog']);
         return;
       }
+
+      const families = this.catalogStore.families.families();
+      const family = families.find((f) => f.codfam === this.codfam);
+
+      if (!family) {
+        // Si no existe, redirige
+        this.messageService.showMessage('error', 'La familia solicitada no existe');
+        this.router.navigate(['/catalog']);
+        return;
+      }
+
+      this.nomfam = family.nomfam;
 
       // Obtiene el store asociado a esta familia
       this.store = this.catalogStore.familyArticles.getStore(this.codfam);
