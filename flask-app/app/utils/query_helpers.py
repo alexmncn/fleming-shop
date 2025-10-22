@@ -36,14 +36,17 @@ def apply_articles_ordering(query, order_by, direction):
         'date': Article.date_created
     }
 
-    if order_by and order_by.lower() in valid_fields:
-        column = valid_fields[order_by.lower()]
-        if direction.lower() == 'desc':
-            return query.order_by(desc(column))
-        else:
-            return query.order_by(asc(column))
-    return query 
+    if not order_by or order_by.lower() not in valid_fields:
+        return query
 
+    column = valid_fields[order_by.lower()]
+    direction_func = desc if direction.lower() == 'desc' else asc
+
+    # Caso especial: si ordenamos por fecha, añadimos 'detalle' como secundario
+    if order_by.lower() == 'date':
+        return query.order_by(direction_func(column), asc(Article.detalle))
+
+    return query.order_by(direction_func(column))
 
 def get_raw_sql_articles_ordering(order_by, direction):
     valid_fields = {
