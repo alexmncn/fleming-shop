@@ -36,10 +36,7 @@ export class SearchComponent {
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       this.searchParam = params['q'] || '';
-      console.log('1')
-      console.log(this.searchParam)
       if (this.searchParam) {
-        console.log('2')
         this.onSearch(this.searchParam);
       }
     });
