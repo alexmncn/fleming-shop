@@ -108,7 +108,7 @@ export class ArticleComponent implements OnInit {
   }
 
   toggleAdminMenu(): void {
-    this.adminMenuActive.set(!this.adminMenuActive);
+    this.adminMenuActive.set(!this.adminMenuActive());
   }
 
   toggleFeatureArticle(event: Event): void {
