@@ -63,7 +63,6 @@ export class FamiliesComponent implements OnInit {
 
       if (total > 0) {
         const count = Math.min(total, perPage);
-        console.log('Updating placeholders to count:', count);
         this.placeholders.set(new Array(count).fill(''));
       }
     });
