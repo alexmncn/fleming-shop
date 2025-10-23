@@ -1,35 +1,49 @@
 <section class="families">
     <header>
         <h4>Familias</h4>
-        <div *ngIf="!noFamilies && !serverError" class="un-fold" (click)="toggleFamiliesDisplay()">
-            <p *ngIf="!this.familiesUnfold">Desplegar</p>
-            <p *ngIf="this.familiesUnfold">Ocultar</p>
-            <span @arrowRotateLeft *ngIf="!this.familiesUnfold" class="pi pi-angle-down"></span>
-            <span @arrowRotateRight *ngIf="this.familiesUnfold" class="pi pi-angle-up"></span>
-        </div>
+        @if (!noFamilies && !serverError) {
+            <div class="un-fold" (click)="toggleFamiliesDisplay()">
+                @if (!familiesUnfold) {
+                    <p>Desplegar</p>
+                    <span @arrowRotateLeft class="pi pi-angle-down"></span>
+                } @else {
+                    <p>Ocultar</p>
+                    <span @arrowRotateRight class="pi pi-angle-up"></span>
+                }
+            </div>
+        }
     </header>
-    <section *ngIf="!noFamilies && !serverError" class="scroller" [class.unfold]="familiesUnfold" (wheel)="onFamilyScroll($event)">
-        <ng-container *ngIf="!loading(); else loadingTemplate">
-            <div class="family" *ngFor="let family of families()" (click)="navigateToFamily(family)">
-                <p>{{ family.nomfam | capitalize }}</p>
-            </div>
-        </ng-container>
-    
-        <ng-template pTemplate="loader" #loadingTemplate>
-            <div class="family" *ngFor="let placeholder of placeholders()">
-                <div class="placeholder-text">
-                    <p-skeleton height="100%" styleClass="mb-2" borderRadius="4px"/>
-                </div>
-            </div>
-        </ng-template>
-    </section>
-    <div *ngIf="noFamilies" class="no-families-info">
-        <span class="material-symbols-outlined">search_off</span>
-        <p>No se han encontrado artículos</p>
-    </div>
+    @if (!noFamilies && !serverError) {
+        <section class="scroller" [class.unfold]="familiesUnfold" (wheel)="onFamilyScroll($event)">
+                @if (!loading()) {
+                    @for (family of families(); track $index) {
+                        <div class="family" (click)="navigateToFamily(family)">
+                            <p>{{ family.nomfam | capitalize }}</p>
+                        </div>
+                    }
+                } @else {
+                    @for (placeholder of placeholders(); track $index) {
+                        <div class="family">
+                            <div class="placeholder-text">
+                                <p-skeleton height="100%" styleClass="mb-2" borderRadius="4px"/>
+                            </div>
+                        </div>
+                    }
+                }
+        </section>
+    }
 
-    <div *ngIf="serverError" class="no-families-info">
-        <span class="material-symbols-outlined">warning</span>
-        <p>Se ha producido un error</p>
-    </div>
+    @if (noFamilies) {
+        <div class="no-families-info">
+            <span class="material-symbols-outlined">search_off</span>
+            <p>No se han encontrado artículos</p>
+        </div>
+    }
+
+    @if (serverError) {
+        <div class="no-families-info">
+            <span class="material-symbols-outlined">warning</span>
+            <p>Se ha producido un error</p>
+        </div>
+    }
 </section>

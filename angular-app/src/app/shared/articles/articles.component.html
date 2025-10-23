@@ -40,15 +40,15 @@
                 <progress [max]="totalArticles" [value]="articles.length"></progress>
             </div>
         
-            <button *ngIf="!allArticlesLoaded || totalArticles == 0" (click)="load()" [disabled]="loadingArticles">
-                <ng-container *ngIf="!loadingArticles; else loadingTemplate">
-                Mostrar más
-                </ng-container>
-            
-                <ng-template #loadingTemplate>
-                <i class="pi pi-spin pi-spinner"></i>
-                </ng-template>
-            </button>
+            @if (!allArticlesLoaded || totalArticles == 0) {
+                <button (click)="load()" [disabled]="loadingArticles">
+                    @if (!loadingArticles) {
+                        Mostrar más
+                    } @else {
+                        <i class="pi pi-spin pi-spinner"></i>
+                    }
+                </button>
+            }
         </div>
     }
 
