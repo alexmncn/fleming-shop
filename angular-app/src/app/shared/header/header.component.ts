@@ -4,7 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
 
 import { AuthService } from '../../services/auth/auth.service';
-import { DrawerService } from '../../services/drawer/drawer.service';
+import { SideMenuService } from '../../services/side-menu/side-menu.service';
 
 @Component({
     selector: 'app-header',
@@ -17,7 +17,7 @@ export class HeaderComponent implements OnInit {
   isAuth: boolean = false;
   username: string | null = '';
 
-  constructor(private router: Router, private authService: AuthService, public drawerService: DrawerService) {}
+  constructor(private router: Router, private authService: AuthService, public sideMenuService: SideMenuService) {}
 
   ngOnInit(): void {
     this.authService.isAuthenticated$.subscribe((auth: boolean) => {
@@ -37,7 +37,7 @@ export class HeaderComponent implements OnInit {
 
   toggleSideMenu(e: Event) {
     e.stopPropagation()
-    this.drawerService.toggle();
+    this.sideMenuService.toggle();
   }
 
   get atCatalog(): boolean {

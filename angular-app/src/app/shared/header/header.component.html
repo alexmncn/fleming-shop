@@ -4,7 +4,7 @@
         
         @if (isAuth) {
             <section class="admin-menu">
-                @if (this.drawerService.isDrawer) {
+                @if (this.sideMenuService.isDrawer()) {
                     <div class="drawer-button" (click)="toggleSideMenu($event)">
                         <mat-icon class="material-symbols-outlined">menu</mat-icon>
                     </div>
