@@ -1,6 +1,6 @@
-import { Component, effect, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, NavigationExtras } from '@angular/router';
+import { Router } from '@angular/router';
 import { SkeletonModule } from 'primeng/skeleton';
 import { trigger, style, transition, animate, state } from '@angular/animations';
 
@@ -87,11 +87,11 @@ export class FamiliesComponent implements OnInit {
   }
 
   get noFamilies(): boolean {
-    return this.statusCode() == 404 && this.families.length == 0 && !this.loading;
+    return this.statusCode() == 404 && this.families.length == 0 && !this.loading();
   }
 
   get serverError(): boolean {
-    return (this.statusCode() == 408 || this.statusCode.toString().startsWith('5')) && this.families.length == 0 && !this.loading;
+    return (this.statusCode() == 408 || this.statusCode().toString().startsWith('5')) && this.families.length == 0 && !this.loading();
   }
 
 }
