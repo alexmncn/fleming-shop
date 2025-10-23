@@ -11,7 +11,7 @@ from sqlalchemy.dialects.mysql import TINYINT
 
 from .extensions import db
 
-from config import URL_SCHEME
+from .config import URL_SCHEME
 
 
 class Article(db.Model):
@@ -44,13 +44,13 @@ class Article(db.Model):
     def image_url(self):
         img = ArticleImage.query.filter_by(article_codebar=self.codebar, is_main=True).first()
         if img:
-            return url_for('images.get_article_image', image_id=img.id, _external=True, _scheme="URL_SCHEME")
+            return url_for('images.get_article_image', image_id=img.id, _external=True, _scheme=URL_SCHEME)
         return None
 
     @property
     def image_urls(self):
         return [
-            url_for('images.get_article_image', image_id=img.id, _external=True, _scheme="URL_SCHEME")
+            url_for('images.get_article_image', image_id=img.id, _external=True, _scheme=URL_SCHEME)
             for img in ArticleImage.query.filter_by(article_codebar=self.codebar).all()
         ]
     
@@ -144,7 +144,7 @@ class ArticleImage(db.Model):
     
     @property
     def url(self):
-        return url_for('images.get_article_image', image_id=self.id, _external=True, _scheme="URL_SCHEME")
+        return url_for('images.get_article_image', image_id=self.id, _external=True, _scheme=URL_SCHEME)
     
     def to_dict(self):
         return {
