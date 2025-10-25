@@ -37,7 +37,7 @@ def get_record_id(domain):
         return data['result'][0]['id'], data['result'][0]['content'] 
     else:
         errors.append(f"Error obteniendo el ID del registro para {domain['name']}: {data['errors']}.")
-        return None
+        return None, None
 
 
 def update_dns_record(record_id, domain, server_ip):
