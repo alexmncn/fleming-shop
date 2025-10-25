@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, effect, EventEmitter, Input, Output, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -16,7 +16,8 @@ import { Article } from '../../models/article.model';
 export class ArticlesComponent {
   @Output() loadArticles = new EventEmitter();
   @Output() sortChanged = new EventEmitter<{ order_by: string, direction: string }>();
-  @Input() articles: any[]= [];
+
+  @Input() articles: any[] = [];
   @Input() headerTitle: string = '';
   @Input() totalArticles: number = 0;
   @Input() perPage: number = 20;
@@ -24,9 +25,10 @@ export class ArticlesComponent {
   @Input() statusCode: number = -1;
   @Input() defOrderBy: string = '';
   @Input() defDirection: string = '';
+
   gridDisplay: boolean = true;
   listDisplay: boolean = false;
-  placeholders: Article[] = new Array(this.perPage).fill('');
+  placeholders = signal<string[]>(new Array(this.perPage).fill(''));
 
   sortOptions = [
     { name: 'Nombre: A a Z', order_by: 'detalle', direction: 'asc' },
@@ -39,10 +41,19 @@ export class ArticlesComponent {
 
   selectedSort = this.sortOptions[0];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+    effect(() => {
+      const total = this.totalArticles;
+      const perPage = this.perPage;
+
+      if (total > 0) {
+        const count = Math.min(total, perPage);
+        this.placeholders.set(new Array(count).fill(''));
+      }
+    });
+  }
 
   ngOnInit(): void {
-
     this.checkRouteAndModifySortOptions();
   }
 
@@ -65,7 +76,7 @@ export class ArticlesComponent {
     }
   }
 
-  onSortChange(clear: boolean): void {
+  onSortChange(): void {
     this.sortChanged.emit({
       order_by: this.selectedSort.order_by,
       direction: this.selectedSort.direction

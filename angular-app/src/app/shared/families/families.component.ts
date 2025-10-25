@@ -1,14 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { Router, NavigationExtras } from '@angular/router';
+import { Router } from '@angular/router';
 import { SkeletonModule } from 'primeng/skeleton';
 import { trigger, style, transition, animate, state } from '@angular/animations';
 
 import { CapitalizePipe } from '../../pipes/capitalize/capitalize-pipe';
 
-import { environment } from '../../../environments/environment';
-import { catchError, of, throwError, timeout } from 'rxjs';
+import { CatalogStoreService } from '../../services/catalog/catalog-store.service';
+import { Family } from '../../models/family.model';
 
 @Component({
     selector: 'app-families',
@@ -49,49 +48,23 @@ import { catchError, of, throwError, timeout } from 'rxjs';
     ]
 })
 export class FamiliesComponent implements OnInit {
-  families: any[] = [];
-  placeholders: any[] = new Array(20).fill('');
-  loading: boolean = true;
-  familiesUnfold: boolean = false;
-  statusCode: number = -1;
+  families = this.catalogStore.families.families;
+  total = this.catalogStore.families.total;
+  loading = this.catalogStore.families.loading;
+  statusCode = this.catalogStore.families.statusCode;
 
-  constructor(private http: HttpClient, private router: Router) { }
+  placeholders = signal<string[]>(new Array(20).fill(''));
+  familiesUnfold: boolean = false;
+
+  constructor(private catalogStore: CatalogStoreService, private router: Router) {}
 
   ngOnInit(): void {
-    this.loadFamilies();
+    if (this.catalogStore.families.families().length === 0) {
+      this.catalogStore.families.loadTotal();
+      this.catalogStore.families.load();
+    }
   }
 
-  loadFamilies(): void {
-    this.http.get(environment.apiUrl + '/articles/families')
-      .pipe(
-        timeout(10000),
-        catchError(error => {
-          this.loading = false;
-          if (error.name === 'TimeoutError') {
-            console.error('Request timed out');
-            this.statusCode = 408;
-            return of([]);
-          }
-          const status = error.status || 500;
-          const message = error.message || 'An unknown error occurred';
-
-          return throwError(() => ({
-            status,
-            message
-          }));
-        })
-      )
-      .subscribe({
-        next:(response) => {
-          this.families = this.families.concat(response);
-          this.loading = false;  
-        },
-        error: (error) => {
-          this.loading = false;
-          this.statusCode = error.status;
-        },
-      });
-  }
   
   onFamilyScroll(event: WheelEvent): void {
     if (!this.familiesUnfold) {
@@ -100,7 +73,6 @@ export class FamiliesComponent implements OnInit {
         event.preventDefault();
         const scrollAmount = event.deltaY * 2;
         scrollContainer.scrollLeft += scrollAmount;
-        
       }
     }
   }
@@ -109,22 +81,17 @@ export class FamiliesComponent implements OnInit {
     this.familiesUnfold = !this.familiesUnfold;
   }
 
-  showFamily(nomfam: string, codfam: number): void {
-    if (this.router.url !== '/catalog/family') {
-      const navigationExtras: NavigationExtras = {
-        queryParams: {'nomfam': nomfam, 'codfam': codfam }
-      };
-
-      this.router.navigate(['/catalog/family'], navigationExtras);;
-    }
+  navigateToFamily(family: Family): void {
+    const slug = family.nomfam.toLowerCase().replace(/\s+/g, '-');
+    this.router.navigate(['/catalog/family', `${family.codfam}-${slug}`]);
   }
 
   get noFamilies(): boolean {
-    return this.statusCode == 404 && this.families.length == 0 && !this.loading;
+    return this.statusCode() == 404 && this.families.length == 0 && !this.loading();
   }
 
   get serverError(): boolean {
-    return (this.statusCode == 408 || this.statusCode.toString().startsWith('5')) && this.families.length == 0 && !this.loading;
+    return (this.statusCode() == 408 || this.statusCode().toString().startsWith('5')) && this.families.length == 0 && !this.loading();
   }
 
 }

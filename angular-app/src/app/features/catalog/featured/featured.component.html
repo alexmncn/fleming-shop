@@ -1,0 +1,14 @@
+<section class="articles">   
+    <app-articles
+        [articles]="articles()"
+        [headerTitle]="headerTitle" 
+        [totalArticles]="totalArticles()" 
+        [perPage]="perPage()" 
+        [loadingArticles]="loading()" 
+        [statusCode]="statusCode()"
+        [defOrderBy]="orderBy()"
+        [defDirection]="direction()"
+        (loadArticles)="onLoadMoreArticles()"
+        (sortChanged)="onSortChangeArticles($event.order_by, $event.direction)"
+    />
+</section>

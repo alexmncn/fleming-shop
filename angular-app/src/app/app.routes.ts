@@ -11,6 +11,8 @@ import { authGuard } from './guards/auth.guard';
 import { AdminComponent } from './features/admin/admin.component';
 import { SalesComponent } from './features/admin/sales/sales.component';
 import { DataExportComponent } from './features/admin/data-export/data-export.component';
+import { FeaturedComponent } from './features/catalog/featured/featured.component';
+import { NewComponent } from './features/catalog/new/new.component';
 
 
 export const routes: Routes = [
@@ -21,8 +23,10 @@ export const routes: Routes = [
         children: [
             { path: '', redirectTo: 'home', pathMatch: 'full' },
             { path: 'home', component: HomeComponent },
+            { path: 'featured', component: FeaturedComponent },
+            { path: 'new', component: NewComponent },
             { path: 'search', component: SearchComponent },
-            { path: 'family', component: FamilyComponent }
+            { path: 'family/:codfamSlug', component: FamilyComponent }
         ]
     },
     { 

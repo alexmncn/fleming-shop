@@ -4,30 +4,30 @@
 
 <section class="articles featured">   
     <app-articles
-        (loadArticles)="loadFeaturedArticles()"
-        (sortChanged)="onSortChangeFeaturedArticles($event.order_by, $event.direction)" 
-        [articles]="featuredArticles"
+        [articles]="featuredArticles()"
         [headerTitle]="featuredHeaderTitle" 
-        [totalArticles]="totalFeaturedArticles" 
-        [perPage]="perPage" 
-        [loadingArticles]="loadingFeaturedArticles" 
-        [statusCode]="featuredStatusCode"
-        [defOrderBy]="featuredArticlesOrderBy"
-        [defDirection]="featuredArticlesDirection"
+        [totalArticles]="totalFeaturedArticles()" 
+        [perPage]="perPage()" 
+        [loadingArticles]="loadingFeatured()" 
+        [statusCode]="featuredStatusCode()"
+        [defOrderBy]="featuredOrderBy()"
+        [defDirection]="featuredDirection()"
+        (loadArticles)="onLoadMoreFeaturedArticles()"
+        (sortChanged)="onSortChangeFeaturedArticles($event.order_by, $event.direction)"
     />
 </section>
 
 <section class="articles new">
     <app-articles 
-        (loadArticles)="loadNewArticles()"
-        (sortChanged)="onSortChangeNewArticles($event.order_by, $event.direction)" 
-        [articles]="newArticles"
-        [headerTitle]="newHeaderTitle"
-        [totalArticles]="totalNewArticles"
-        [perPage]="perPage"
-        [loadingArticles]="loadingNewArticles"
-        [statusCode]="newStatusCode"
-        [defOrderBy]="newArticlesOrderBy"
-        [defDirection]="newArticlesDirection"
+        [articles]="newArticles()"
+        [headerTitle]="newHeaderTitle" 
+        [totalArticles]="totalNewArticles()" 
+        [perPage]="perPage()" 
+        [loadingArticles]="loadingNew()" 
+        [statusCode]="newStatusCode()"
+        [defOrderBy]="newOrderBy()"
+        [defDirection]="newDirection()"
+        (loadArticles)="onLoadMoreNewArticles()"
+        (sortChanged)="onSortChangeNewArticles($event.order_by, $event.direction)"
     />
 </section>

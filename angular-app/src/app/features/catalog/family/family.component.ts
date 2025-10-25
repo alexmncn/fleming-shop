@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
-import { catchError, timeout } from 'rxjs/operators';
-import { of } from 'rxjs';
-import { ArticlesService } from '../../../services/catalog/articles/articles.service';
+import { ActivatedRoute, Router } from '@angular/router';
+
+import { MessageService } from '../../../services/message/message.service';
 
 import { ArticlesComponent } from "../../../shared/articles/articles.component";
+import { CatalogStoreService } from '../../../services/catalog/catalog-store.service';
 
 @Component({
     selector: 'app-family',
@@ -16,67 +16,62 @@ import { ArticlesComponent } from "../../../shared/articles/articles.component";
 export class FamilyComponent {
   nomfam: string = '';
   codfam: number = 0;
-  articles: any[] = [];
-  totalArticles: number = 0;
-  perPage: number = 30;
-  articlesPage: number = 1;
-  articlesOrderBy: string = 'detalle';
-  articlesDirection: string = 'asc';
-  loadingArticles: boolean = false;
-  statusCode: number = -1;
 
-  constructor(private route: ActivatedRoute, private articlesService: ArticlesService) { }
+  store?: ReturnType<CatalogStoreService['familyArticles']['getStore']>;
+
+  articles = computed(() => this.store?.visibleItems() ?? []);
+  totalArticles = computed(() => this.store?.total() ?? 0);
+  page = computed(() => this.store?.page() ?? 1);
+  perPage = computed(() => this.store?.perPage() ?? 20);
+  orderBy = computed(() => this.store?.orderBy() ?? '');
+  direction = computed(() => this.store?.direction() ?? 'asc');
+  loading = computed(() => this.store?.loading() ?? false);
+  statusCode = computed(() => this.store?.statusCode() ?? -1);
+
+  constructor(private route: ActivatedRoute, private router: Router, private catalogStore: CatalogStoreService, private messageService: MessageService) { }
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      this.nomfam = params['nomfam'];
-      this.codfam = params['codfam'];
-      if (this.nomfam) {
-        this.loadTotalFamilyArticles();
-        this.loadFamilyArticles();
+    this.route.paramMap.subscribe(async params => {
+      const param = params.get('codfamSlug') || '';
+      this.codfam = +param.split('-')[0];
+      if (!this.codfam) {
+        this.router.navigate(['/catalog']);
+        return;
+      }
+
+      const families = this.catalogStore.families.families();
+      const family = families.find((f) => f.codfam === this.codfam);
+
+      if (!family) {
+        // Si no existe, redirige
+        this.messageService.showMessage('error', 'La familia solicitada no existe');
+        this.router.navigate(['/catalog']);
+        return;
+      }
+
+      this.nomfam = family.nomfam;
+
+      // Obtiene el store asociado a esta familia
+      this.store = this.catalogStore.familyArticles.getStore(this.codfam);
+
+      // Si aún no se ha cargado nada, haz una carga inicial
+      if (this.store.items().length === 0) {
+        await this.store.loadTotal();
+        await this.store.load(true);
+      } else {
+        // Si ya hay datos, reinicia la vista al principio
+        this.store.visiblePages.set(1);
       }
     });
   }
 
-  loadTotalFamilyArticles(): void {
-    this.articlesService.getTotalFamilyArticles(this.codfam).subscribe({
-      next: (res) => this.totalArticles = res.total,
-      error: (err) => {
-        this.statusCode = err.status || 500;
-        console.error('Error fetching total:', err);
-      }
-    });
+  onLoadMoreArticles() {
+    this.store?.load(false);
   }
 
-  loadFamilyArticles(): void {
-    this.loadingArticles = true;
-    this.articlesService.getFamilyArticles(this.codfam, this.articlesPage, this.perPage, this.articlesOrderBy, this.articlesDirection)
-      .pipe(
-        timeout(10000),
-        catchError(err => {
-          this.loadingArticles = false;
-          this.statusCode = err.status || 500;
-          return of([]);
-        })
-      )
-      .subscribe({
-        next: (articles) => {
-          this.articles = [...this.articles, ...articles];
-          this.articlesPage++;
-          this.loadingArticles = false;
-        },
-        error: (err) => {
-          this.loadingArticles = false;
-          this.statusCode = err.status;
-        }
-      });
-  }
-
-  onSortChangeArticles(order_by: string, direction: string): void {
-    this.articlesOrderBy = order_by;
-    this.articlesDirection = direction;
-    this.articlesPage = 1;
-    this.articles = [];
-    this.loadFamilyArticles();
+  onSortChangeArticles(orderBy: string, direction: string): void {
+    this.store?.orderBy.set(orderBy);
+    this.store?.direction?.set(direction);
+    this.store?.forceReload();
   }
 }

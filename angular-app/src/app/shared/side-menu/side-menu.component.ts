@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 
 import { AuthService } from '../../services/auth/auth.service';
 import { MessageService } from '../../services/message/message.service';
-import { DrawerService } from '../../services/drawer/drawer.service';
+import { SideMenuService } from '../../services/side-menu/side-menu.service';
 
 @Component({
   selector: 'app-side-menu',
@@ -18,7 +18,7 @@ export class SideMenuComponent {
   drawerVisible = signal(false);
 
   menuItems = [
-    { label: 'Catálogo', icon: 'pi pi-home', routerLink: '/catalog/home' },
+    { label: 'Catálogo', icon: 'pi pi-home', routerLink: '/catalog' },
     { label: 'Artículos', icon: 'pi pi-box', routerLink: '/admin/articles' },
     { label: 'Familias', icon: 'pi pi-tags', routerLink: '/admin/families' },
     { label: 'Ventas', icon: 'pi pi-dollar', routerLink: '/admin/sales' },
@@ -28,9 +28,9 @@ export class SideMenuComponent {
     { label: 'Exportar datos', icon: 'pi pi-file-export', routerLink: '/admin/data-export' }    
   ];
 
-  constructor(private authService: AuthService, private router: Router, private messageService: MessageService, public drawerService: DrawerService) {
+  constructor(private authService: AuthService, private router: Router, private messageService: MessageService, public sideMenuService: SideMenuService) {
     effect(() => {
-      if (this.drawerService.isOpen()) {
+      if (this.sideMenuService.isOpen()) {
         this.drawerVisible.set(true);
       } else {
         setTimeout(() => this.drawerVisible.set(false), 250); // 250ms = duración animación salida
@@ -46,14 +46,14 @@ export class SideMenuComponent {
 
   navigateTo(route: string): void {
     this.router.navigate([route]).then(() => {
-      if (this.drawerService.isDrawer) {
-        this.drawerService.close(); 
+      if (this.sideMenuService.isDrawer()) {
+        this.sideMenuService.close(); 
       }
     });
   }
 
   isActive(item: any) {
-    return this.router.url === item.routerLink;
+    return this.router.url.includes(item.routerLink);
   }
 
   logout(): void {
