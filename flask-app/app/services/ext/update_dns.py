@@ -34,7 +34,11 @@ def get_record_id(domain):
     response = requests.get(url, headers=HEADERS, params=params)
     data = response.json()
     if data['success']:
-        return data['result'][0]['id'], data['result'][0]['content'] 
+        try:
+            return data['result'][0]['id'], data['result'][0]['content']
+        except IndexError:
+            errors.append(f"No se encontró el registro DNS para {domain['name']}.")
+            return None, None 
     else:
         errors.append(f"Error obteniendo el ID del registro para {domain['name']}: {data['errors']}.")
         return None, None
