@@ -1,7 +1,6 @@
 import { Component, Input, OnInit, signal, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Router, ActivatedRoute } from '@angular/router';
 import { trigger, style, transition, animate, state} from '@angular/animations';
 import { Observable } from 'rxjs';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -79,7 +78,7 @@ export class ArticleComponent implements OnInit {
   uploadImagePreview = signal<string | ArrayBuffer | null>(null);
   isUploadingImageMain = signal(false);
 
-  constructor(private http: HttpClient, private messageService: MessageService, private authService: AuthService, private router: Router, private route: ActivatedRoute) { }
+  constructor(private http: HttpClient, private messageService: MessageService, private authService: AuthService) { }
 
   ngOnInit(): void {
     this.authService.isAuthenticated$.subscribe((auth: boolean) => {

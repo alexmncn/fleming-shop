@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CatalogService } from './catalog.service';
+import { CatalogApiService } from './catalog-api.service';
 import { PaginatedListStore } from './paginated-list-store.catalog';
 import { Article } from '../../models/article.model';
 import { signal } from '@angular/core';
@@ -11,7 +11,7 @@ export class FamilyArticlesStore {
   // clave: codfam
   stores = signal<Record<number, PaginatedListStore<Article>>>({});
 
-  constructor(private api: CatalogService) {}
+  constructor(private api: CatalogApiService) {}
 
   getStore(codfam: number) {
     if (!this.stores()[codfam]) {

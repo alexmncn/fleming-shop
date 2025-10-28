@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { CatalogService } from './catalog.service';
+import { CatalogApiService } from './catalog-api.service';
 import { Article } from '../../models/article.model';
 
 import { PaginatedListStore } from './paginated-list-store.catalog';
@@ -10,7 +10,7 @@ import { FamilyStore } from './family-store.catalog';
   providedIn: 'root'
 })
 export class CatalogStoreService {
-  constructor(private api: CatalogService) {}
+  constructor(private api: CatalogApiService) {}
 
   featuredArticles = new PaginatedListStore<Article>(
     (page, perPage, orderBy, direction) =>

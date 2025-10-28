@@ -1,5 +1,5 @@
 import { firstValueFrom } from "rxjs";
-import { CatalogService } from "./catalog.service";
+import { CatalogApiService } from "./catalog-api.service";
 import { Injectable, signal } from "@angular/core";
 
 import { Family } from "../../models/family.model";
@@ -11,7 +11,7 @@ export class FamilyStore {
   loading = signal(false);
   statusCode = signal(0);
 
-  constructor(private api: CatalogService) {}
+  constructor(private api: CatalogApiService) {}
 
   async loadTotal() {
     try {

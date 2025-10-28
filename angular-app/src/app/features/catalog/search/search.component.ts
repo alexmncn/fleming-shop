@@ -6,7 +6,7 @@ import { of } from 'rxjs';
 
 import { ArticlesComponent } from "../../../shared/articles/articles.component";
 
-import { CatalogService } from '../../../services/catalog/catalog.service';
+import { CatalogApiService } from '../../../services/catalog/catalog-api.service';
 
 @Component({
     selector: 'app-search',
@@ -31,7 +31,7 @@ export class SearchComponent {
   direction: string = '';
 
 
-  constructor(private catalogService: CatalogService, private route: ActivatedRoute) { }
+  constructor(private catalogApiService: CatalogApiService, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
@@ -56,7 +56,7 @@ export class SearchComponent {
   }
 
   getTotalSearchArticles(): void {
-    this.catalogService.getTotalSearchArticles(this.searchParam, this.filter, this.contextFilter, this.contextValue).subscribe({
+    this.catalogApiService.getTotalSearchArticles(this.searchParam, this.filter, this.contextFilter, this.contextValue).subscribe({
       next: (res) => this.totalArticles = res.total,
       error: (err) => {
         this.statusCode = err.status || 500;
@@ -66,7 +66,7 @@ export class SearchComponent {
   }
 
   loadSearchArticles(): void {
-    this.catalogService.getSearchArticles(this.searchParam, this.filter, this.contextFilter, this.contextValue, this.articlesPage, this.perPage, this.orderBy, this.direction)
+    this.catalogApiService.getSearchArticles(this.searchParam, this.filter, this.contextFilter, this.contextValue, this.articlesPage, this.perPage, this.orderBy, this.direction)
       .pipe(
         timeout(10000),
         catchError(err => {

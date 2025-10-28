@@ -6,7 +6,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 
 import { environment } from '../../../environments/environment';
-import { CatalogService } from '../../services/catalog/catalog.service';
+import { CatalogApiService } from '../../services/catalog/catalog-api.service';
 import { MessageService } from '../../services/message/message.service';
 
 @Component({
@@ -22,14 +22,14 @@ export class SearchBarComponent implements OnInit {
 
   totalArticles: any = 'todos los'; 
 
-  constructor(private catalogService: CatalogService, private messageService: MessageService, private router: Router) { }
+  constructor(private catalogApiService: CatalogApiService, private messageService: MessageService, private router: Router) { }
 
   ngOnInit(): void {
     this.loadTotalArticles();
   }
 
   loadTotalArticles(): void {
-    this.catalogService.getTotalArticles().subscribe({
+    this.catalogApiService.getTotalArticles().subscribe({
       next: (res) => this.totalArticles = res.total,
       error: (err) => {
         console.error('Error fetching total:', err);

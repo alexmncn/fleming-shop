@@ -7,7 +7,7 @@ import { Article } from '../../models/article.model';
 import { Family } from '../../models/family.model';
 
 @Injectable({ providedIn: 'root' })
-export class CatalogService {
+export class CatalogApiService {
   private baseUrl = environment.apiUrl;
   private totalArticlesUrl: string = environment.apiUrl + '/articles/total';
   private featuredArticlesUrl: string = this.baseUrl + '/articles/featured';
