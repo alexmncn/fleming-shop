@@ -1,20 +1,15 @@
 import { signal, computed } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
+import { Article } from '../../models/article.model';
 
-interface Identifiable {
-  id?: string | number;
-  codebar?: string;
-  codfam?: number;
-}
-
-export class PaginatedListStore<T extends Identifiable> {
+export class PaginatedListStore {
   // === CONFIGURABLE ===
-  private fetchPageFn: (...args: any[]) => Observable<T[]>; // función que pide artículos
-  private fetchTotalFn?: (...args: any[]) => Observable<{ total: number }>; // opcional
+  private fetchPageFn: (page: number, perPage: number, orderBy: string, direction: string, ...args: any[]) => Observable<Article[]>;
+  private fetchTotalFn?: (...args: any[]) => Observable<{ total: number }>;
 
   // === STATE ===
   perPage = signal(20);
-  items = signal<T[]>([]);
+  items = signal<Article[]>([]);
   total = signal<number>(0);
   page = signal<number>(1);
   visiblePages = signal<number>(1);
@@ -32,7 +27,10 @@ export class PaginatedListStore<T extends Identifiable> {
   hasMoreCached = computed(() => this.items().length > this.visibleCount());
   hasMore = computed(() => this.hasMoreCached() || this.hasMoreRemote());
 
-  constructor(fetchPageFn: (...args: any[]) => Observable<T[]>, fetchTotalFn?: (...args: any[]) => Observable<{ total: number }>) {
+  constructor(
+    fetchPageFn: (page: number, perPage: number, orderBy: string, direction: string, ...args: any[]) => Observable<Article[]>,
+    fetchTotalFn?: (...args: any[]) => Observable<{ total: number }>
+  ) {
     this.fetchPageFn = fetchPageFn;
     this.fetchTotalFn = fetchTotalFn;
   }
@@ -51,9 +49,7 @@ export class PaginatedListStore<T extends Identifiable> {
 
   async load(reset = false, ...args: any[]) {
     if (reset) {
-      this.items.set([]);
-      this.page.set(1);
-      this.visiblePages.set(1);
+      this.clear();
     }
 
     const cached = this.items();
@@ -61,13 +57,13 @@ export class PaginatedListStore<T extends Identifiable> {
     const perPage = this.perPage();
     const nextPageToRequest = this.page();
 
-    // Si ya hay suficientes artículos cacheados para mostrar la siguiente ventana:
+    // Si ya hay suficientes artículos cacheados
     if (cached.length >= needVisible + perPage) {
       this.visiblePages.update(v => v + 1);
       return;
     }
 
-    // Si hay algunos en cache pero aún queda por pedir:
+    // Si hay algunos en cache pero aún queda por pedir
     if (cached.length >= needVisible) {
       this.visiblePages.update(v => v + 1);
       if (!this.hasMoreRemote()) return;
@@ -76,15 +72,18 @@ export class PaginatedListStore<T extends Identifiable> {
     // Pedir siguiente página
     this.loading.set(true);
     try {
-      const data = await firstValueFrom(this.fetchPageFn(nextPageToRequest, perPage, this.orderBy(), this.direction(), ...args));
+      const data = await firstValueFrom(
+        this.fetchPageFn(nextPageToRequest, perPage, this.orderBy(), this.direction(), ...args)
+      );
+
       if (!Array.isArray(data)) throw new Error('Invalid API response');
 
       // evitar duplicados
-      const existingIds = new Set((cached as any[]).map((a: any) => a.codebar ?? a.codfam ?? a.id ?? JSON.stringify(a)));
-      const newOnes = data.filter(a => !existingIds.has(a.codebar ?? a.codfam ?? a.id ?? JSON.stringify(a)));
+      const existing = new Set(cached.map(a => a.codebar));
+      const newOnes = data.filter(a => !existing.has(a.codebar));
 
       if (newOnes.length) {
-        this.items.update(current => [...current, ...newOnes]);
+        this.items.update(list => [...list, ...newOnes]);
       }
 
       this.page.update(p => p + 1);
@@ -98,9 +97,7 @@ export class PaginatedListStore<T extends Identifiable> {
   }
 
   async forceReload(...args: any[]) {
-    this.items.set([]);
-    this.page.set(1);
-    this.visiblePages.set(1);
+    this.clear();
     await this.loadTotal(...args);
     await this.load(false, ...args);
   }
@@ -109,6 +106,21 @@ export class PaginatedListStore<T extends Identifiable> {
     this.orderBy.set(orderBy);
     this.direction.set(direction);
     await this.load(true, ...args);
+  }
+
+  // === NUEVO: operaciones locales ===
+
+  addArticle(article: Article) {
+    this.items.update(list => {
+      if (list.some(a => a.codebar === article.codebar)) return list; // evitar duplicados
+      return [...list, article];
+    });
+    this.total.update(t => t + 1);
+  }
+
+  removeArticle(article: Article) {
+    this.items.update(list => list.filter(a => a.codebar !== article.codebar));
+    this.total.update(t => Math.max(0, t - 1));
   }
 
   clear() {

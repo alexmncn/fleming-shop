@@ -9,6 +9,7 @@ import { Article } from '../../models/article.model';
 
 import { AuthService } from '../../services/auth/auth.service';
 import { MessageService } from '../../services/message/message.service';
+import { ArticleActionsService } from '../../services/admin/actions/articles/article-actions.service';
 
 import { CapitalizePipe } from '../../pipes/capitalize/capitalize-pipe';
 
@@ -78,7 +79,7 @@ export class ArticleComponent implements OnInit {
   uploadImagePreview = signal<string | ArrayBuffer | null>(null);
   isUploadingImageMain = signal(false);
 
-  constructor(private http: HttpClient, private messageService: MessageService, private authService: AuthService) { }
+  constructor(private http: HttpClient, private messageService: MessageService, private authService: AuthService, private articleActionsService: ArticleActionsService) { }
 
   ngOnInit(): void {
     this.authService.isAuthenticated$.subscribe((auth: boolean) => {
@@ -112,86 +113,18 @@ export class ArticleComponent implements OnInit {
 
   toggleFeatureArticle(event: Event): void {
     event.preventDefault();
-
-    const checkbox = event.target as HTMLInputElement;
-
-    var confirmed = false;
-    if (!this.isFeatured()) {
-      confirmed = confirm('Seguro que quieres destacar el articulo?');
-    } else {
-      confirmed = confirm('Seguro que quieres eliminar de destacados el articulo?');
-    }
-    if (confirmed) {
-      this.featureArticle(!this.isFeatured())
-        .subscribe({
-          next: (response) => {
-            this.article.destacado = !this.article.destacado;
-            this.isFeatured.set(this.article.destacado);
-            checkbox.checked = this.isFeatured();
-
-            var s_message = '';
-            if (this.isFeatured()) {
-              s_message = 'El articulo se ha destacado correctamente';
-            } else {
-              s_message = 'El articulo se ha eliminado de destacados correctamente';
-            }
-            this.messageService.showMessage('success', s_message)
-            this.articleSelected.set(false);
-          },
-          error: (error) => {
-            console.log(error)
-            this.messageService.showMessage('error', 'Ha ocurrido un error al destacar el articulo')
-          }
-        });
-    } else {
-      this.messageService.showMessage('warn', 'Proceso abortado')
-    }
-  }
-
-  featureArticle(newValue: boolean): Observable<any> {
-    return this.http.post(this.featureURL, {},{params: {'codebar': this.article.codebar, 'featured': newValue}});
+    this.articleActionsService.toggleFeatured(this.article, updated => {;
+      this.articleSelected.set(false);
+      this.isFeatured.set(updated.destacado);
+    });
   }
 
   toggleHiddenCheckbox(event: Event): void {
     event.preventDefault();
-
-    const checkbox = event.target as HTMLInputElement;
-
-    var confirmed = false;
-    if (!this.isHidden()) {
-      confirmed = confirm('Seguro que quieres ocultar el articulo?');
-    } else {
-      confirmed = confirm('Seguro que quieres eliminar de ocultos el articulo?');
-    }
-    if (confirmed) {
-      this.hideArticle(!this.isHidden())
-        .subscribe({
-          next: (response) => {
-            this.article.hidden = !this.article.hidden;
-            this.isHidden.set(this.article.hidden);
-            checkbox.checked = this.isHidden();
-
-            var s_message = '';
-            if (this.isHidden()) {
-              s_message = 'El articulo se ha ocultado correctamente';
-            } else {
-              s_message = 'El articulo se ha eliminado de ocultos correctamente';
-            }
-            this.messageService.showMessage('success', s_message)
-            this.articleSelected.set(false);
-          },
-          error: (error) => {
-            console.log(error)
-            this.messageService.showMessage('error', 'Ha ocurrido un error al destacar el articulo')
-          }
-        });
-    } else {
-      this.messageService.showMessage('warn', 'Proceso abortado')
-    }
-  }
-
-  hideArticle(newValue: boolean): Observable<any> {
-    return this.http.post(this.hideURL, {},{params: {'codebar': this.article.codebar, 'hidden': newValue}});
+    this.articleActionsService.toggleHidden(this.article, updated => {
+      this.articleSelected.set(false);
+      this.isHidden.set(updated.hidden);
+    });
   }
 
   toggleImageUploadMenu(): void {

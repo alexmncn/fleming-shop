@@ -1,5 +1,5 @@
-import { Component, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, computed, effect, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { MessageService } from '../../../services/message/message.service';
@@ -14,21 +14,26 @@ import { CatalogStoreService } from '../../../services/catalog/catalog-store.ser
     styleUrl: './family.component.css'
 })
 export class FamilyComponent {
-  nomfam: string = '';
-  codfam: number = 0;
+  nomfam = '';
+  codfam = 0;
 
-  store?: ReturnType<CatalogStoreService['familyArticles']['getStore']>;
+  articles = computed(() => this.store()?.visibleItems() ?? []);
+  totalArticles = computed(() => this.store()?.total() ?? 0);
+  page = computed(() => this.store()?.page() ?? 1);
+  perPage = computed(() => this.store()?.perPage() ?? 20);
+  orderBy = computed(() => this.store()?.orderBy() ?? '');
+  direction = computed(() => this.store()?.direction() ?? 'asc');
+  loading = computed(() => this.store()?.loading() ?? false);
+  statusCode = computed(() => this.store()?.statusCode() ?? -1);
 
-  articles = computed(() => this.store?.visibleItems() ?? []);
-  totalArticles = computed(() => this.store?.total() ?? 0);
-  page = computed(() => this.store?.page() ?? 1);
-  perPage = computed(() => this.store?.perPage() ?? 20);
-  orderBy = computed(() => this.store?.orderBy() ?? '');
-  direction = computed(() => this.store?.direction() ?? 'asc');
-  loading = computed(() => this.store?.loading() ?? false);
-  statusCode = computed(() => this.store?.statusCode() ?? -1);
+  store = signal<ReturnType<CatalogStoreService['familyArticles']['getStore']> | null>(null);
 
-  constructor(private route: ActivatedRoute, private router: Router, private catalogStore: CatalogStoreService, private messageService: MessageService) { }
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private catalogStore: CatalogStoreService,
+    private messageService: MessageService
+  ) {}
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(async params => {
@@ -43,7 +48,6 @@ export class FamilyComponent {
       const family = families.find((f) => f.codfam === this.codfam);
 
       if (!family) {
-        // Si no existe, redirige
         this.messageService.showMessage('error', 'La familia solicitada no existe');
         this.router.navigate(['/catalog']);
         return;
@@ -51,27 +55,30 @@ export class FamilyComponent {
 
       this.nomfam = family.nomfam;
 
-      // Obtiene el store asociado a esta familia
-      this.store = this.catalogStore.familyArticles.getStore(this.codfam);
+      // Guardamos el store en el signal
+      const familyStore = this.catalogStore.familyArticles.getStore(this.codfam);
+      this.store.set(familyStore);
 
-      // Si aún no se ha cargado nada, haz una carga inicial
-      if (this.store.items().length === 0) {
-        await this.store.loadTotal();
-        await this.store.load(true);
+      // Cargamos si está vacío
+      if (familyStore.items().length === 0) {
+        await familyStore.loadTotal();
+        await familyStore.load(true);
       } else {
-        // Si ya hay datos, reinicia la vista al principio
-        this.store.visiblePages.set(1);
+        familyStore.visiblePages.set(1);
       }
     });
   }
 
+
   onLoadMoreArticles() {
-    this.store?.load(false);
+    this.store()?.load(false);
   }
 
   onSortChangeArticles(orderBy: string, direction: string): void {
-    this.store?.orderBy.set(orderBy);
-    this.store?.direction?.set(direction);
-    this.store?.forceReload();
+    const s = this.store();
+    if (!s) return;
+    s.orderBy.set(orderBy);
+    s.direction.set(direction);
+    s.forceReload();
   }
 }
