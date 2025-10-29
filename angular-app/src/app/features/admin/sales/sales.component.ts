@@ -50,14 +50,22 @@ export class SalesComponent implements OnInit{
 
     this.salesService.getTicketsByDate(formattedDate).subscribe(tickets => {
       this.tickets = tickets;
+
+      // Reset scroll
+      const container = document.querySelector('.tickets-list');
+      container?.scrollTo({ top: 0 });
     });
   }
 
   onTicketSelected(ticket: Ticket) {
     this.selectedTicket = ticket;
+
+    // Focus ticket in the list scroll
+    const element = document.getElementById(ticket.number.toString());
+    element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
     this.salesService.getItemsByTicket(ticket.number).subscribe(items => {
       this.ticketItems = items;
-
       //setTimeout(() => this.scrollToTicketDetails(), 500);
     });
   }

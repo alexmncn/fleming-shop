@@ -52,7 +52,7 @@
           @if (tickets != null && tickets.length > 0) {
             <ul class="tickets-list">
               @for (ticket of tickets; track $index) {
-                <li class="ticket-item" [class.selected]="ticket === selectedTicket" (click)="onTicketSelected(ticket)">
+                <li class="ticket-item" [id]="ticket.number" [class.selected]="ticket === selectedTicket" (click)="onTicketSelected(ticket)">
                   <span># {{ ticket.number }}</span>
                   <span class="amount">{{ ticket.amount }} €</span>
                 </li>
