@@ -1,7 +1,7 @@
 <section [id]="article.codebar" class="article-card" [class.grid]="gridDisplay" [class.list]="listDisplay" (click)="toggleSelection()">
   @if (!loading()) {
     <section class="img" [class.placeholder]="!article.has_image || loadingImage() || imgError()">
-      @if (article.has_image && !loadingImage() && !imgError()) {
+      @if (imgUrl() && !loadingImage() && !imgError()) {
         <img [src]="imgUrl()" (error)="imgError.set(true)" loading="lazy" />
       } @else {
         <div class="placeholder-no-img">
@@ -121,13 +121,19 @@
           </div>
 
           <section class="img">
-            @if (article.has_image || !imgError()) {
-              <img [src]="imgUrl()" (error)="imgError.set(true)" />
+            @if (imgUrl() && !loadingImage() && !imgError()) {
+              <img [src]="imgUrl()" (error)="imgError.set(true)" loading="lazy" />
             } @else {
               <div class="placeholder-no-img">
                 <div class="content">
                   <i class="pi pi-image"></i>
-                  <p>Sin imagen</p>
+                  @if (imgError()) {
+                    <p>Error al cargar imagen</p>
+                  } @else if (loadingImage()) {
+                    <p>Cargando imagen...</p>
+                  } @else {
+                    <p>Sin imagen</p>
+                  }
                 </div>
               </div>
             }
