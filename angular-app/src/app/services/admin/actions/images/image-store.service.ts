@@ -63,7 +63,6 @@ export class ImageStoreService {
     const url = response.image_url;
     const id = this.extractIdFromUrl(url);
 
-    console.log('Imagen subida con ID:', id);
     // Descargamos el archivo para cachearlo
     const blob = await firstValueFrom(this.imageApi.getImageById(id));
     if (!blob) throw new Error('No se pudo obtener el archivo después de subirlo');

@@ -75,9 +75,10 @@ export class ArticleComponent implements OnInit {
   isHidden = signal(false);
   uploadImageMenuActive = signal(false);
   selectedFile = signal<File | null>(null);
+  loadingImage = signal(false);
   uploadingImage = signal(false);
   uploadImagePreview = signal<string | ArrayBuffer | null>(null);
-  isUploadingImageMain = signal(false);
+  isUploadImageMain = false;
 
   constructor( 
       private messageService: MessageService, 
@@ -103,14 +104,14 @@ export class ArticleComponent implements OnInit {
   async loadMainImage(): Promise<void> {
     if (!this.article.image_url) return;
 
-    this.uploadingImage.set(true);
+    this.loadingImage.set(true);
     const blobUrl = await this.imageStoreService.getImage(this.article.image_url);
     if (blobUrl) {
       this.imgUrl.set(blobUrl);
     } else {
       this.imgError.set(false);
     }
-    this.uploadingImage.set(false);
+    this.loadingImage.set(false);
   }
 
   toggleSelection(): void {
@@ -172,7 +173,7 @@ export class ArticleComponent implements OnInit {
 
   toggleMainImage(event: Event): void {
     const checkbox = event.target as HTMLInputElement;
-    this.isUploadingImageMain.set(checkbox.checked);
+    this.isUploadImageMain = checkbox.checked;
   }
 
   async uploadImage(): Promise<void> {
@@ -184,7 +185,7 @@ export class ArticleComponent implements OnInit {
       const { url } = await this.imageStoreService.uploadImage(
         this.selectedFile()!,
         this.article.codebar,
-        this.isUploadingImageMain()
+        this.isUploadImageMain
       );
 
       // Actualiza la información del artículo
