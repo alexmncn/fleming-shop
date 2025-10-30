@@ -65,7 +65,7 @@ def delete_article_image(image_id):
         send_alert(f"Error eliminando imagen con id {image_id}: {e}", 1)
         return jsonify(error="Internal server error"), 500
     
-@images_bp.route('/images/article', methods=['GET'])
+@images_bp.route('/images/article/all', methods=['GET'])
 @jwt_required()
 def get_all_article_images():
     codebar = request.args.get('codebar', None)
