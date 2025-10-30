@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, signal, SimpleChanges } from '@angular/core';
+import { Component, inject, Input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { trigger, style, transition, animate, state} from '@angular/animations';
@@ -9,6 +9,7 @@ import { Article } from '../../models/article.model';
 import { AuthService } from '../../services/auth/auth.service';
 import { MessageService } from '../../services/message/message.service';
 import { ArticleActionsService } from '../../services/admin/actions/articles/article-actions.service';
+import { ImageStoreService } from '../../services/admin/actions/images/image-store.service';
 
 import { CapitalizePipe } from '../../pipes/capitalize/capitalize-pipe';
 
@@ -78,11 +79,11 @@ export class ArticleComponent implements OnInit {
   uploadImagePreview = signal<string | ArrayBuffer | null>(null);
   isUploadingImageMain = signal(false);
 
-  constructor(
-      private http: HttpClient, 
+  constructor( 
       private messageService: MessageService, 
       private authService: AuthService, 
-      private articleActionsService: ArticleActionsService
+      private articleActionsService: ArticleActionsService,
+      private imageStoreService: ImageStoreService
     ) { }
 
   ngOnInit(): void {
@@ -92,11 +93,24 @@ export class ArticleComponent implements OnInit {
   }
 
   ngOnChanges(): void {
-    this.imgUrl.set(this.article.image_url);
+    this.loadMainImage();
     this.loading.set(!this.article.detalle);
     this.imgError.set(false);
     this.isFeatured.set(this.article.destacado);
     this.isHidden.set(this.article.hidden);
+  }
+
+  async loadMainImage(): Promise<void> {
+    if (!this.article.image_url) return;
+
+    this.uploadingImage.set(true);
+    const blobUrl = await this.imageStoreService.getImage(this.article.image_url);
+    if (blobUrl) {
+      this.imgUrl.set(blobUrl);
+    } else {
+      this.imgError.set(false);
+    }
+    this.uploadingImage.set(false);
   }
 
   toggleSelection(): void {
@@ -161,30 +175,34 @@ export class ArticleComponent implements OnInit {
     this.isUploadingImageMain.set(checkbox.checked);
   }
 
-  uploadImage(): void {
-    if (this.selectedFile()) {
-      this.uploadingImage.set(true);
+  async uploadImage(): Promise<void> {
+    if (!this.selectedFile()) return;
 
-      const formData = new FormData();
-      formData.append('file', this.selectedFile()!!, this.selectedFile.name);
-      formData.append('codebar', this.article.codebar);
-      formData.append('is_main', this.isUploadingImageMain() ? '1' : '0');
+    this.uploadingImage.set(true);
 
-      this.http.post<{ image_url: string }>(this.uploadImageURL, formData)
-        .subscribe({
-          next: (response) => {
-            this.imgUrl.set(response.image_url);
-            console.log('Imagen subida correctamente:', response);
-            this.uploadingImage.set(false);
-            this.messageService.showMessage('success', 'La imagen se ha añadido correctamente')
-            this.toggleSelection()
-          },
-          error: (error) => {
-            console.log(error)
-            this.uploadingImage.set(false);
-            this.messageService.showMessage('error', 'Ha ocurrido un error al subir la imagen')
-          }
-        });
+    try {
+      const { url } = await this.imageStoreService.uploadImage(
+        this.selectedFile()!,
+        this.article.codebar,
+        this.isUploadingImageMain()
+      );
+
+      // Actualiza la información del artículo
+      this.article.has_image = true;
+      this.article.image_url = url;
+
+      this.uploadingImage.set(false);
+      
+      // Recarga la imagen principal
+      this.loadMainImage()
+
+      this.messageService.showMessage('success', 'La imagen se ha añadido correctamente');
+      this.toggleSelection();
+
+    } catch (error) {
+      console.error(error);
+      this.uploadingImage.set(false);
+      this.messageService.showMessage('error', 'Ha ocurrido un error al subir la imagen');
     }
   }
 

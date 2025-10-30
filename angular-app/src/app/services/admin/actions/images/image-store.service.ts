@@ -1,16 +1,17 @@
-import { Injectable } from '@angular/core';
+import { Injectable, untracked } from '@angular/core';
 import { ImageApiService } from './image-api.service';
 import { firstValueFrom } from 'rxjs';
 
 export interface ImageData {
   id: string;        // UUID extraído de la URL
+  url: string;      // URL original desde el backend
   blobUrl: string;   // URL temporal creada desde el Blob
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class ImageStorageService {
+export class ImageStoreService {
   // Cache temporal: image_id -> Blob URL
   private imageCache = new Map<string, string>();
 
@@ -59,8 +60,10 @@ export class ImageStorageService {
   async uploadImage(file: File, articleCodebar: string, isMain: boolean): Promise<ImageData> {
     // Llamamos al API para subir la imagen
     const response = await firstValueFrom(this.imageApi.uploadArticleImage(articleCodebar, file, isMain));
-    const id = this.extractIdFromUrl(response.image_url);
+    const url = response.image_url;
+    const id = this.extractIdFromUrl(url);
 
+    console.log('Imagen subida con ID:', id);
     // Descargamos el archivo para cachearlo
     const blob = await firstValueFrom(this.imageApi.getImageById(id));
     if (!blob) throw new Error('No se pudo obtener el archivo después de subirlo');
@@ -68,7 +71,7 @@ export class ImageStorageService {
     const blobUrl = URL.createObjectURL(blob);
     this.imageCache.set(id, blobUrl);
 
-    return { id, blobUrl };
+    return { id, url, blobUrl };
   }
 
   /**

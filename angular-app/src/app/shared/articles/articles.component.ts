@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'primeng/select';
 
 import { ArticleComponent } from '../article/article.component';
-import { Article } from '../../models/article.model';
 
 @Component({
     selector: 'app-articles',

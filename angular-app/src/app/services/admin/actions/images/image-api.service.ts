@@ -5,7 +5,7 @@ import { Observable, catchError, of, throwError, timeout } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 
 
-Injectable({
+@Injectable({
   providedIn: 'root'
 })
 export class ImageApiService {
