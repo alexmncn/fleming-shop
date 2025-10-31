@@ -56,27 +56,26 @@ def crop_to_content(image: Image.Image) -> Image.Image:
     return image
 
 def resize_and_center(image: Image.Image, size=(1000, 1000), margin_ratio=0) -> Image.Image:
-    """
-    Redimensiona la imagen manteniendo proporción, la centra en un fondo blanco
-    """
     target_w, target_h = size
 
-    # Calcular tamaño máximo de imagen útil restando márgenes
+    # Calcular tamaño máximo útil
     margin_w = int(target_w * margin_ratio)
     margin_h = int(target_h * margin_ratio)
     max_w = target_w - 2 * margin_w
     max_h = target_h - 2 * margin_h
 
-    # Redimensionar imagen manteniendo aspecto
-    image.thumbnail((max_w, max_h), Image.LANCZOS)
+    # Escalar siempre para que ocupe lo máximo posible dentro del lienzo
+    ratio = min(max_w / image.width, max_h / image.height)
+    new_w = int(image.width * ratio)
+    new_h = int(image.height * ratio)
+    image = image.resize((new_w, new_h), Image.LANCZOS)
 
     # Crear fondo blanco
     background = Image.new("RGB", size, (255, 255, 255))
 
-    # Calcular posición centrada
-    x = (target_w - image.width) // 2
-    y = (target_h - image.height) // 2
-
+    # Centrar
+    x = (target_w - new_w) // 2
+    y = (target_h - new_h) // 2
     background.paste(image, (x, y), mask=image if image.mode == "RGBA" else None)
 
     return background
