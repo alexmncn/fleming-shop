@@ -8,10 +8,7 @@ from app.services.pushover_alerts import send_alert
 
 
 domains = [
-    {'name': 'tiendafleming.es', 'proxied': True, 'updated': False, 'subdomains': [
-                {'name': 'api.tiendafleming.es', 'proxied': True, 'updated': False}
-            ]
-    }
+    {'name': 'tiendafleming.es', 'proxied': True, 'updated': False, 'subdomains':[]}
 ]
 
 errors = []
