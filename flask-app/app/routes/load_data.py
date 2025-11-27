@@ -81,7 +81,7 @@ def upload_file(filetype):
         redis_conn = Redis(host=REDIS_DATABASE_HOST, port=REDIS_DATABASE_PORT)
         q = Queue(REDIS_IMPORTS_QUEUE, connection=redis_conn)
         
-        job = q.enqueue_in(timedelta(minutes=10), process_import_file, import_file_id, username)
+        job = q.enqueue_in(timedelta(minutes=1), process_import_file, import_file_id, username)
     except Exception as e:
         send_alert(f"⚠️ Archivo recibido: <b>{filetype.capitalize()}</b>: Error al poner en cola, prueba a hacerlo manualmente: {e}", 1)
         return jsonify(message="File saved successfully but failed queuing task, try adding it manually"), 206
