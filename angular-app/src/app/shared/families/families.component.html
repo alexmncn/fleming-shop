@@ -1,6 +1,6 @@
 <section class="families">
     <header>
-        <h4>Familias</h4>
+        <h2>Familias</h2>
         @if (!noFamilies && !serverError) {
             <div class="un-fold" (click)="toggleFamiliesDisplay()">
                 @if (!familiesUnfold) {
@@ -20,7 +20,7 @@
                     @for (family of families(); track $index) {
                         <div class="family" (click)="navigateToFamily(family)">
                             @if (family.icon_name) {
-                                <span class="material-symbols-outlined" [style.color]="family.icon_color">{{ family.icon_name }}</span>
+                                <span class="material-symbols-outlined icon" [style.color]="family.icon_color">{{ family.icon_name }}</span>
                             }
                             <p>{{ family.nomfam | capitalize }}</p>
                         </div>

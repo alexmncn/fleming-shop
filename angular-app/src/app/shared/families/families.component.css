@@ -22,11 +22,6 @@ header {
     }
 }
 
-h4 {
-    font-size: clamp(0.85rem, 2.5vw, 1.2rem);
-    margin: 0;
-}
-
 .un-fold {
     display: flex;
     align-items: center;
@@ -65,6 +60,8 @@ section.scroller {
 
 section.scroller.unfold {
     display: grid;
+    padding: 1rem 0.1rem;
+    padding-top: 0;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     height: auto;
     animation: unfold 2s ease-out;
@@ -79,19 +76,28 @@ section.scroller.unfold {
     }
 }
 
+@media (max-width: 100rem) {
+    section.scroller {
+        padding: 1rem 0.1rem;
+        padding-top: 0;
+    }    
+}
 
 @media (max-width: 600px) {
     section.scroller {
         gap: 0.5rem;
-        padding: 0.5rem;
+        padding: 0.5rem 0.1rem;
         padding-top: 0;
     }
 
 
     section.scroller.unfold {
+        padding: 1rem 0.1rem;
+        padding-top: 0;
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
 }
+
 
 .family {
     display: flex;
@@ -105,19 +111,25 @@ section.scroller.unfold {
     background-color: white;
     box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.05);
     cursor: pointer;
-    font-size: clamp(0.75rem, 2.5vw, 1rem);
+    font-size: 1rem;
     user-select: none;
     font-weight: 500;
 }
 
-.family span {
-    font-size: clamp(20px, 4vw, 30px);
+.family .icon {
+    font-size: 30px;
 }
 
 @media (max-width: 600px) {
     .family {
         gap: 0.5rem;
-        padding: 0.5rem 1rem;
+        padding: 0.5rem 0.8rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+    }
+
+    .family .icon {
+        font-size: 20px;
     }
 }
 
