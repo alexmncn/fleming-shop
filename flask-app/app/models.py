@@ -164,19 +164,28 @@ class Family(db.Model):
     
     codfam = Column(Integer, primary_key=True, nullable=False)
     nomfam = Column(String(50), nullable=False)
+    description = Column(Text, nullable=True)
     hidden = Column(TINYINT(1), default=0, nullable=True)
+    icon_name = Column(String(100), default='category', nullable=True)
+    icon_color = Column(String(7), default='#000000', nullable=True)
     
     def to_dict(self):
         return {
             'codfam': self.codfam,
             'nomfam': self.nomfam,
-            'hidden': bool(self.hidden)
+            'description': self.description,
+            'hidden': bool(self.hidden),
+            'icon_name': self.icon_name,
+            'icon_color': self.icon_color,
         }
 
     def to_dict_reduced(self):
         return {
             'codfam': self.codfam,
-            'nomfam': self.nomfam
+            'nomfam': self.nomfam,
+            'description': self.description,
+            'icon_name': self.icon_name,
+            'icon_color': self.icon_color
         }
         
         

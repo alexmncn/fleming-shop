@@ -1,9 +1,5 @@
 section.families {
-    padding: 1rem;
-    border: var(--border-1-2);
-    border-radius: 12px;
-    background-color: white;
-    box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.05);
+
 }
 
 @media (max-width: 600px) {
@@ -98,19 +94,29 @@ section.scroller.unfold {
 }
 
 .family {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
     padding: 1rem 1.25rem;
     white-space: nowrap;
     text-align: left;
-    border-radius: 12px;
+    border-radius: 20px;
     border: var(--border-1-2);
     background-color: white;
     box-shadow: 0 4px 8px 1px rgba(0, 0, 0, 0.05);
     cursor: pointer;
     font-size: clamp(0.75rem, 2.5vw, 1rem);
+    user-select: none;
+    font-weight: 500;
+}
+
+.family span {
+    font-size: clamp(20px, 4vw, 30px);
 }
 
 @media (max-width: 600px) {
     .family {
+        gap: 0.5rem;
         padding: 0.5rem 1rem;
     }
 }

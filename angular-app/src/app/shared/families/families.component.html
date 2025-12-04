@@ -13,11 +13,15 @@
             </div>
         }
     </header>
+
     @if (!noFamilies && !serverError) {
         <section class="scroller" [class.unfold]="familiesUnfold" (wheel)="onFamilyScroll($event)">
                 @if (!loading()) {
                     @for (family of families(); track $index) {
                         <div class="family" (click)="navigateToFamily(family)">
+                            @if (family.icon_name) {
+                                <span class="material-symbols-outlined" [style.color]="family.icon_color">{{ family.icon_name }}</span>
+                            }
                             <p>{{ family.nomfam | capitalize }}</p>
                         </div>
                     }
