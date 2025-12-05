@@ -24,16 +24,21 @@
   --border-1-2: 1px solid var(--p-slate-200);
   --border-1-3: 1px solid var(--p-slate-300);
 
+
   --header-height: 5rem;      /* tamaño por defecto */
+  --header-logo-height: calc(var(--header-height) * 0.5);
+
   --header-height-lg: 5.5rem;   /* pantallas grandes */
-  --header-height-sm: 3rem;   /* pantallas pequeñas */
+  --header-height-sm: 3rem;   /* pantallas pequeñas -> multilinea */
 
   @media (min-width: 100rem) {
     --header-height: var(--header-height-lg);
+    --header-logo-height: calc(var(--header-height-lg) * 0.5);
   }
 
   @media (max-width: 600px) {
-    --header-height: var(--header-height-sm);
+    --header-height: calc(var(--header-height-sm)*1.9);
+    --header-logo-height: calc(var(--header-height-sm) * 0.5);
   }
 }
 

@@ -1,20 +1,30 @@
 <header>
-    <div class="container" [class.extended]="isAuth">
-        <img [routerLink]="['/auth/login']"  src="assets/logos/fleming_logo.webp" alt="Fleming Logo">
-        
-        @if (isAuth) {
-            <section class="admin-menu">
-                @if (this.sideMenuService.isDrawer()) {
+    <div class="main" [class.small]="isScreenSmall()">
+        <div class="first-line">
+            <img [routerLink]="['/auth/login']"  src="assets/logos/fleming_logo.webp" alt="Fleming Logo">
+            
+            @if (!isScreenSmall()) {
+                <section class="search-bar">
+                    <app-search-bar/>
+                </section>
+            }
+
+            
+            @if (isAuth) {
+                <section class="admin-menu">
                     <div class="drawer-button" (click)="toggleSideMenu($event)">
-                        <mat-icon class="material-symbols-outlined">menu</mat-icon>
+                        <span class="material-symbols-outlined">menu</span>
                     </div>
-                } @else {
-                    <div class="user-info">
-                        <mat-icon class="material-symbols-outlined">person</mat-icon>
-                        <p>{{ username }}</p>
-                    </div>
-                }
-            </section>
+                </section>
+            }
+        </div>
+
+        @if (isScreenSmall()) {
+            <div class="second-line">
+                <section class="search-bar">
+                    <app-search-bar/>
+                </section>
+            </div>
         }
     </div>
 </header>

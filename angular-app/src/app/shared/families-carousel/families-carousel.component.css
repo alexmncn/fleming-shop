@@ -118,6 +118,7 @@ section.scroller.unfold {
 
 .family .icon {
     font-size: 30px;
+    font-variation-settings: 'FILL' 0, 'wght' 300;
 }
 
 @media (max-width: 600px) {

@@ -4,11 +4,11 @@ import { CommonModule } from '@angular/common';
 import { CatalogStoreService } from '../../../services/catalog/catalog-store.service';
 
 import { ArticlesComponent } from '../../../shared/articles/articles.component';
-import { FamiliesComponent } from "../../../shared/families/families.component";
+import { FamiliesCarouselComponent } from "../../../shared/families-carousel/families-carousel.component";
 
 @Component({
     selector: 'app-home',
-    imports: [CommonModule, ArticlesComponent, FamiliesComponent],
+    imports: [CommonModule, ArticlesComponent, FamiliesCarouselComponent],
     templateUrl: './home.component.html',
     styleUrl: './home.component.css'
 })

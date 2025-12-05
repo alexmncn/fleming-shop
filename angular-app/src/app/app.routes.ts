@@ -1,18 +1,20 @@
 import { Routes } from '@angular/router';
 
+import { authGuard } from './guards/auth.guard';
+
 import { CatalogComponent } from './features/catalog/catalog.component';
 import { HomeComponent } from './features/catalog/home/home.component';
+import { FeaturedComponent } from './features/catalog/featured/featured.component';
+import { NewComponent } from './features/catalog/new/new.component';
+import { FamiliesComponent } from './features/catalog/families/families.component';
 import { SearchComponent } from './features/catalog/search/search.component';
 import { FamilyComponent } from './features/catalog/family/family.component';
 import { AuthComponent } from './features/auth/auth.component';
 import { LoginComponent } from './features/auth/login/login.component';
 import { RegisterComponent } from './features/auth/register/register.component';
-import { authGuard } from './guards/auth.guard';
 import { AdminComponent } from './features/admin/admin.component';
 import { SalesComponent } from './features/admin/sales/sales.component';
 import { DataExportComponent } from './features/admin/data-export/data-export.component';
-import { FeaturedComponent } from './features/catalog/featured/featured.component';
-import { NewComponent } from './features/catalog/new/new.component';
 
 
 export const routes: Routes = [
@@ -23,6 +25,7 @@ export const routes: Routes = [
         children: [
             { path: '', redirectTo: 'home', pathMatch: 'full' },
             { path: 'home', component: HomeComponent },
+            { path: 'families', component: FamiliesComponent},
             { path: 'featured', component: FeaturedComponent },
             { path: 'new', component: NewComponent },
             { path: 'search', component: SearchComponent },

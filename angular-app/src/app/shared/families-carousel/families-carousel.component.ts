@@ -10,10 +10,10 @@ import { CatalogStoreService } from '../../services/catalog/catalog-store.servic
 import { Family } from '../../models/family.model';
 
 @Component({
-    selector: 'app-families',
+    selector: 'app-families-carousel',
     imports: [CommonModule, SkeletonModule, CapitalizePipe],
-    templateUrl: './families.component.html',
-    styleUrl: './families.component.css',
+    templateUrl: './families-carousel.component.html',
+    styleUrl: './families-carousel.component.css',
     animations: [
         trigger('arrowRotateLeft', [
             state('void', style({
@@ -47,7 +47,7 @@ import { Family } from '../../models/family.model';
         ])
     ]
 })
-export class FamiliesComponent implements OnInit {
+export class FamiliesCarouselComponent implements OnInit {
   families = this.catalogStore.families.families;
   total = this.catalogStore.families.total;
   loading = this.catalogStore.families.loading;
