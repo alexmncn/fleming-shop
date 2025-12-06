@@ -46,7 +46,7 @@ html, body { height: 100%;}
 body { 
   margin: 0;
   font-family: 'Montserrat','Segoe UI', Roboto, "Helvetica Neue", sans-serif;
-  background-color: var(--background-white);
+  background-color:  white;
   color: var(--p-slate-800);
 }
 
