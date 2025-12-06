@@ -367,7 +367,7 @@ section.list .info-placeholder {
     overflow: hidden;
     backdrop-filter: blur(7px);
     -webkit-backdrop-filter: blur(7px);
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: rgba(0, 0, 0, 0.3);
 }
 
 .overlay {
