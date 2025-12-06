@@ -37,7 +37,7 @@
   }
 
   @media (max-width: 600px) {
-    --header-height: calc(var(--header-height-sm)*1.9);
+    --header-height: calc(var(--header-height-sm)*1.75);
     --header-logo-height: calc(var(--header-height-sm) * 0.5);
   }
 }

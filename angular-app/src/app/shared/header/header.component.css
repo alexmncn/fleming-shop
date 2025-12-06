@@ -18,7 +18,7 @@ header {
 .main.small {
     flex-direction: column;
     margin: 0 0.5rem;
-    gap: 0.5rem;
+    gap: 0.1rem;
 }
 
 @media (min-width: 100rem) {
@@ -42,8 +42,9 @@ header {
 
 .small .first-line {
     flex: 0 0 auto;
-    margin-top: 0.5rem;
+    display: flex;
     justify-content: space-between;
+    margin-top: 0.5rem;
 }
 
 img {
@@ -53,15 +54,21 @@ img {
 
 .first-line .search-bar {
     flex: 1 1 auto;
+    display: flex;
+    justify-content: center;
+}
+
+.first-line .search-bar .container {
+    width: 50%;
+    min-width: 17rem;
 }
 
 .admin-menu .drawer-button {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 4px;
-    padding: 0.25rem;
     box-sizing: border-box;
+    border-radius: 4px;
     transition: background 0.3s ease;
     cursor: pointer;
 }
@@ -71,7 +78,7 @@ img {
 }
 
 .admin-menu .drawer-button span {
-    font-size: 30px;
+    font-size: 32px;
 }
 
 @media (max-width: 600px) {
@@ -80,8 +87,36 @@ img {
     }
 }
 
+.login-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.login-button span {
+    font-size: 32px;
+}
+
+.login-button:hover {
+    font-variation-settings: 'FILL' 1;
+}
+
+@media (max-width: 600px) {
+    .login-button span {
+        font-size: 24px;
+    }
+}
+
 
 .second-line {
     flex: 1 1 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.second-line .search-bar {
     width: 100%;
 }

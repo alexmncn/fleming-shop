@@ -1,11 +1,13 @@
 <header>
     <div class="main" [class.small]="isScreenSmall()">
         <div class="first-line">
-            <img [routerLink]="['/auth/login']"  src="assets/logos/fleming_logo.webp" alt="Fleming Logo">
+            <img [routerLink]="['/catalog/home']"  src="assets/logos/fleming_logo.webp" alt="Fleming Logo">
             
             @if (!isScreenSmall()) {
                 <section class="search-bar">
-                    <app-search-bar/>
+                    <div class="container">
+                        <app-search-bar/>
+                    </div>
                 </section>
             }
 
@@ -15,6 +17,10 @@
                     <div class="drawer-button" (click)="toggleSideMenu($event)">
                         <span class="material-symbols-outlined">menu</span>
                     </div>
+                </section>
+            } @else {
+                <section class="login-button" [routerLink]="['/auth/login']">
+                    <span class="material-symbols-outlined">account_circle</span>
                 </section>
             }
         </div>
