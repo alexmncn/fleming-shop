@@ -50,14 +50,161 @@ body {
   color: var(--p-slate-800);
 }
 
-h2 {
+
+/* Tipografía - Encabezados estándar */
+h1 {
+  font-size: 2.5rem;
+  line-height: 1.2;
+  font-weight: 700;
   margin: 0;
   color: var(--p-slate-900);
+}
 
-  @media (max-width: 600px) {
+h2 {
+  font-size: 1.875rem;  /* Reducido de 2rem */
+  line-height: 1.3;
+  font-weight: 700;
+  margin: 0;
+  color: var(--p-slate-900);
+}
+
+h3 {
+  font-size: 1.5rem;     /* Reducido de 1.75rem */
+  line-height: 1.4;
+  font-weight: 700;      /* Cambiado de 600 */
+  margin: 0;
+  color: var(--p-slate-900);
+}
+
+h4 {
+  font-size: 1.25rem;    /* Reducido de 1.5rem */
+  line-height: 1.4;
+  font-weight: 700;      /* Cambiado de 500 */
+  margin: 0;
+  color: var(--p-slate-900);
+}
+
+h5 {
+  font-size: 1.125rem;   /* Reducido de 1.25rem */
+  line-height: 1.5;
+  font-weight: 700;      /* Cambiado de 500 */
+  margin: 0;
+  color: var(--p-slate-900);
+}
+
+h6 {
+  font-size: 1rem;       /* Reducido de 1.125rem */
+  line-height: 1.5;
+  font-weight: 700;      /* Cambiado de 500 */
+  margin: 0;
+  color: var(--p-slate-900);
+}
+
+/* Responsive - Tablet */
+@media (max-width: 768px) {
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.625rem; }  /* Ajustado proporcionalmente */
+  h3 { font-size: 1.375rem; }   /* Ajustado proporcionalmente */
+  h4 { font-size: 1.125rem; }
+  h5 { font-size: 1rem; }
+  h6 { font-size: 0.9375rem; }
+}
+
+/* Responsive - Mobile */
+@media (max-width: 600px) {
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+  h4 { font-size: 1.125rem; }
+  h5 { font-size: 1rem; }
+  h6 { font-size: 0.875rem; }
+}
+
+
+/* Tipografía - Párrafos estándar */
+p {
+  font-size: 1rem;           /* 16px - tamaño base */
+  line-height: 1.6;         /* Espaciado cómodo para lectura */
+  font-weight: 400;
+  margin: 0 0 1rem 0;      /* Margen inferior para separación entre párrafos */
+  color: var(--p-slate-800);
+}
+
+/* Variantes de párrafos */
+p.lead,                      /* Párrafo destacado/introductorio */
+p.large {
+  font-size: 1.125rem;      /* 18px */
+  line-height: 1.6;
+  font-weight: 400;
+  color: var(--p-slate-700);
+}
+
+p.small,                     /* Texto pequeño */
+p.caption {
+  font-size: 0.875rem;       /* 14px */
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--p-slate-600);
+}
+
+p.description {              /* Para descripciones después de títulos */
+  font-size: 1rem;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--p-slate-600);
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+p.muted {                    /* Texto secundario/deshabilitado */
+  font-size: 0.9375rem;      /* 15px */
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--p-slate-500);
+}
+
+/* Responsive - Tablet */
+@media (max-width: 768px) {
+  p {
+    font-size: 0.9375rem;    /* 15px */
+    line-height: 1.6;
+  }
+  
+  p.lead,
+  p.large {
     font-size: 1rem;
   }
+  
+  p.small,
+  p.caption {
+    font-size: 0.8125rem;    /* 13px */
+  }
 }
+
+/* Responsive - Mobile */
+@media (max-width: 600px) {
+  p {
+    font-size: 0.875rem;     /* 14px */
+    line-height: 1.5;
+  }
+  
+  p.lead,
+  p.large {
+    font-size: 0.9375rem;    /* 15px */
+  }
+  
+  p.small,
+  p.caption {
+    font-size: 0.75rem;      /* 12px */
+  }
+  
+  p.description {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    margin-bottom: 1rem;
+  }
+}
+
 
 button {
   border: none;
