@@ -28,9 +28,9 @@
         <div class="stock-info">
           <div class="circle" [class.green]="inStock" [class.red]="!inStock"></div>
           @if (inStock) {
-            <p>Disponible</p>
+            <a>Disponible</a>
           } @else {
-            <p>Sin stock</p>
+            <a>Sin stock</a>
           }
         </div>
       }
@@ -48,9 +48,9 @@
       <div class="stock-info">
         <div class="circle" [class.green]="inStock" [class.red]="!inStock"></div>
         @if (inStock) {
-          <p>Disponible</p>
+          <a>Disponible</a>
         } @else {
-          <p>Sin stock</p>
+          <a>Sin stock</a>
         }
       </div>
     }
