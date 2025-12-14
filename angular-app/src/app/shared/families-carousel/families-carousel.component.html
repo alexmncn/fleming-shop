@@ -1,28 +1,22 @@
-<section class="families">
-    <header>
-        <h2>Familias</h2>
-        @if (!noFamilies && !serverError) {
-            <div class="un-fold" (click)="toggleFamiliesDisplay()">
-                @if (!familiesUnfold) {
-                    <p>Desplegar</p>
-                    <span @arrowRotateLeft class="pi pi-angle-down"></span>
-                } @else {
-                    <p>Ocultar</p>
-                    <span @arrowRotateRight class="pi pi-angle-up"></span>
-                }
-            </div>
-        }
-    </header>
-
+<main>
     @if (!noFamilies && !serverError) {
-        <section class="scroller" [class.unfold]="familiesUnfold" (wheel)="onFamilyScroll($event)">
+        <section 
+            class="families" 
+            [class.unfold]="familiesUnfold" 
+            (wheel)="onFamilyScroll($event)"
+            (pointerdown)="onPointerDown($event)"
+            (pointermove)="onPointerMove($event)"
+            (pointerup)="onPointerUp($event)"
+            (pointerleave)="onPointerUp($event)"
+            (mouseenter)="onMouseEnter($event)"
+            (mouseleave)="onMouseLeave($event)">
                 @if (!loading()) {
                     @for (family of families(); track $index) {
                         <div class="family" (click)="navigateToFamily(family)">
                             @if (family.icon_name) {
                                 <span class="material-symbols-outlined icon" [style.color]="family.icon_color">{{ family.icon_name }}</span>
                             }
-                            <p>{{ family.nomfam | capitalize }}</p>
+                            <a>{{ family.nomfam | capitalize }}</a>
                         </div>
                     }
                 } @else {
@@ -50,4 +44,4 @@
             <p>Se ha producido un error</p>
         </div>
     }
-</section>
+</main>

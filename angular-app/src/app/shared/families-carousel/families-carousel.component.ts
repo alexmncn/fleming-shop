@@ -56,6 +56,13 @@ export class FamiliesCarouselComponent implements OnInit {
   placeholders = signal<string[]>(new Array(20).fill(''));
   familiesUnfold: boolean = false;
 
+  private isDragging = false;
+  private startX = 0;
+  private scrollLeft = 0;
+  private scrollContainer: HTMLElement | null = null;
+  private hasAnimated = false; // Para que solo se ejecute una vez
+  private hoverAnimationTimeout: any = null;
+
   constructor(private catalogStore: CatalogStoreService, private router: Router) {}
 
   ngOnInit(): void {
@@ -76,6 +83,105 @@ export class FamiliesCarouselComponent implements OnInit {
       }
     }
   }
+
+
+  onPointerDown(event: PointerEvent): void {
+    if (this.familiesUnfold) return;
+    
+    const container = event.currentTarget as HTMLElement;
+    this.scrollContainer = container;
+    this.isDragging = true;
+    this.startX = event.pageX - container.offsetLeft;
+    this.scrollLeft = container.scrollLeft;
+    container.setPointerCapture(event.pointerId);
+    container.style.cursor = 'grabbing';
+  }
+  
+  onPointerMove(event: PointerEvent): void {
+    if (!this.isDragging || !this.scrollContainer || this.familiesUnfold) return;
+    
+    event.preventDefault();
+    const x = event.pageX - this.scrollContainer.offsetLeft;
+    const walk = (x - this.startX) * 2;
+    this.scrollContainer.scrollLeft = this.scrollLeft - walk;
+  }
+  
+  onPointerUp(event: PointerEvent): void {
+    if (this.scrollContainer) {
+      this.isDragging = false;
+      this.scrollContainer.releasePointerCapture(event.pointerId);
+      this.scrollContainer.style.cursor = 'grab';
+      this.scrollContainer = null;
+    }
+  }
+
+
+  onMouseEnter(event: MouseEvent): void {
+    if (this.familiesUnfold || this.hasAnimated) return;
+    
+    const container = event.currentTarget as HTMLElement;
+    
+    // Verificar que hay contenido para hacer scroll
+    if (container.scrollWidth <= container.clientWidth) return;
+    
+    // Delay pequeño antes de animar (opcional, para no ser intrusivo)
+    this.hoverAnimationTimeout = setTimeout(() => {
+      this.playHoverAnimation(container);
+    }, 300); // 300ms de delay
+  }
+
+  onMouseLeave(event: MouseEvent): void {
+    // Cancelar la animación si el usuario sale antes
+    if (this.hoverAnimationTimeout) {
+      clearTimeout(this.hoverAnimationTimeout);
+      this.hoverAnimationTimeout = null;
+    }
+  }
+
+  private playHoverAnimation(container: HTMLElement): void {
+    if (this.familiesUnfold || this.hasAnimated) return;
+    
+    const initialScroll = container.scrollLeft;
+    const scrollAmount = 30; // Píxeles a desplazar (ajusta según prefieras)
+    const duration = 400; // Duración de cada movimiento en ms
+    const easeOut = (t: number) => 1 - Math.pow(1 - t, 3); // Función de easing
+    
+    // Scroll hacia adelante
+    this.animateScroll(container, initialScroll, initialScroll + scrollAmount, duration, easeOut, () => {
+      // Scroll de vuelta
+      this.animateScroll(container, initialScroll + scrollAmount, initialScroll, duration, easeOut, () => {
+        this.hasAnimated = true;
+      });
+    });
+  }
+
+  private animateScroll(
+    element: HTMLElement, 
+    start: number, 
+    end: number, 
+    duration: number, 
+    easing: (t: number) => number,
+    callback?: () => void
+  ): void {
+    const startTime = performance.now();
+    
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = easing(progress);
+      
+      element.scrollLeft = start + (end - start) * eased;
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else if (callback) {
+        callback();
+      }
+    };
+    
+    requestAnimationFrame(animate);
+  }
+  
 
   toggleFamiliesDisplay() {
     this.familiesUnfold = !this.familiesUnfold;
