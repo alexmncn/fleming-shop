@@ -1,1 +1,43 @@
-<p>families works!</p>
+<main>
+    <header>
+        <h2>Familias</h2>
+        <p class="description">En esta sección podrás encontrar todas las familias de artículos disponibles en el catálogo.</p>
+    </header>
+
+    @if (!noFamilies && !serverError) {
+        <section class="families">
+            @if (!loading()) {
+                @for (family of families(); track $index) {
+                    <div class="family" (click)="navigateToFamily(family)">
+                        @if (family.icon_name) {
+                            <span class="material-symbols-outlined icon" [style.color]="family.icon_color">{{ family.icon_name }}</span>
+                        }
+                        <a>{{ family.nomfam | capitalize }}</a>
+                    </div>
+                }
+            } @else {
+                @for (placeholder of placeholders(); track $index) {
+                    <div class="family">
+                        <div class="placeholder-text">
+                            <p-skeleton height="100%" styleClass="mb-2" borderRadius="4px"/>
+                        </div>
+                    </div>
+                }
+            }
+        </section>
+    }
+
+    @if (noFamilies) {
+        <div class="no-families-info">
+            <span class="material-symbols-outlined">search_off</span>
+            <p>No se han encontrado artículos</p>
+        </div>
+    }
+
+    @if (serverError) {
+        <div class="no-families-info">
+            <span class="material-symbols-outlined">warning</span>
+            <p>Se ha producido un error</p>
+        </div>
+    }
+</main>
