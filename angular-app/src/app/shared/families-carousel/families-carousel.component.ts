@@ -54,7 +54,6 @@ export class FamiliesCarouselComponent implements OnInit {
   statusCode = this.catalogStore.families.statusCode;
 
   placeholders = signal<string[]>(new Array(20).fill(''));
-  familiesUnfold: boolean = false;
 
   private isDragging = false;
   private startX = 0;
@@ -82,35 +81,26 @@ export class FamiliesCarouselComponent implements OnInit {
 
   
   onFamilyScroll(event: WheelEvent): void {
-    if (!this.familiesUnfold) {
       const scrollContainer = event.currentTarget as HTMLElement;
       if (event.deltaY !== 0) {
         event.preventDefault();
         const scrollAmount = event.deltaY * 2;
         scrollContainer.scrollLeft += scrollAmount;
       }
-    }
   }
 
 
   onPointerDown(event: PointerEvent): void {
-    if (this.familiesUnfold) return;
-    
     const container = event.currentTarget as HTMLElement;
+    
+    // En dispositivos táctiles, no hacer nada - el click nativo y scroll funcionan correctamente
+    if (this.isTouchDevice) return;
+    
     const target = event.target as HTMLElement;
     
     // Guardar el elemento clickeado inicialmente
     this.clickedElement = target.closest('.family') as HTMLElement;
     this.scrollContainer = container;
-    
-    // En dispositivos táctiles, solo guardar posición inicial para detectar clicks
-    // No interferir con el scroll nativo
-    if (this.isTouchDevice) {
-      this.scrollLeft = container.scrollLeft;
-      this.dragStartX = event.pageX;
-      this.dragStartY = event.pageY;
-      return;
-    }
     
     // Para desktop (mouse), inicializar variables de drag
     this.dragStartX = event.pageX;
@@ -123,7 +113,7 @@ export class FamiliesCarouselComponent implements OnInit {
   
   onPointerMove(event: PointerEvent): void {
     // En dispositivos táctiles, no usar drag personalizado
-    if (this.isTouchDevice || this.familiesUnfold) return;
+    if (this.isTouchDevice) return;
     
     if (!this.scrollContainer) return;
     
@@ -154,33 +144,10 @@ export class FamiliesCarouselComponent implements OnInit {
   onPointerUp(event: PointerEvent): void {
     if (!this.scrollContainer) return;
     
-    // En dispositivos táctiles, detectar si fue click o scroll
+    // En dispositivos táctiles, no hacer nada - el click nativo y scroll funcionan correctamente
     if (this.isTouchDevice) {
-      const currentScroll = this.scrollContainer.scrollLeft;
-      const scrollDelta = Math.abs(currentScroll - this.scrollLeft);
-      const deltaX = Math.abs(event.pageX - this.dragStartX);
-      const deltaY = Math.abs(event.pageY - this.dragStartY);
-      const initialScroll = this.scrollLeft;
-      const clickedElement = this.clickedElement;
-      const scrollContainer = this.scrollContainer;
-      
-      // Limpiar referencias inmediatamente
       this.scrollContainer = null;
       this.clickedElement = null;
-      
-      // Si no hubo movimiento significativo ni scroll, fue un click
-      if (scrollDelta < 10 && deltaX < 10 && deltaY < 10 && clickedElement) {
-        // Pequeño delay para asegurar que cualquier scroll nativo termine
-        setTimeout(() => {
-          if (scrollContainer) {
-            const finalScroll = scrollContainer.scrollLeft;
-            // Verificar una vez más que no hubo scroll después del delay
-            if (Math.abs(finalScroll - initialScroll) < 10 && clickedElement) {
-              clickedElement.click();
-            }
-          }
-        }, 100);
-      }
       return;
     }
     
@@ -201,7 +168,7 @@ export class FamiliesCarouselComponent implements OnInit {
 
   onMouseEnter(event: MouseEvent): void {
     // No ejecutar animación en dispositivos táctiles
-    if (this.isTouchDevice || this.familiesUnfold || this.hasAnimated) return;
+    if (this.isTouchDevice || this.hasAnimated) return;
     
     const container = event.currentTarget as HTMLElement;
     
@@ -223,7 +190,7 @@ export class FamiliesCarouselComponent implements OnInit {
   }
 
   private playHoverAnimation(container: HTMLElement): void {
-    if (this.isTouchDevice || this.familiesUnfold || this.hasAnimated) return;
+    if (this.isTouchDevice || this.hasAnimated) return;
     
     const initialScroll = container.scrollLeft;
     const scrollAmount = 30; // Píxeles a desplazar (ajusta según prefieras)
@@ -264,11 +231,6 @@ export class FamiliesCarouselComponent implements OnInit {
     };
     
     requestAnimationFrame(animate);
-  }
-  
-
-  toggleFamiliesDisplay() {
-    this.familiesUnfold = !this.familiesUnfold;
   }
 
   navigateToFamily(family: Family): void {

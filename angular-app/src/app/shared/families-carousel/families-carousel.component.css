@@ -47,24 +47,6 @@ section.families {
     scroll-behavior: smooth;
 }
 
-section.families.unfold {
-    display: grid;
-    padding: 1rem 0.1rem;
-    padding-top: 0;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    height: auto;
-    animation: unfold 2s ease-out;
-}
-
-@keyframes unfold {
-    from {
-        max-height: 4rem;
-    }
-    to {
-        max-height: 10000px;
-    }
-}
-
 @media (max-width: 100rem) {
     section.families {
         padding: 1rem 0.1rem;
@@ -75,12 +57,6 @@ section.families.unfold {
     section.families {
         gap: 0.5rem;
         padding: 0.5rem 0.1rem;
-    }
-
-
-    section.families.unfold {
-        padding: 1rem 0.1rem;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
 }
 

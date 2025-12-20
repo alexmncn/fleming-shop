@@ -2,7 +2,6 @@
     @if (!noFamilies && !serverError) {
         <section 
             class="families" 
-            [class.unfold]="familiesUnfold" 
             (wheel)="onFamilyScroll($event)"
             (pointerdown)="onPointerDown($event)"
             (pointermove)="onPointerMove($event)"
