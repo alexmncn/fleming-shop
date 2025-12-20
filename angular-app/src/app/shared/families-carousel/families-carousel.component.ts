@@ -101,8 +101,18 @@ export class FamiliesCarouselComponent implements OnInit {
     
     // Guardar el elemento clickeado inicialmente
     this.clickedElement = target.closest('.family') as HTMLElement;
-    
     this.scrollContainer = container;
+    
+    // En dispositivos táctiles, solo guardar posición inicial para detectar clicks
+    // No interferir con el scroll nativo
+    if (this.isTouchDevice) {
+      this.scrollLeft = container.scrollLeft;
+      this.dragStartX = event.pageX;
+      this.dragStartY = event.pageY;
+      return;
+    }
+    
+    // Para desktop (mouse), inicializar variables de drag
     this.dragStartX = event.pageX;
     this.dragStartY = event.pageY;
     this.startX = event.pageX - container.offsetLeft;
@@ -112,7 +122,10 @@ export class FamiliesCarouselComponent implements OnInit {
   }
   
   onPointerMove(event: PointerEvent): void {
-    if (!this.scrollContainer || this.familiesUnfold) return;
+    // En dispositivos táctiles, no usar drag personalizado
+    if (this.isTouchDevice || this.familiesUnfold) return;
+    
+    if (!this.scrollContainer) return;
     
     // Calcular el desplazamiento desde el inicio
     const deltaX = Math.abs(event.pageX - this.dragStartX);
@@ -139,19 +152,50 @@ export class FamiliesCarouselComponent implements OnInit {
   }
   
   onPointerUp(event: PointerEvent): void {
-    if (this.scrollContainer) {
-      // Si estábamos arrastrando, liberar la captura y prevenir el click
-      if (this.isDragging) {
-        event.preventDefault();
-        this.scrollContainer.releasePointerCapture(event.pointerId);
-        this.scrollContainer.style.cursor = 'grab';
-      }
+    if (!this.scrollContainer) return;
+    
+    // En dispositivos táctiles, detectar si fue click o scroll
+    if (this.isTouchDevice) {
+      const currentScroll = this.scrollContainer.scrollLeft;
+      const scrollDelta = Math.abs(currentScroll - this.scrollLeft);
+      const deltaX = Math.abs(event.pageX - this.dragStartX);
+      const deltaY = Math.abs(event.pageY - this.dragStartY);
+      const initialScroll = this.scrollLeft;
+      const clickedElement = this.clickedElement;
+      const scrollContainer = this.scrollContainer;
       
-      this.isDragging = false;
-      this.hasDragged = false;
+      // Limpiar referencias inmediatamente
       this.scrollContainer = null;
       this.clickedElement = null;
+      
+      // Si no hubo movimiento significativo ni scroll, fue un click
+      if (scrollDelta < 10 && deltaX < 10 && deltaY < 10 && clickedElement) {
+        // Pequeño delay para asegurar que cualquier scroll nativo termine
+        setTimeout(() => {
+          if (scrollContainer) {
+            const finalScroll = scrollContainer.scrollLeft;
+            // Verificar una vez más que no hubo scroll después del delay
+            if (Math.abs(finalScroll - initialScroll) < 10 && clickedElement) {
+              clickedElement.click();
+            }
+          }
+        }, 100);
+      }
+      return;
     }
+    
+    // Lógica para desktop (con mouse)
+    // Si estábamos arrastrando, liberar la captura y prevenir el click
+    if (this.isDragging) {
+      event.preventDefault();
+      this.scrollContainer.releasePointerCapture(event.pointerId);
+      this.scrollContainer.style.cursor = 'grab';
+    }
+    
+    this.isDragging = false;
+    this.hasDragged = false;
+    this.scrollContainer = null;
+    this.clickedElement = null;
   }
 
 
