@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -52,8 +52,27 @@ export class FamiliesCarouselComponent implements OnInit {
   total = this.catalogStore.families.total;
   loading = this.catalogStore.families.loading;
   statusCode = this.catalogStore.families.statusCode;
+  displayed: number = 10;
 
-  placeholders = signal<string[]>(new Array(20).fill(''));
+  // Seleccionar 15 familias aleatorias
+  displayedFamilies = computed(() => {
+    const allFamilies = this.families();
+    if (allFamilies.length === 0) return [];
+    
+    // Crear una copia del array para no modificar el original
+    const shuffled = [...allFamilies];
+    
+    // Algoritmo Fisher-Yates para mezclar aleatoriamente
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    
+    // Retornar solo las primeras X
+    return shuffled.slice(0, this.displayed);
+  });
+
+  placeholders = signal<string[]>(new Array(16).fill('')); // 15 familias + "Ver más"
 
   private isDragging = false;
   private startX = 0;
@@ -238,12 +257,16 @@ export class FamiliesCarouselComponent implements OnInit {
     this.router.navigate(['/catalog/family', `${family.codfam}-${slug}`]);
   }
 
+  navigateToAllFamilies(): void {
+    this.router.navigate(['/catalog/families']);
+  }
+
   get noFamilies(): boolean {
-    return this.statusCode() == 404 && this.families.length == 0 && !this.loading();
+    return this.statusCode() == 404 && this.families().length == 0 && !this.loading();
   }
 
   get serverError(): boolean {
-    return (this.statusCode() == 408 || this.statusCode().toString().startsWith('5')) && this.families.length == 0 && !this.loading();
+    return (this.statusCode() == 408 || this.statusCode().toString().startsWith('5')) && this.families().length == 0 && !this.loading();
   }
 
 }
