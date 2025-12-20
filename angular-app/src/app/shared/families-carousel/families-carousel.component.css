@@ -68,7 +68,6 @@ section.families.unfold {
 @media (max-width: 100rem) {
     section.families {
         padding: 1rem 0.1rem;
-        padding-top: 0;
     }    
 }
 
@@ -81,7 +80,6 @@ section.families.unfold {
 
     section.families.unfold {
         padding: 1rem 0.1rem;
-        padding-top: 0;
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
 }
