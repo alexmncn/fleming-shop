@@ -24,6 +24,13 @@ export class MessageService {
 
   // Agrega un mensaje a la lista
   showMessage(type: string, text: string, duration: number = this.defaultDuration) {
+    // Buscar y eliminar mensajes existentes con el mismo texto
+    const existingMessages = this.messages.filter(message => message.text === text);
+    existingMessages.forEach(message => {
+      this.removeMessage(message.id);
+    });
+
+    // Añadir el nuevo mensaje
     const id = this.nextId++;
     const newMessage: Message = { id, type, text, duration };
     this.messages.push(newMessage);

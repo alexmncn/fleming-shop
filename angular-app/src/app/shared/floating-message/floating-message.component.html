@@ -1,18 +1,39 @@
-@if (messages.length > 0) {
+@if (!isHidden()) {
   <main>
     <ng-container *ngFor="let message of messages">
       <section [ngClass]="message.type" @slideInRight>
         <!-- Íconos condicionales -->
-        <mat-icon class="material-symbols-outlined" *ngIf="message.type === 'info' || message.type === 'warn'">info</mat-icon>
-        <mat-icon class="material-symbols-outlined" *ngIf="message.type === 'success'">check_circle</mat-icon>
-        <mat-icon class="material-symbols-outlined" *ngIf="message.type === 'error'">error</mat-icon>
+        <span class="material-symbols-outlined" *ngIf="message.type === 'info' || message.type === 'warn'">info</span>
+        <span class="material-symbols-outlined" *ngIf="message.type === 'success'">check_circle</span>
+        <span class="material-symbols-outlined" *ngIf="message.type === 'error'">error</span>
         <div class="message">
           <p>{{ message.text }}</p>
         </div>
-        <mat-icon class="material-symbols-outlined close" (click)="closeMessage(message.id)">close</mat-icon>
         
-        <!-- Barra de progreso, por ejemplo, para mostrar el tiempo restante -->
-        <div class="progress-bar" [ngStyle]="{ 'animation-duration': message.duration * 1000 + 'ms' }"></div>
+        <!-- Contenedor para el botón de cerrar con barra de progreso circular -->
+        <div class="close-container">
+          <svg class="progress-circle" viewBox="0 0 36 36">
+            <circle
+              class="progress-circle-bg"
+              cx="18"
+              cy="18"
+              r="16"
+              fill="none"
+              stroke="rgba(255, 255, 255, 0.3)"
+              stroke-width="2"/>
+            <circle
+              class="progress-circle-bar"
+              cx="18"
+              cy="18"
+              r="16"
+              fill="none"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+              [style.animation-duration]="message.duration * 1000 + 'ms'"/>
+          </svg>
+          <span class="material-symbols-outlined close" (click)="closeMessage(message.id)">close</span>
+        </div>
       </section>
     </ng-container>
   </main>
