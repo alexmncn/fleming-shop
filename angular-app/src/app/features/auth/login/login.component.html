@@ -3,28 +3,34 @@
     <div class="form-group">
       <label for="username">Usuario</label>
       <input type="text" id="username" formControlName="username" placeholder="Introduce tu nombre de usuario" autocomplete="off" [class.error]="loginForm.controls['username'].touched && loginForm.controls['username'].hasError('required') || credentialsError">
-      <div class="message error" @errorAnimation *ngIf="loginForm.controls['username'].touched && loginForm.controls['username'].hasError('required')">
-        <p>* Obligatorio</p>
-      </div>
+      @if (loginForm.controls['username'].touched && loginForm.controls['username'].hasError('required')) {
+        <div class="message error" @errorAnimation>
+          <p class="caption">* Obligatorio</p>
+        </div>
+      }
     </div>
 
     <div class="form-group">
       <label form="password">Contraseña</label>
       <input type="password" id="password" formControlName="password" placeholder="Introduce tu contraseña" autocomplete="off" [class.error]="loginForm.controls['password'].touched && (loginForm.controls['password'].hasError('required') || loginForm.controls['password'].hasError('minlength')) || credentialsError">
-      <div class="message error">
-        <p @errorAnimation *ngIf="loginForm.controls['password'].touched && loginForm.controls['password'].hasError('required')">* Obligatorio</p>
-        <p @errorAnimation *ngIf="loginForm.controls['password'].hasError('minlength')">La contraseña debe tener al menos {{ passwordMinLen }} caracteres</p>
-      </div>
+      @if (loginForm.controls['password'].touched && loginForm.controls['password'].hasError('required')) {
+        <div class="message error" @errorAnimation>
+          <p class="caption">* Obligatorio</p>
+        </div>
+      }
+      @if (loginForm.controls['password'].hasError('minlength')) {
+        <div class="message error" @errorAnimation>
+          <p class="caption">La contraseña debe tener al menos {{ passwordMinLen }} caracteres</p>
+        </div>
+      }
     </div>
 
-    <button type="submit" [disabled]="!loginForm.valid && (loginForm.controls['username'].touched || loginForm.controls['password'].touched)">
-      <ng-container *ngIf="!isLoading; else loadingTemplate">
-      Enviar
-      </ng-container>
-
-      <ng-template #loadingTemplate>
-      <i class="pi pi-spin pi-spinner"></i>
-      </ng-template>
+    <button type="submit" [disabled]="(!loginForm.valid && (loginForm.controls['username'].touched || loginForm.controls['password'].touched)) || isLoading">
+      @if (!isLoading) {
+        Enviar
+      } @else {
+        <i class="pi pi-spin pi-spinner"></i>
+      }
     </button>
   </form>
 

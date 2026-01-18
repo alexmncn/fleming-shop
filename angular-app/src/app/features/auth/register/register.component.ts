@@ -9,6 +9,8 @@ import { NgxTurnstileComponent } from 'ngx-turnstile';
 import { AuthService } from '../../../services/auth/auth.service';
 import { MessageService } from '../../../services/message/message.service';
 
+import { environment } from '../../../../environments/environment';
+
 @Component({
     selector: 'app-register',
     imports: [CommonModule, ReactiveFormsModule, NgxTurnstileModule],
@@ -57,7 +59,7 @@ export class RegisterComponent {
 
   // Turnstile captcha
   @ViewChild('turnstileRef') turnstileComponent!: NgxTurnstileComponent;
-  turnstileSiteKey: string = '0x4AAAAAABCNsBv9TuGNBJQn';
+  turnstileSiteKey: string = environment.turnstileSiteKey;
   turnstileResolved: boolean = false;
   turnstileResponse: string | null = null;
 
@@ -91,12 +93,12 @@ export class RegisterComponent {
                   this.tempPassword = this.registerForm.value.password;
                   this.messageService.showMessage('warn', 'Necesitas el código de confirmación para completar el registro', 0);
                 } else if (error.status == 400) {
-                  this.messageService.showMessage('error', 'Error en el captcha');
+                  this.messageService.showMessage('error', 'Error en el captcha. Inténtalo de nuevo en unos segundos...');
                 } else if (error.status == 409) {
                   this.credentialsError = true;
-                  this.messageService.showMessage('error', 'El usuario ya existe. Inténtalo de nuevo');
+                  this.messageService.showMessage('error', 'El usuario ya existe. Inténtalo de nuevo...');
                 } else if (error.status == 0 || error.status == 500) {
-                  this.messageService.showMessage('error', 'Error del servidor. Inténtalo de nuevo más tarde');
+                  this.messageService.showMessage('error', 'Error del servidor. Inténtalo de nuevo más tarde...');
                 }
 
                 this.isLoading = false;

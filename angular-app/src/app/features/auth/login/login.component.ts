@@ -9,6 +9,8 @@ import { NgxTurnstileComponent } from 'ngx-turnstile';
 import { AuthService } from '../../../services/auth/auth.service';
 import { MessageService } from '../../../services/message/message.service';
 
+import { environment } from '../../../../environments/environment';
+
 @Component({
     selector: 'app-login',
     imports: [CommonModule, ReactiveFormsModule, NgxTurnstileModule],
@@ -47,7 +49,7 @@ export class LoginComponent {
 
   // Turnstile captcha
   @ViewChild('turnstileRef') turnstileComponent!: NgxTurnstileComponent;
-  turnstileSiteKey: string = '0x4AAAAAABCNsBv9TuGNBJQn';
+  turnstileSiteKey: string = environment.turnstileSiteKey;
   turnstileResolved: boolean = false;
   turnstileResponse: string | null = null;
 
@@ -78,12 +80,12 @@ export class LoginComponent {
           },
           error: (error) => {
             if (error.status == 400) {
-              this.messageService.showMessage('error', 'Error en el captcha');
+              this.messageService.showMessage('error', 'Error en el captcha. Inténtalo de nuevo en unos segundos...');
             } else if (error.status == 401) {
-              this.messageService.showMessage('error', 'Error de autenticación');
+              this.messageService.showMessage('error', 'Credenciales incorrectas. Inténtalo de nuevo...');
               this.credentialsError = true;
             } else if (error.status == 0 || error.status == 500) {
-              this.messageService.showMessage('error', 'Error del servidor. Inténtalo de nuevo mas tarde');
+              this.messageService.showMessage('error', 'Error del servidor. Inténtalo de nuevo más tarde...');
             }
 
             this.isLoading = false;

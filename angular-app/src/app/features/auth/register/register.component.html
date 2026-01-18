@@ -1,67 +1,81 @@
 <section>
-    <form @slideInDown *ngIf="registerStep == 0" [formGroup]="registerForm" (ngSubmit)="sendRegister()" class="register-form">
-        <div class="form-group">
-            <label for="username">Usuario</label>
-            <input type="text" id="username" formControlName="username" placeholder="Introduce tu nombre de usuario" autocomplete="off" [class.error]="registerForm.controls['username'].touched && registerForm.controls['username'].hasError('required') || credentialsError">
-            <div class="message error" @errorAnimation *ngIf="registerForm.controls['username'].touched && registerForm.controls['username'].hasError('required')">
-                <p>* Obligatorio</p>
+    @if (registerStep == 0) {
+        <form @slideInDown [formGroup]="registerForm" (ngSubmit)="sendRegister()" class="register-form">
+            <div class="form-group">
+                <label for="username">Usuario</label>
+                <input type="text" id="username" formControlName="username" placeholder="Introduce tu nombre de usuario" autocomplete="off" [class.error]="registerForm.controls['username'].touched && registerForm.controls['username'].hasError('required') || credentialsError">
+                @if (registerForm.controls['username'].touched && registerForm.controls['username'].hasError('required')) {
+                    <div class="message error" @errorAnimation>
+                        <p class="caption">* Obligatorio</p>
+                    </div>
+                }
+            </div>
+    
+            <div class="form-group">
+                <label form="password">Contraseña</label>
+                <input type="password" id="password" formControlName="password" placeholder="Introduce tu contraseña" autocomplete="off" [class.error]="registerForm.controls['password'].touched && (registerForm.controls['password'].hasError('required') || registerForm.controls['password'].hasError('minlength')) || credentialsError">
+                @if (registerForm.controls['password'].touched && registerForm.controls['password'].hasError('required')) {
+                    <div class="message error" @errorAnimation>
+                        <p class="caption">* Obligatorio</p>
+                    </div>
+                }
+                @if (registerForm.controls['password'].hasError('minlength')) {
+                    <div class="message error" @errorAnimation>
+                        <p class="caption">La contraseña debe tener al menos {{ passwordMinLen }} caracteres</p>
+                    </div>
+                }
+            </div>
+    
+            <div class="form-group">
+                <label form="confirm-password">Confirmar contraseña</label>
+                <input type="password" id="confirm_password" formControlName="confirm_password" placeholder="Introduce tu contraseña" autocomplete="off" [class.error]="registerForm.controls['confirm_password'].touched && (registerForm.controls['confirm_password'].hasError('required') || registerForm.controls['password'].hasError('minlength')) || credentialsError">
+                @if (registerForm.controls['confirm_password'].touched && registerForm.controls['confirm_password'].hasError('required')) {
+                    <div class="message error" @errorAnimation>
+                        <p class="caption">* Obligatorio</p>
+                    </div>
+                }
+                @if (registerForm.controls['password'].hasError('minlength')) {
+                    <div class="message error" @errorAnimation>
+                        <p class="caption">La contraseña debe tener al menos {{ passwordMinLen }} caracteres</p>
+                    </div>
+                }
+            </div>
+    
+            <button type="submit" [disabled]="(!registerForm.valid && (registerForm.controls['username'].touched || registerForm.controls['password'].touched)) || isLoading">
+                @if (!isLoading) {
+                    Enviar
+                } @else {
+                    <i class="pi pi-spin pi-spinner"></i>
+                }
+            </button>
+        </form>
+    
+        <div class="turnstile-container">
+            <div class="turnstile-wrapper">
+                <ngx-turnstile #turnstileRef [siteKey]="turnstileSiteKey" (resolved)="handleTurnstileResolved($event)" theme="light" [tabIndex]="0"></ngx-turnstile>
             </div>
         </div>
+    }
 
-        <div class="form-group">
-            <label form="password">Contraseña</label>
-            <input type="password" id="password" formControlName="password" placeholder="Introduce tu contraseña" autocomplete="off" [class.error]="registerForm.controls['password'].touched && (registerForm.controls['password'].hasError('required') || registerForm.controls['password'].hasError('minlength')) || credentialsError">
-            <div class="message error">
-                <p @errorAnimation *ngIf="registerForm.controls['password'].touched && registerForm.controls['password'].hasError('required')">* Obligatorio</p>
-                <p @errorAnimation *ngIf="registerForm.controls['password'].hasError('minlength')">La contraseña debe tener al menos {{ passwordMinLen }} caracteres</p>
+    @if (registerStep == 1) {
+        <form @slideInDown [formGroup]="otpForm" (ngSubmit)="sendRegister()" class="register-form">
+            <div class="form-group">
+                <label form="confirm-password">Código de confirmación</label>
+                <input type="text" id="OTPcode" formControlName="OTPcode" placeholder="Introduce el código de confirmación" autocomplete="off" [class.error]="otpForm.controls['OTPcode'].touched && (otpForm.controls['OTPcode'].hasError('required') || otpForm.controls['OTPcode'].hasError('minlength') || otpForm.controls['OTPcode'].hasError('maxlength'))">
+                <div class="message error">
+                    <p class="caption" @errorAnimation *ngIf="otpForm.controls['OTPcode'].touched && otpForm.controls['OTPcode'].hasError('required')">* Obligatorio</p>
+                </div>
             </div>
-        </div>
-
-        <div class="form-group">
-            <label form="confirm-password">Confirmar contraseña</label>
-            <input type="password" id="confirm_password" formControlName="confirm_password" placeholder="Introduce tu contraseña" autocomplete="off" [class.error]="registerForm.controls['confirm_password'].touched && (registerForm.controls['confirm_password'].hasError('required') || registerForm.controls['password'].hasError('minlength')) || credentialsError">
-            <div class="message error">
-                <p @errorAnimation *ngIf="registerForm.controls['confirm_password'].touched && registerForm.controls['confirm_password'].hasError('required')">* Obligatorio</p>
-                <p @errorAnimation *ngIf="">La contraseña debe tener al menos {{ passwordMinLen }} caracteres</p>
-            </div>
-        </div>
-
-        <button type="submit" [disabled]="!registerForm.valid && (registerForm.controls['username'].touched || registerForm.controls['password'].touched)">
-            <ng-container *ngIf="!isLoading; else loadingTemplate">
-            Enviar
-            </ng-container>
-        
-            <ng-template #loadingTemplate>
-            <i class="pi pi-spin pi-spinner"></i>
-            </ng-template>
-        </button>
-    </form>
-
-    <div *ngIf="registerStep==0" class="turnstile-container">
-        <div class="turnstile-wrapper">
-            <ngx-turnstile #turnstileRef [siteKey]="turnstileSiteKey" (resolved)="handleTurnstileResolved($event)" theme="light" [tabIndex]="0"></ngx-turnstile>
-        </div>
-    </div>
-
-    <form @slideInDown *ngIf="registerStep == 1" [formGroup]="otpForm" (ngSubmit)="sendRegister()" class="register-form">
-        <div class="form-group">
-            <label form="confirm-password">Código de confirmación</label>
-            <input type="text" id="OTPcode" formControlName="OTPcode" placeholder="Introduce el código de confirmación" autocomplete="off" [class.error]="otpForm.controls['OTPcode'].touched && (otpForm.controls['OTPcode'].hasError('required') || otpForm.controls['OTPcode'].hasError('minlength') || otpForm.controls['OTPcode'].hasError('maxlength'))">
-            <div class="message error">
-                <p @errorAnimation *ngIf="otpForm.controls['OTPcode'].touched && otpForm.controls['OTPcode'].hasError('required')">* Obligatorio</p>
-            </div>
-        </div>
-
-        <button type="submit" [disabled]="!otpForm.valid && otpForm.controls['OTPcode'].touched">
-            <ng-container *ngIf="!isLoading; else loadingTemplate">
-            Confirmar
-            </ng-container>
-        
-            <ng-template #loadingTemplate>
-            <i class="pi pi-spin pi-spinner"></i>
-            </ng-template>
-        </button>
-    </form>
+    
+            <button type="submit" [disabled]="(!otpForm.valid && otpForm.controls['OTPcode'].touched) || isLoading">
+                @if (!isLoading) {
+                    Confirmar
+                } @else {
+                    <i class="pi pi-spin pi-spinner"></i>
+                }
+            </button>
+        </form>
+    }
 
     
 </section>

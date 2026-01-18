@@ -203,6 +203,10 @@ p.muted {                    /* Texto secundario/deshabilitado */
     margin-top: 0.25rem;
     margin-bottom: 1rem;
   }
+
+  p.muted {
+    font-size: 0.875rem;      /* 14px */
+  }
 }
 
 

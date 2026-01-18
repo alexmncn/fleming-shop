@@ -81,10 +81,12 @@ input.error {
 }
 
 .message.error {
-    color: var(--error-accent);
-    font-size: clamp(0.65rem, 2vw, 0.9rem);
     line-height: 0;
     position: absolute;
+}
+
+.message.error p {
+    color: var(--error-accent);
 }
 
 button {
@@ -107,6 +109,11 @@ button {
 
 button:active {
     background-color: var(--primary-accent-400);
+}
+
+button:disabled {
+    background-color: var(--primary-accent-300);
+    cursor: not-allowed;
 }
 
 @media (max-width: 600px) {
