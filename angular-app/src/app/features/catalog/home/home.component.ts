@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 import { CatalogStoreService } from '../../../services/catalog/catalog-store.service';
 
@@ -8,7 +8,7 @@ import { FamiliesCarouselComponent } from "../../../shared/families-carousel/fam
 
 @Component({
     selector: 'app-home',
-    imports: [CommonModule, ArticlesComponent, FamiliesCarouselComponent],
+    imports: [ArticlesComponent, FamiliesCarouselComponent],
     templateUrl: './home.component.html',
     styleUrl: './home.component.css'
 })

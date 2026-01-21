@@ -1,5 +1,5 @@
 import { Component, inject, Input, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { HttpClient } from '@angular/common/http';
 import { trigger, style, transition, animate, state} from '@angular/animations';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -17,7 +17,7 @@ import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-article',
-    imports: [CommonModule, SkeletonModule, CapitalizePipe],
+    imports: [SkeletonModule, CapitalizePipe],
     templateUrl: './article.component.html',
     styleUrl: './article.component.css',
     animations: [

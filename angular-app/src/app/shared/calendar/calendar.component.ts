@@ -1,12 +1,12 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatIcon } from '@angular/material/icon';
 
 import { CapitalizeFirstPipe } from '../../pipes/capitalize/capitalize-first-pipe';
 
 @Component({
   selector: 'app-calendar',
-  imports: [CommonModule, MatIcon, CapitalizeFirstPipe],
+  imports: [MatIcon, CapitalizeFirstPipe],
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.css']
 })

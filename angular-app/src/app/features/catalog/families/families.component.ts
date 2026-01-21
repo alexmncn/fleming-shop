@@ -1,5 +1,5 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { SkeletonModule } from 'primeng/skeleton';
 
@@ -10,7 +10,7 @@ import { Family } from '../../../models/family.model';
 
 @Component({
   selector: 'app-families',
-  imports: [CommonModule, SkeletonModule, CapitalizePipe],
+  imports: [SkeletonModule, CapitalizePipe],
   templateUrl: './families.component.html',
   styleUrl: './families.component.css'
 })

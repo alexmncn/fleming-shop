@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { trigger, style, transition, animate, state } from '@angular/animations';
@@ -13,7 +13,7 @@ import { environment } from '../../../../environments/environment';
 
 @Component({
     selector: 'app-register',
-    imports: [CommonModule, ReactiveFormsModule, NgxTurnstileModule],
+    imports: [ReactiveFormsModule, NgxTurnstileModule],
     templateUrl: './register.component.html',
     styleUrl: './register.component.css',
     animations: [

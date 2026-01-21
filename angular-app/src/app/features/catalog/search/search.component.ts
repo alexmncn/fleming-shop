@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute } from '@angular/router';
 import { catchError, timeout } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -10,7 +10,7 @@ import { CatalogApiService } from '../../../services/catalog/catalog-api.service
 
 @Component({
     selector: 'app-search',
-    imports: [CommonModule, ArticlesComponent],
+    imports: [ArticlesComponent],
     templateUrl: './search.component.html',
     styleUrl: './search.component.css'
 })

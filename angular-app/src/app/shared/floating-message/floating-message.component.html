@@ -1,15 +1,20 @@
 @if (!isHidden()) {
   <main>
-    <ng-container *ngFor="let message of messages">
+    @for (message of messages; track message) {
       <section [ngClass]="message.type" @slideInRight>
         <!-- Íconos condicionales -->
-        <span class="material-symbols-outlined" *ngIf="message.type === 'info' || message.type === 'warn'">info</span>
-        <span class="material-symbols-outlined" *ngIf="message.type === 'success'">check_circle</span>
-        <span class="material-symbols-outlined" *ngIf="message.type === 'error'">error</span>
+        @if (message.type === 'info' || message.type === 'warn') {
+          <span class="material-symbols-outlined">info</span>
+        }
+        @if (message.type === 'success') {
+          <span class="material-symbols-outlined">check_circle</span>
+        }
+        @if (message.type === 'error') {
+          <span class="material-symbols-outlined">error</span>
+        }
         <div class="message">
           <p>{{ message.text }}</p>
         </div>
-        
         <!-- Contenedor para el botón de cerrar con barra de progreso circular -->
         <div class="close-container">
           <svg class="progress-circle" viewBox="0 0 36 36">
@@ -21,21 +26,20 @@
               fill="none"
               stroke="rgba(255, 255, 255, 0.3)"
               stroke-width="2"/>
-            <circle
-              class="progress-circle-bar"
-              cx="18"
-              cy="18"
-              r="16"
-              fill="none"
-              stroke="white"
-              stroke-width="2"
-              stroke-linecap="round"
-              [style.animation-duration]="message.duration * 1000 + 'ms'"/>
-          </svg>
-          <span class="material-symbols-outlined close" (click)="closeMessage(message.id)">close</span>
-        </div>
-      </section>
-    </ng-container>
-  </main>
-}
-  
+              <circle
+                class="progress-circle-bar"
+                cx="18"
+                cy="18"
+                r="16"
+                fill="none"
+                stroke="white"
+                stroke-width="2"
+                stroke-linecap="round"
+                [style.animation-duration]="message.duration * 1000 + 'ms'"/>
+              </svg>
+              <span class="material-symbols-outlined close" (click)="closeMessage(message.id)">close</span>
+            </div>
+          </section>
+        }
+      </main>
+    }

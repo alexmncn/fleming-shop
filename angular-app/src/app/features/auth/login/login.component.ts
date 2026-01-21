@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { trigger, state, style, transition, animate } from '@angular/animations';
@@ -13,7 +13,7 @@ import { environment } from '../../../../environments/environment';
 
 @Component({
     selector: 'app-login',
-    imports: [CommonModule, ReactiveFormsModule, NgxTurnstileModule],
+    imports: [ReactiveFormsModule, NgxTurnstileModule],
     templateUrl: './login.component.html',
     styleUrl: './login.component.css',
     animations: [

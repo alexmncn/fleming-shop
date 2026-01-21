@@ -1,5 +1,5 @@
 import { Component, computed, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { MessageService } from '../../../services/message/message.service';
@@ -10,7 +10,7 @@ import { PaginatedListStore } from '../../../services/catalog/paginated-list-sto
 
 @Component({
     selector: 'app-family',
-    imports: [CommonModule, ArticlesComponent],
+    imports: [ArticlesComponent],
     templateUrl: './family.component.html',
     styleUrl: './family.component.css'
 })

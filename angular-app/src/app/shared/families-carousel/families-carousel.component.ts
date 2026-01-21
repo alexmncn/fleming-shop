@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { SkeletonModule } from 'primeng/skeleton';
 import { trigger, style, transition, animate, state } from '@angular/animations';
@@ -11,7 +11,7 @@ import { Family } from '../../models/family.model';
 
 @Component({
     selector: 'app-families-carousel',
-    imports: [CommonModule, SkeletonModule, CapitalizePipe],
+    imports: [SkeletonModule, CapitalizePipe],
     templateUrl: './families-carousel.component.html',
     styleUrl: './families-carousel.component.css',
     animations: [

@@ -1,6 +1,6 @@
 import { Component, effect, EventEmitter, Input, Output, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'primeng/select';
 
@@ -8,7 +8,7 @@ import { ArticleComponent } from '../article/article.component';
 
 @Component({
     selector: 'app-articles',
-    imports: [CommonModule, ArticleComponent, FormsModule, SelectModule],
+    imports: [ArticleComponent, FormsModule, SelectModule],
     templateUrl: './articles.component.html',
     styleUrl: './articles.component.css'
 })

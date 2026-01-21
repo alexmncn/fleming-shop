@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterOutlet, RouterLink } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
 import { MatDivider } from '@angular/material/divider';
@@ -7,7 +7,7 @@ import { FloatingMessageComponent } from "../../shared/floating-message/floating
 
 @Component({
     selector: 'app-auth',
-    imports: [CommonModule, RouterOutlet, RouterLink, MatDivider, MatIcon, FloatingMessageComponent],
+    imports: [RouterOutlet, RouterLink, MatDivider, MatIcon, FloatingMessageComponent],
     templateUrl: './auth.component.html',
     styleUrl: './auth.component.css'
 })
