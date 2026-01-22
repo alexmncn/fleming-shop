@@ -21,7 +21,7 @@
     "@angular/platform-browser-dynamic": "^21.1.0",
     "@angular/router": "^21.1.0",
     "@primeng/themes": "^19.0.10",
-    "ngx-cookie-service": "^20.1.0",
+    "ngx-cookie-service": "^21.1.0",
     "ngx-select-dropdown": "^3.3.2",
     "ngx-turnstile": "^0.2.4",
     "primeflex": "^4.0.0",
