@@ -3,52 +3,56 @@
         @if (this.drawerVisible()) {
             <!-- Drawer overlay -->
             <div class="drawer">
-            <div class="drawer-overlay" (click)="sideMenuService.toggle()" [class.fade-in]="sideMenuService.isOpen()" [class.fade-out]="!sideMenuService.isOpen()"></div>
-            <aside class="drawer-panel" [class.open]="sideMenuService.isOpen()" [class.slide-in]="sideMenuService.isOpen()" [class.slide-out]="!sideMenuService.isOpen()">
-                <div class="top">
-                <button class="close-btn" (click)="sideMenuService.toggle()">
-                    <i class="pi pi-times"></i>
-                </button>
-                </div>
-
-                <div class="divider"></div>
-            
-                <div class="middle">
-                <ul>
-                    @for (item of menuItems; track item.label) {
-                    <li class="option" [class.active]="isActive(item)" [title]="item.label" (click)="navigateTo(item.routerLink)">
+                <div class="drawer-overlay" (click)="sideMenuService.toggle()" [class.fade-in]="sideMenuService.isOpen()" [class.fade-out]="!sideMenuService.isOpen()"></div>
+                <aside class="drawer-panel" [class.open]="sideMenuService.isOpen()" [class.slide-in]="sideMenuService.isOpen()" [class.slide-out]="!sideMenuService.isOpen()">
+                    <div class="top">
                         <div class="content">
-                        <i [class]="item.icon"></i>
-                        <span>{{ item.label }}</span>
+                            <img src="assets/logos/cesta_fleming_logo.webp" alt="Cesta Fleming Logo">
+                            <div class="button-container">
+                                <button class="close-btn" (click)="sideMenuService.toggle()">
+                                    <i class="pi pi-times"></i>
+                                </button>
+                            </div>
                         </div>
-                    </li>
-                    }
-                </ul>
-                </div>
-                
-                <div class="divider"></div>
-                
-                <div class="bottom">
-                <div class="option logout" (click)="logout()">
-                    <div class="content">
-                    <i class="pi pi-sign-out"></i>
-                    <span>Cerrar sesión</span>
                     </div>
-                </div>
-                </div>
                 
-            </aside>
+                    <div class="middle">
+                        <ul>
+                            @for (item of menuItems; track item.label) {
+                            <li class="option" [class.active]="isActive(item)" [title]="item.label" (click)="navigateTo(item.routerLink)">
+                                <div class="content">
+                                <i [class]="item.icon"></i>
+                                <span>{{ item.label }}</span>
+                                </div>
+                            </li>
+                            }
+                        </ul>
+                    </div>
+
+                    <div class="bottom">
+                        <div class="option logout" (click)="logout()">
+                            <div class="content">
+                            <i class="pi pi-sign-out"></i>
+                            <span>Cerrar sesión</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </aside>
             </div>
         }
     } @else {
         <aside class="sidebar" [class.visible]="drawerVisible()" [class.expanded]="sideMenuService.isOpen()">
         <div class="top">
-            <button class="toggle-btn" (click)="sideMenuService.toggle()">
-            <i class="pi pi-angle-double-left"></i>
-            </button>
+            <div class="content">
+                <img src="assets/logos/cesta_fleming_logo.webp" alt="Cesta Fleming Logo">
+                <div class="button-container">
+                    <button class="toggle-btn" (click)="sideMenuService.toggle()">
+                        <i class="pi pi-angle-double-right"></i>
+                    </button>
+                </div>
+            </div>
         </div>
-
-        <div class="divider"></div>
         
         <div class="middle">
             <ul>
@@ -65,16 +69,14 @@
             </ul>
         </div>
         
-        <div class="divider"></div>
-        
         <div class="bottom">
             <div class="option logout" (click)="logout()">
-            <div class="content">
-                <i class="pi pi-sign-out"></i>
-                @if (sideMenuService.isOpen()) {
-                <span>Cerrar sesión</span>
-                }
-            </div>
+                <div class="content">
+                    <i class="pi pi-sign-out"></i>
+                    @if (sideMenuService.isOpen()) {
+                    <span>Cerrar sesión</span>
+                    }
+                </div>
             </div>
         </div>
         </aside>

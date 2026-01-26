@@ -1,14 +1,23 @@
 main {
   display: flex;
-  flex-direction: row;
-  height: calc(100svh - var(--header-height));
+  overflow: hidden;
+  height: 100svh;
+}
+
+.content {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: var(--background-white);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
 .main-content {
   flex: 1 1 auto;
-  background: var(--background-white);
-  box-sizing: border-box;
+  min-width: 0;
+  height: calc(100svh - var(--header-height));
   overflow: auto;
 }
 

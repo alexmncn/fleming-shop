@@ -4,9 +4,8 @@ aside.sidebar {
   flex-direction: column;
   align-items: stretch;
   box-sizing: border-box;
-  padding: 0.5rem;
   background: white;
-  border-left: var(--border-1-3);
+  border-right: var(--border-1-3);
   overflow: hidden;
   width: 70px;
   transition: width 0.3s ease;
@@ -16,43 +15,72 @@ aside.sidebar {
   width: 260px;
 }
 
-.divider {
-  height: 1px;
-  width: 100%;
-  align-self: center;
-  background: var(--p-slate-300);
-}
-
 
 .top {
+  display: flex;
+  align-items: center;
+  width: 100%;
   flex: 0 0 auto;
-  margin-bottom: 0.5rem;
+  width: 100%;
+  height: calc(var(--header-height));
+  padding: 0.5rem;
+  border-bottom: var(--border-1-3);
+  overflow: hidden;
 }
 
-.sidebar.expanded > .top {
-  justify-content: flex-start;
+.top .content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+}
+
+.top .content img {
+  margin-left: 0.35rem;
+  height: var(--header-logo-height);
+}
+
+.top .content .button-container {
+  display: flex;
+  justify-content: end;
+  width: 100%;
 }
 
 .toggle-btn {
   background: var(--p-slate-100);
   border: none;
   border-radius: 8px;
-  height: 35px;
-  width: 50px;
+  height: 40px;
+  width: 40px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s, transform 0.2s;
+  opacity: 0;
+  transition: background 0.2s, transform 0.2s, opacity 0.2s;
 }
 
 .toggle-btn:hover {
   background: var(--p-slate-200);
-  transform: translateX(-3px);
+  transform: translateX(3px);
+}
+
+.sidebar.expanded .toggle-btn {
+  opacity: 1;
 }
 
 .sidebar.expanded .toggle-btn:hover {
-  transform: translateX(3px);
+  transform: translateX(-3px);
+}
+
+.toggle-btn i {
+  font-size: 1.4rem;
+  color: var(--p-slate-600);
+  transition: transform 0.3s;
+}
+
+.sidebar.expanded .toggle-btn i {
+  transform: rotateY(180deg);
 }
 
 .toggle-btn i {
@@ -69,7 +97,7 @@ aside.sidebar {
 .middle {
   flex: 1 1 auto;
   overflow: auto;
-  padding: 0.5rem 0;
+  padding: 0.5rem;
 }
 
 .middle ul {
@@ -152,10 +180,14 @@ aside.sidebar {
   background: var(--error-accent);
 }
 
+
 .bottom {
   flex: 0 0 auto;
   margin-top: 0.5rem;
+  padding: 0.5rem;
+  border-top: var(--border-1-3);
 }
+
 
 
 .drawer {
@@ -175,7 +207,7 @@ aside.sidebar {
 .drawer-panel {
   position: absolute;
   top: 0;
-  right: 0;
+  left: 0;
   width: 260px;
   height: 100%;
   
@@ -184,9 +216,8 @@ aside.sidebar {
   flex-direction: column;
   align-items: stretch;
   box-sizing: border-box;
-  padding: 0.5rem;
   background: white;
-  border-left: var(--border-1-3);
+  border-right: var(--border-1-3);
   overflow: hidden;
   box-shadow: -2px 0 8px rgba(0,0,0,0.2);
   transform: translateX(100%);
@@ -202,8 +233,8 @@ aside.sidebar {
   background: var(--p-slate-100);
   border: none;
   border-radius: 8px;
-  height: 35px;
-  width: 50px;
+  height: 40px;
+  width: 40px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -211,10 +242,10 @@ aside.sidebar {
   transition: background 0.2s;
 }
 
-.toggle-btn i {
-  font-size: 1.4rem;
-  color: var(--p-slate-600);
+.close-btn:hover {
+  background: var(--p-slate-200);
 }
+
 
 /* Drawer animations */
 .slide-in {
@@ -223,9 +254,10 @@ aside.sidebar {
 .slide-out {
   animation: slideOut 200ms ease-in forwards;
 }
+
 @keyframes slideIn {
   from {
-    transform: translateX(100%);
+    transform: translateX(-100%);
     opacity: 0;
   }
   to {
@@ -239,7 +271,7 @@ aside.sidebar {
     opacity: 1;
   }
   to {
-    transform: translateX(100%);
+    transform: translateX(-100%);
     opacity: 0;
   }
 }
@@ -251,6 +283,7 @@ aside.sidebar {
 .fade-out {
   animation: fadeOut 200ms ease-in forwards;
 }
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

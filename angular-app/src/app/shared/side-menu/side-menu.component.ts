@@ -13,7 +13,6 @@ import { SideMenuService } from '../../services/side-menu/side-menu.service';
 })
 export class SideMenuComponent {
   isAuth: boolean = false;
-  isScreenSmall: boolean = window.innerWidth <= 600;
   currentRoute: string = "";
   drawerVisible = signal(false);
 

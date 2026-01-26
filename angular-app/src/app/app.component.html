@@ -1,10 +1,12 @@
-<app-header/>
 <main>
-    <section class="main-content">
-        <router-outlet/>
-        @if (showFooter) {
-            <app-footer/>
-        }
-    </section>
     <app-side-menu/>
+    <section class="content">
+        <app-header/>
+        <section class="main-content">
+            <router-outlet/>
+            @if (showFooter) {
+                <app-footer/>
+            }
+        </section>
+    </section>
 </main>
