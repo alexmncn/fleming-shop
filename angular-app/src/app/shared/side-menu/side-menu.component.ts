@@ -15,6 +15,8 @@ export class SideMenuComponent {
   isAuth: boolean = false;
   currentRoute: string = "";
   drawerVisible = signal(false);
+  isMenuHover = signal(false)
+  isMenuFixed = signal(false)
 
   menuItems = [
     { label: 'Catálogo', icon: 'pi pi-home', routerLink: '/catalog' },
@@ -53,6 +55,31 @@ export class SideMenuComponent {
 
   isActive(item: any) {
     return this.router.url.includes(item.routerLink);
+  }
+
+  onMenuHover(isHover: boolean): void {
+    this.isMenuHover.set(isHover);
+    if (isHover) {
+      this.sideMenuService.open()
+      console.log("abierto hover")
+    } else {
+      if (!this.isMenuFixed()) {
+        this.sideMenuService.close()
+        console.log("cerrado hover out")
+      }
+      console.log("nada hover out")
+    }
+  }
+
+  fixMenu(): void {
+    if (this.isMenuFixed()) {
+      this.sideMenuService.close()
+      this.isMenuFixed.set(false)
+    } else {
+      this.isMenuFixed.set(true)
+    }
+    
+    console.log("estado fix menu:" + this.isMenuFixed)
   }
 
   logout(): void {

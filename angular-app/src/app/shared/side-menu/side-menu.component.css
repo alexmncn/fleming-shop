@@ -11,7 +11,11 @@ aside.sidebar {
   transition: width 0.3s ease;
 }
 
-.sidebar.expanded {
+aside.sidebar.expanded.fixed {
+  width: 260px;
+}
+
+aside.sidebar.expanded:hover {
   width: 260px;
 }
 
@@ -62,7 +66,6 @@ aside.sidebar {
 
 .toggle-btn:hover {
   background: var(--p-slate-200);
-  transform: translateX(3px);
 }
 
 .sidebar.expanded .toggle-btn {
@@ -70,6 +73,10 @@ aside.sidebar {
 }
 
 .sidebar.expanded .toggle-btn:hover {
+  transform: translateX(3px);
+}
+
+.sidebar.expanded.fixed .toggle-btn:hover {
   transform: translateX(-3px);
 }
 
@@ -79,17 +86,7 @@ aside.sidebar {
   transition: transform 0.3s;
 }
 
-.sidebar.expanded .toggle-btn i {
-  transform: rotateY(180deg);
-}
-
-.toggle-btn i {
-  font-size: 1.4rem;
-  color: var(--p-slate-600);
-  transition: transform 0.3s;
-}
-
-.sidebar.expanded .toggle-btn i {
+.sidebar.expanded.fixed .toggle-btn i {
   transform: rotateY(180deg);
 }
 
@@ -159,7 +156,7 @@ aside.sidebar {
   display: inline-block;
   opacity: 0;
   transform: translateX(-10px);
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition: opacity 0.15s ease, transform 0.25s ease;
 }
 
 /* Cuando el sidebar está expandido */

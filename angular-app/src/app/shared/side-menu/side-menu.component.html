@@ -42,12 +42,12 @@
             </div>
         }
     } @else {
-        <aside class="sidebar" [class.visible]="drawerVisible()" [class.expanded]="sideMenuService.isOpen()">
+        <aside class="sidebar" [class.visible]="drawerVisible()" [class.expanded]="sideMenuService.isOpen()" [class.fixed]="isMenuFixed()" (mouseenter)="onMenuHover(true)" (mouseleave)="onMenuHover(false)">
         <div class="top">
             <div class="content">
                 <img src="assets/logos/cesta_fleming_logo.webp" alt="Cesta Fleming Logo">
                 <div class="button-container">
-                    <button class="toggle-btn" (click)="sideMenuService.toggle()">
+                    <button class="toggle-btn" (click)="fixMenu()">
                         <i class="pi pi-angle-double-right"></i>
                     </button>
                 </div>
