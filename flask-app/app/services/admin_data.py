@@ -4,7 +4,7 @@ from app.extensions import db
 from app.models import Article, Family, DailySales, Ticket, TicketItem
 from app.services.pushover_alerts import send_alert
 
-
+# Articles
 def feature_article(codebar, featured):
     try:    
         session = db.session
@@ -54,7 +54,9 @@ def hide_article(codebar, hidden):
             send_alert(f'Error al eliminar de ocultos el articulo con <b>codebar: {codebar}</b>:\n {e}', 0)
             
         return e
-    
+
+
+# Families
 def hide_family(codfam, hidden):
     try:    
         session = db.session
@@ -107,7 +109,8 @@ def hide_family_articles(codfam, hidden):
             send_alert(f'Error al eliminar de ocultos los articulos de la familia con <b>codigo: {codfam}</b>:\n {e}', 0)
         return e
     
-     
+
+# Sales Data
 def all_daily_sales():
     return [ds.to_dict() for ds in DailySales.query.all()]
 
