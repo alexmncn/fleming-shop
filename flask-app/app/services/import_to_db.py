@@ -1,5 +1,6 @@
 import re
 import math
+import numbers
 import os, time, glob, re, math, uuid
 from datetime import datetime
 import pandas as pd
@@ -23,6 +24,63 @@ article_column_to_attribute_map = {
     'CCODEBAR': 'codebar',
     'DACTUALIZA': 'factualizacion'
 }
+
+ARTICLE_ID_DTYPE = {'CREF': str, 'CCODEBAR': str}
+HTICKETL_ID_DTYPE = {'CREF': str, 'CCODBAR': str}
+
+
+def normalize_numeric_id(value, field_name):
+    """
+    Normaliza ref/codebar a str de solo dígitos.
+    Devuelve (valor_normalizado, mensaje_error, mensaje_correccion).
+    """
+    if pd.isna(value):
+        return None, f"El campo '{field_name}' está vacío o no contiene números.", None
+
+    if isinstance(value, bool):
+        return None, f"El campo '{field_name}' no es del tipo esperado (int, str): Type -> {type(value)}.", None
+
+    if isinstance(value, float):
+        if not value.is_integer():
+            return None, f"El campo '{field_name}' no es del tipo esperado (int, str): Type -> {type(value)}.", None
+        value = int(value)
+    elif isinstance(value, numbers.Integral):
+        value = int(value)
+    elif isinstance(value, str):
+        original = value.strip()
+        if original.lower() in ('nan', 'none', ''):
+            return None, f"El campo '{field_name}' está vacío o no contiene números.", None
+        if re.fullmatch(r'\d+\.0', original):
+            original = original[:-2]
+        value = original
+    else:
+        return None, f"El campo '{field_name}' no es del tipo esperado (int, str): Type -> {type(value)}.", None
+
+    original = str(value).strip()
+    if re.search(r'[eE]', original):
+        return None, f"El campo '{field_name}' contiene notación científica (dato corrupto).", None
+
+    cleaned = re.sub(r'\D', '', original)
+    if not cleaned:
+        return None, f"El campo '{field_name}' está vacío o no contiene números.", None
+
+    fix = None
+    if cleaned != original:
+        fix = f"Se han eliminado caracteres no numéricos del campo '{field_name}'."
+
+    return cleaned, None, fix
+
+
+def format_id_for_csv(value):
+    """Convierte un identificador a string estable antes de guardarlo en CSV."""
+    normalized, error, _ = normalize_numeric_id(value, 'ID')
+    if not error:
+        return normalized
+    if pd.isna(value):
+        return pd.NA
+    if isinstance(value, float) and value.is_integer():
+        return str(int(value))
+    return str(value).strip()
 
 
 def process_import_file(import_file_id, username, max_retries=0):
@@ -130,14 +188,14 @@ def articles_dbf_to_csv(articles_dbf_path, articles_dbf_name, filetype):
     csv_path = os.path.join(DATA_ROUTE, f'no_filtered_{articles_dbf_name}.csv') # No filtered csv path
     df.to_csv(csv_path, index=False) # Save raw data as csv
     
-    df = pd.read_csv(csv_path) # Read the csv data
+    df = pd.read_csv(csv_path, dtype=ARTICLE_ID_DTYPE) # Read the csv data
     df.columns = df.columns.str.strip()
     
-    # Convertir a string y quitar ".0" para columnas específicas
+    # Normalizar identificadores como texto de dígitos
     columns_to_fix = ['CREF', 'CCODEBAR']
     for col in columns_to_fix:
         if col in df.columns:
-            df[col] = df[col].astype(str).str.replace(r'\.0$', '', regex=True)
+            df[col] = df[col].apply(format_id_for_csv)
     
     selected_columns = article_column_to_attribute_map.keys()  # Set the needed columns from keys of defined map
     
@@ -174,34 +232,22 @@ def validate_clean_article_data(row):
     errors = []  # Errores encontrados
 
     # === CCODEBAR ===
-    codebar = row.get('CCODEBAR')
-    if not isinstance(codebar, (int, str)):
-        errors.append(f"El campo 'CCODEBAR' no es del tipo esperado (int, str): Type -> {type(codebar)}.")
+    normalized, error, fix = normalize_numeric_id(row.get('CCODEBAR'), 'CCODEBAR')
+    if error:
+        errors.append(error)
     else:
-        original = str(codebar).strip()
-        cleaned = re.sub(r'\D', '', original)
-        if not cleaned:
-            errors.append("El campo 'CCODEBAR' está vacío o no contiene números.")
-        elif cleaned != original:
-            fixes.append("Se han eliminado caracteres no numéricos del campo 'CCODEBAR'.")
-            row['CCODEBAR'] = cleaned
-        else:
-            row['CCODEBAR'] = original
+        if fix:
+            fixes.append(fix)
+        row['CCODEBAR'] = normalized
 
     # === CREF ===
-    ref = row.get('CREF')
-    if not isinstance(ref, (int, str)):
-        errors.append(f"El campo 'CREF' no es del tipo esperado (int, str): Type -> {type(ref)}.")
+    normalized, error, fix = normalize_numeric_id(row.get('CREF'), 'CREF')
+    if error:
+        errors.append(error)
     else:
-        original = str(ref).strip()
-        cleaned = re.sub(r'\D', '', original)
-        if not cleaned:
-            errors.append("El campo 'CREF' está vacío o no contiene números.")
-        elif cleaned != original:
-            fixes.append("Se han eliminado caracteres no numéricos del campo 'CREF'.")
-            row['CREF'] = cleaned
-        else:
-            row['CREF'] = original
+        if fix:
+            fixes.append(fix)
+        row['CREF'] = normalized
 
     # === CDETALLE ===
     detalle = row.get('CDETALLE')
@@ -241,6 +287,10 @@ def clean_nan_value(value):
     # pd.isna() retorna True para np.nan, None, etc.
     if pd.isna(value):
         return None
+    if isinstance(value, float) and math.isfinite(value) and value.is_integer():
+        return str(int(value))
+    if isinstance(value, numbers.Integral):
+        return str(int(value))
     return value
 
 def update_articles(articles_dbf_path, articles_dbf_name, filetype, username):
@@ -263,7 +313,7 @@ def update_articles(articles_dbf_path, articles_dbf_name, filetype, username):
                 raise TimeoutError(f"El archivo {articles_csv_path} no estuvo disponible en {timeout} segundos.")
             time.sleep(interval)
         
-        articles_csv = pd.read_csv(articles_csv_path)
+        articles_csv = pd.read_csv(articles_csv_path, dtype=ARTICLE_ID_DTYPE)
     except Exception as e:
         status = 1
         status_info = f"Error al leer el CSV: {str(e)}"
@@ -325,76 +375,79 @@ def update_articles(articles_dbf_path, articles_dbf_name, filetype, username):
                 
             # Eliminar duplicados, manteniendo solo la primera ocurrencia
             clean_articles_csv = clean_articles_csv.drop_duplicates(subset=['CCODEBAR'], keep='first')
-                
-            
-            # Cargamos todos los artículos existentes en la DB
-            db_articles = {article.codebar: article for article in Article.query.all()}
-            deleted_articles = set(db_articles.keys()) # Inicializamos los artículos a eliminar
-            
-            # Actualizar o crear los artículos en la DB
-            new_articles = []
-            updated_articles = []
-            
-            # Recorrer los artículos del CSV
-            for _, article_csv in clean_articles_csv.iterrows():
-                codebar = article_csv['CCODEBAR']
-                
-                # Si el artículo ya existe, se actualiza
-                if codebar in db_articles:
-                    article_db = db_articles[codebar] # Obtener el artículo de la lista de la DB
-                    deleted_articles.remove(codebar) # Eliminar de la lista de articulos a eliminar
-                    
-                    changes = {}
-                    for col, attr in article_column_to_attribute_map.items():
-                        if col != 'CCODEBAR': # Filtramos el codebar (simpre coincidirán)
-                            new_value = article_csv[col] # Valor 'nuevo' del CSV
-                            db_value = getattr(article_db, attr) # Valor actual en la DB
-                            
-                            # Convertir la fecha a string sin la hora, para comparar con el CSV
-                            if attr == 'factualizacion':
-                                db_value = db_value.strftime('%Y-%m-%d')
-                                
-                            # Si cambia el valor, se guarda en 'changes'
-                            if new_value != db_value:
-                                changes[attr] = new_value
-                            
-                    # Si hay cambios, se actualiza el artículo y se guarda en la lista de actualizados
-                    if changes:
-                        for attr, new_value in changes.items():
-                            setattr(article_db, attr, new_value)
-                        updated_articles.append(article_db)
-                        
-                else:
-                    # Inserta como nuevo artículo 
-                    article = Article(
-                        ref=article_csv['CREF'],
-                        detalle=article_csv['CDETALLE'],
-                        codfam=article_csv['CCODFAM'],
-                        pcosto=article_csv['NCOSTEDIV'],
-                        pvp=article_csv['NPVP'],
-                        codebar=article_csv['CCODEBAR'],
-                        factualizacion=article_csv['DACTUALIZA']
-                    )
-                    new_articles.append(article)
-                
-            # Aplicar cambios en la base de datos
-            try:
-                session = db.session
-                session.add_all(new_articles) # Insertar los nuevos artículos
-                session.add_all(updated_articles) # Actualizar los artículos modificados 
 
-                for codebar in deleted_articles:
-                    session.delete(db_articles[codebar]) # Eliminar los artículos que ya no existen
-                    
-                session.commit() # Confirmar los cambios
-                
-                status_info = "Importación completada con exito."
-            except SQLAlchemyError as e:
-                session.rollback()
+            if len(clean_rows) == 0:
                 status = 1
-                status_info = f"Error en la base de datos: {str(e)}"
-            finally:
-                session.close()
+                status_info = "Importación abortada: ninguna fila válida. No se modificó la base de datos."
+            else:
+                # Cargamos todos los artículos existentes en la DB
+                db_articles = {article.codebar: article for article in Article.query.all()}
+                deleted_articles = set(db_articles.keys()) # Inicializamos los artículos a eliminar
+                
+                # Actualizar o crear los artículos en la DB
+                new_articles = []
+                updated_articles = []
+                
+                # Recorrer los artículos del CSV
+                for _, article_csv in clean_articles_csv.iterrows():
+                    codebar = article_csv['CCODEBAR']
+                    
+                    # Si el artículo ya existe, se actualiza
+                    if codebar in db_articles:
+                        article_db = db_articles[codebar] # Obtener el artículo de la lista de la DB
+                        deleted_articles.remove(codebar) # Eliminar de la lista de articulos a eliminar
+                        
+                        changes = {}
+                        for col, attr in article_column_to_attribute_map.items():
+                            if col != 'CCODEBAR': # Filtramos el codebar (simpre coincidirán)
+                                new_value = article_csv[col] # Valor 'nuevo' del CSV
+                                db_value = getattr(article_db, attr) # Valor actual en la DB
+                                
+                                # Convertir la fecha a string sin la hora, para comparar con el CSV
+                                if attr == 'factualizacion':
+                                    db_value = db_value.strftime('%Y-%m-%d')
+                                    
+                                # Si cambia el valor, se guarda en 'changes'
+                                if new_value != db_value:
+                                    changes[attr] = new_value
+                                
+                        # Si hay cambios, se actualiza el artículo y se guarda en la lista de actualizados
+                        if changes:
+                            for attr, new_value in changes.items():
+                                setattr(article_db, attr, new_value)
+                            updated_articles.append(article_db)
+                            
+                    else:
+                        # Inserta como nuevo artículo 
+                        article = Article(
+                            ref=article_csv['CREF'],
+                            detalle=article_csv['CDETALLE'],
+                            codfam=article_csv['CCODFAM'],
+                            pcosto=article_csv['NCOSTEDIV'],
+                            pvp=article_csv['NPVP'],
+                            codebar=article_csv['CCODEBAR'],
+                            factualizacion=article_csv['DACTUALIZA']
+                        )
+                        new_articles.append(article)
+                    
+                # Aplicar cambios en la base de datos
+                try:
+                    session = db.session
+                    session.add_all(new_articles) # Insertar los nuevos artículos
+                    session.add_all(updated_articles) # Actualizar los artículos modificados 
+
+                    for codebar in deleted_articles:
+                        session.delete(db_articles[codebar]) # Eliminar los artículos que ya no existen
+                        
+                    session.commit() # Confirmar los cambios
+                    
+                    status_info = "Importación completada con exito."
+                except SQLAlchemyError as e:
+                    session.rollback()
+                    status = 1
+                    status_info = f"Error en la base de datos: {str(e)}"
+                finally:
+                    session.close()
                 
         except Exception as e:
             status = 1
@@ -1158,14 +1211,13 @@ def hticketl_dbf_to_csv(hticketl_dbf_path, hticketl_dbf_name, filetype):
     csv_path = os.path.join(DATA_ROUTE, f'no_filtered_{hticketl_dbf_name}.csv')
     df.to_csv(csv_path, index=False)
     
-    df = pd.read_csv(csv_path)
+    df = pd.read_csv(csv_path, dtype=HTICKETL_ID_DTYPE)
     df.columns = df.columns.str.strip()
     
-    # Convertir a string y quitar ".0" para columnas específicas
-    columns_to_fix = ['CCODBAR','CREF']
+    columns_to_fix = ['CCODBAR', 'CREF']
     for col in columns_to_fix:
         if col in df.columns:
-            df[col] = df[col].astype(str).str.replace(r'\.0$', '', regex=True)
+            df[col] = df[col].apply(format_id_for_csv)
     
     selected_columns = ['NNUMTICKET', 'CCODBAR', 'CREF', 'CDETALLE', 'NCANT', 'NPREUNIT']
     
@@ -1196,34 +1248,22 @@ def validate_clean_hticketl_data(row):
     errors = []
     
     # === CCODBAR ===
-    codebar = row.get('CCODBAR')
-    if not isinstance(codebar, (int, str)):
-        errors.append(f"El campo 'CCODBAR' no es del tipo esperado (int, str): Type -> {type(codebar)}.")
+    normalized, error, fix = normalize_numeric_id(row.get('CCODBAR'), 'CCODBAR')
+    if error:
+        errors.append(error)
     else:
-        original = str(codebar).strip()
-        cleaned = re.sub(r'\D', '', original)
-        if not cleaned:
-            errors.append("El campo 'CCODBAR' está vacío o no contiene números.")
-        elif cleaned != original:
-            fixes.append("Se han eliminado caracteres no numéricos del campo 'CCODBAR'.")
-            row['CCODBAR'] = cleaned
-        else:
-            row['CCODBAR'] = original
+        if fix:
+            fixes.append(fix)
+        row['CCODBAR'] = normalized
 
     # === CREF ===
-    ref = row.get('CREF')
-    if not isinstance(ref, (int, str)):
-        errors.append(f"El campo 'CREF' no es del tipo esperado (int, str): Type -> {type(ref)}.")
+    normalized, error, fix = normalize_numeric_id(row.get('CREF'), 'CREF')
+    if error:
+        errors.append(error)
     else:
-        original = str(ref).strip()
-        cleaned = re.sub(r'\D', '', original)
-        if not cleaned:
-            errors.append("El campo 'CREF' está vacío o no contiene números.")
-        elif cleaned != original:
-            fixes.append("Se han eliminado caracteres no numéricos del campo 'CREF'.")
-            row['CREF'] = cleaned
-        else:
-            row['CREF'] = original
+        if fix:
+            fixes.append(fix)
+        row['CREF'] = normalized
     
     # CDETALLE: cadena de hasta 100 caracteres, puede contener cualquier carácter UTF-8
     detalle = row.get('CDETALLE')
@@ -1264,7 +1304,7 @@ def update_hticketl(hticketl_dbf_path, hticketl_dbf_name, filetype, username):
                 raise TimeoutError(f"El archivo {hticketl_csv_path} no estuvo disponible en {timeout} segundos.")
             time.sleep(interval)
 
-        hticketl_csv = pd.read_csv(hticketl_csv_path)
+        hticketl_csv = pd.read_csv(hticketl_csv_path, dtype=HTICKETL_ID_DTYPE)
     except Exception as e:
         status = 1
         status_info = f"Error al leer el CSV: {str(e)}"
