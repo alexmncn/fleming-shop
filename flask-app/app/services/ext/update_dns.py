@@ -51,6 +51,10 @@ def update_dns_record(record_id, domain, server_ip):
         'proxied': domain['proxied']
     }
     response = requests.put(url, headers=HEADERS, json=data)
+    
+    print(response.status_code)
+    print(response.text)
+    
     data = response.json()
     if data['success']:
         domain['updated'] = True
@@ -109,15 +113,20 @@ def main():
     changed_ip = False
     
     server_ip = get_server_ip()
+    print(f"Server IP : {server_ip}")
 
     main_domain = domains[0]
 
     main_record_id, record_ip = get_record_id(main_domain)
+    print(f"Record ID : {main_record_id}")
+    print(f"DNS IP    : {record_ip}")
     
     if main_record_id:
         if server_ip == record_ip:
+            print("La IP ya coincide")
             changed_ip = False
         else:
+            print("Actualizando...")
             changed_ip = True
             update_dns_record(main_record_id, main_domain, server_ip)
             
